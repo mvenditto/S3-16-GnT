@@ -39,7 +39,7 @@ public class LocalActor extends UntypedAbstractActor {
                             ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
                             ",\"netty\":{\"tcp\":{\"hostname\":\""+Inet4Address.getLocalHost().getHostAddress()+"\",\"port\":5050}}}}}"
             );
-            ActorSystem system = ActorSystem.create("LocalSystem", customConf);
+            ActorSystem system = ActorSystem.create("LocalActor", customConf);
             system.actorOf(Props.create(LocalActor.class), "local");
         } catch (UnknownHostException e) {
             e.printStackTrace();
