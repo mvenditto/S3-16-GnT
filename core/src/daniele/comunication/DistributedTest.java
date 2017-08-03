@@ -34,16 +34,10 @@ public class DistributedTest {
     @Test
     public void testCommunicationBetweenSameSystem() {
         try {
-            String confText =
-                    "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," +
-                            "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" +
-                            ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
-                            ",\"netty\":{\"tcp\":{\"hostname\":\"" + Inet4Address.getLocalHost().getHostAddress() + "\",\"port\":2727}}}}}";
-            Config customConf = ConfigFactory.parseString(confText);
-            SystemManager.getInstance().createSystem("LocalSystem", customConf);
-            ActorRef local1 = SystemManager.getInstance().getSystem("LocalSystem").actorOf(Props.create(LocalActor.class), "local1");
-            ActorRef local2 = SystemManager.getInstance().getSystem("LocalSystem").actorOf(Props.create(LocalActor.class), "local2");
-            local1.tell(new IntMsg(0), local2);
+            SystemManager.getInstance().createSystem("LocalSystem", null);
+            ActorRef local_1 = SystemManager.getInstance().getSystem("LocalSystem").actorOf(Props.create(LocalActor.class), "local_1");
+            ActorRef local_2 = SystemManager.getInstance().getSystem("LocalSystem").actorOf(Props.create(LocalActor.class), "local_2");
+            local_1.tell(new IntMsg(0), local_2);
         } catch (Exception e) {
             e.printStackTrace();
         }
