@@ -12,7 +12,7 @@ import java.net.Inet4Address;
 public class DistributedTest {
 
     @Test
-    public void testCommunication() {
+    public void testCommunicationBetweenSystems() {
         try {
             String confText =
                     "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," +
@@ -26,6 +26,24 @@ public class DistributedTest {
             SystemManager.getInstance().createSystem("LocalSystem", customConf);
             ActorRef local = SystemManager.getInstance().getSystem("LocalSystem").actorOf(Props.create(LocalActor.class), "local");
             remote.tell(new IntMsg(0), local);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testCommunicationBetweenSameSystem() {
+        try {
+            String confText =
+                    "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," +
+                            "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" +
+                            ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
+                            ",\"netty\":{\"tcp\":{\"hostname\":\"" + Inet4Address.getLocalHost().getHostAddress() + "\",\"port\":2727}}}}}";
+            Config customConf = ConfigFactory.parseString(confText);
+            SystemManager.getInstance().createSystem("LocalSystem", customConf);
+            ActorRef local1 = SystemManager.getInstance().getSystem("LocalSystem").actorOf(Props.create(LocalActor.class), "local1");
+            ActorRef local2 = SystemManager.getInstance().getSystem("LocalSystem").actorOf(Props.create(LocalActor.class), "local2");
+            local1.tell(new IntMsg(0), local2);
         } catch (Exception e) {
             e.printStackTrace();
         }
