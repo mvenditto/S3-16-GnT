@@ -3,22 +3,18 @@ package daniele.comunication
 import akka.actor.{Props, UntypedAbstractActor}
 import daniele.comunication.Messages.{IntMsg, StringMsg}
 
-
-
-class LocalActor(name: String) extends UntypedAbstractActor {
-
+class AllActor(name: String) extends UntypedAbstractActor{
   override def onReceive(message: Any): Unit = message match {
     case msg: IntMsg =>
-      println(name + ": " + msg.v + " from: " + sender())
-      //x inc()
+      println("name: " + name + "| value: " + msg.v + " from: " + sender())
       sender().tell(IntMsg(msg.v+1), getSelf())
     case msg: StringMsg =>
-      println("message: " + msg.v)
-      sender().tell(StringMsg("received"), getSelf())
+      println("name: " + name + "| message: " + msg.v + " from: " + sender())
+      sender().tell(StringMsg("response"), getSelf())
     case _ => println("message unknown")
   }
 }
 
-object LocalActor {
-  def props(name: String): Props = Props(new LocalActor(name))
+object AllActor {
+  def props(name: String): Props = Props(new AllActor(name))
 }

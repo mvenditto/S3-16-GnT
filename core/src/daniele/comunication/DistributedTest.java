@@ -21,11 +21,11 @@ public class DistributedTest {
             Config customConf = ConfigFactory.parseString(confText);
             SystemManager.getInstance().createSystem("RemoteSystem", customConf);
             ActorRef remote = SystemManager.getInstance().getSystem("RemoteSystem").actorOf
-                    (LocalActor.props("Local"), "local");
+                    (IntActor.props("Remote"), "remote");
             customConf = ConfigFactory.parseString(confText.replace("2727", "5050"));
             SystemManager.getInstance().createSystem("LocalSystem", customConf);
             ActorRef local = SystemManager.getInstance().getSystem("LocalSystem").actorOf
-                    (LocalActor.props("Remote"), "remote");
+                    (IntActor.props("Local"), "local");
             remote.tell(new IntMsg(0), local);
         } catch (Exception e) {
             e.printStackTrace();
@@ -34,13 +34,34 @@ public class DistributedTest {
 
     @Test
     public void testCommunicationBetweenSameSystem() {
+        SystemManager.getInstance().createSystem("LocalSystem", null);
+        ActorRef firstLocal = SystemManager.getInstance().getSystem("LocalSystem").actorOf
+                (IntActor.props("First Local"), "firstLocal");
+        ActorRef secondLocal = SystemManager.getInstance().getSystem("LocalSystem").actorOf
+                (IntActor.props("Second Local"), "secondLocal");
+        firstLocal.tell(new IntMsg(0), secondLocal);
+    }
+
+    @Test
+    public void testTwoSystemsThreeActors() {
         try {
-            SystemManager.getInstance().createSystem("LocalSystem", null);
+            String confText =
+                    "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," +
+                            "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" +
+                            ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
+                            ",\"netty\":{\"tcp\":{\"hostname\":\""+ Inet4Address.getLocalHost().getHostAddress()+"\",\"port\":2727}}}}}";
+            Config customConf = ConfigFactory.parseString(confText);
+            SystemManager.getInstance().createSystem("RemoteSystem", customConf);
+            ActorRef remote = SystemManager.getInstance().getSystem("RemoteSystem").actorOf
+                    (IntActor.props("Remote"), "remote");
+            customConf = ConfigFactory.parseString(confText.replace("2727", "5050"));
+            SystemManager.getInstance().createSystem("LocalSystem", customConf);
             ActorRef firstLocal = SystemManager.getInstance().getSystem("LocalSystem").actorOf
-                    (LocalActor.props("First Local"), "firstLocal");
-            ActorRef SecondLocal = SystemManager.getInstance().getSystem("LocalSystem").actorOf
-                    (LocalActor.props("Second Local"), "secondLocal");
-            firstLocal.tell(new IntMsg(0), SecondLocal);
+                    (AllActor.props("First Local"), "firstLocal");
+            ActorRef secondLocal = SystemManager.getInstance().getSystem("LocalSystem").actorOf
+                    (StringActor.props("Second Local"), "secondLocal");
+            remote.tell(new IntMsg(0), firstLocal);
+            secondLocal.tell(new Messages.StringMsg("hello world"), firstLocal);
         } catch (Exception e) {
             e.printStackTrace();
         }
