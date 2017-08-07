@@ -4,7 +4,7 @@ import java.net.InetAddress
 
 import akka.actor.{ActorRef, ActorSelection}
 import com.typesafe.config.{Config, ConfigFactory}
-import daniele.utils.IntMsg
+import daniele.comunication.Messages.IntMsg
 
 object RemoteLauncher extends App {
   val confText: String =
@@ -29,5 +29,5 @@ object LocalLauncher extends App {
   val local: ActorRef = SystemManager.getInstance().getSystem("LocalSystem").actorOf(LocalActor.props("Local"), "local")
   val remoteActor: ActorSelection = SystemManager.getInstance().getSystem("LocalSystem").actorSelection("akka.tcp://RemoteSystem@192.168.1.12:2727/user/remote")
   println("That 's remote: " + remoteActor)
-  remoteActor.tell(new IntMsg(0), local)
+  remoteActor.tell(IntMsg(0), local)
 }

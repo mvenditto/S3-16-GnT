@@ -3,7 +3,7 @@ package daniele.comunication;
 import akka.actor.ActorRef;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import daniele.utils.IntMsg;
+import daniele.comunication.Messages.IntMsg;
 import org.junit.Test;
 
 import java.net.Inet4Address;
