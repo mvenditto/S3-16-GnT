@@ -1,11 +1,11 @@
 package daniele.comunication
 
-import akka.actor.{Props, UntypedAbstractActor}
+import akka.actor.Props
 import daniele.comunication.Messages.IntMsg
 
 
 
-class IntActor(name: String) extends UntypedAbstractActor {
+class IntActor(override val name: String) extends NamedActor {
 
   override def onReceive(message: Any): Unit = message match {
     case msg: IntMsg =>

@@ -1,9 +1,9 @@
 package daniele.comunication
 
-import akka.actor.{Props, UntypedAbstractActor}
+import akka.actor.Props
 import daniele.comunication.Messages.{IntMsg, StringMsg}
 
-class AllActor(name: String) extends UntypedAbstractActor{
+class AllActor(override val name: String) extends NamedActor {
   override def onReceive(message: Any): Unit = message match {
     case msg: IntMsg =>
       println("name: " + name + "| value: " + msg.v + " from: " + sender())
