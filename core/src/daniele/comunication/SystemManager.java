@@ -9,6 +9,7 @@ import com.typesafe.config.Config;
 import javafx.util.Pair;
 import scala.concurrent.Future;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,15 +42,18 @@ public class SystemManager {
     }
 
     public ActorRef getLocalActor(String actorName) {
-        for(Pair<String, ActorRef> pair: this.actorList) {
-            if(pair.getKey().equals(actorName)) {
-                return pair.getValue();
-            }
-        }
-        return null;
+        return  this.actorList.stream().filter(x -> x.getKey().equals(actorName)).findFirst().get().getValue();
     }
 
     public ActorSelection getRemoteActor(String systemName, String ip, String portNumber, String path) {
-        return this.system.actorSelection("akka.tcp://" + systemName + "@" + ip + ":" + portNumber + path);
+        StringBuilder tmp = new StringBuilder(60);
+        tmp.append("akka.tcp://");
+        tmp.append(systemName);
+        tmp.append("@");
+        tmp.append(ip);
+        tmp.append(":");
+        tmp.append(portNumber);
+        tmp.append(path);
+        return this.system.actorSelection(tmp.toString());
     }
 }
