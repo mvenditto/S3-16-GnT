@@ -14,7 +14,7 @@ public interface MovableEntity<T extends Vector<T>> extends SteeringEntity<T>{
 
     ComplexSteeringBehaviorBuilder<T> setComplexSteeringBehavior();
 
-    Ray[] getRays();
+    Ray<T>[] getRays();
 
     Color getColor();
 

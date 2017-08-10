@@ -9,6 +9,8 @@ public interface GeometryRenderer {
 
     void renderCharacter(ShapeRenderer shapeRenderer, MovableEntity<Vector2> character);
 
+    void renderCharacterDebugInfo(ShapeRenderer shapeRenderer, MovableEntity<Vector2> character);
+
     void renderGraph(ShapeRenderer shapeRenderer, Graph graph);
 
     void renderMap(ShapeRenderer shapeRenderer, Object map);
