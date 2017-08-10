@@ -8,12 +8,32 @@ import com.badlogic.gdx.math.Vector;
 
 public interface MovableEntity<T extends Vector<T>> extends SteeringEntity<T>{
 
+    /**
+     * Set a {@link RaycastCollisionDetector} to enable this entity to avoid world objects collisions.
+     * @param collisionDetector the collision detector to be used by this.
+     */
     void setCollisionDetector(RaycastCollisionDetector<T> collisionDetector);
 
+    /**
+     * Set a {@link Proximity} to enable this entity to hide behind world objects.
+     * @param proximityDetector the proximity detector to be used by this.
+     */
     void setProximityDetector(Proximity<T> proximityDetector);
 
+    /**
+     * Returns a {@link ComplexSteeringBehaviorBuilder} linked with this {@link MovableEntity}
+     * that enables to build a complex {@link com.badlogic.gdx.ai.steer.SteeringBehavior}.
+     * When a build...(*) method is called, the created behavior is setted as this entity
+     * {@link com.badlogic.gdx.ai.steer.SteeringBehavior}.
+     * @return the builded {@link com.badlogic.gdx.ai.steer.SteeringBehavior}.
+     */
     ComplexSteeringBehaviorBuilder<T> setComplexSteeringBehavior();
 
+    /**
+     *
+     * @return An Array of {@link Ray},
+     * used by the {@link RaycastCollisionDetector} used by this entity, if present.
+     */
     Ray<T>[] getRays();
 
     Color getColor();

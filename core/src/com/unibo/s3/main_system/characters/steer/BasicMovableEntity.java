@@ -144,7 +144,7 @@ public class BasicMovableEntity extends BasicSteeringEntity implements MovableEn
     }
 
     @Override
-    public Ray[] getRays() {
+    public Ray<Vector2>[] getRays() {
         return rayConfiguration.getRays();
     }
 
