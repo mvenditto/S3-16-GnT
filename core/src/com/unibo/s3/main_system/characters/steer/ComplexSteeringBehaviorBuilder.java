@@ -7,23 +7,23 @@ import com.badlogic.gdx.math.Vector;
 
 public interface ComplexSteeringBehaviorBuilder<T extends Vector<T>> {
 
-    ComplexSteeringBehaviorBuilder seek(Location<T> target);
+    ComplexSteeringBehaviorBuilder<T> seek(Location<T> target);
 
-    ComplexSteeringBehaviorBuilder fleeFrom(Location<T> target);
+    ComplexSteeringBehaviorBuilder<T> fleeFrom(Location<T> target);
 
-    ComplexSteeringBehaviorBuilder arriveTo(Location<T> target);
+    ComplexSteeringBehaviorBuilder<T> arriveTo(Location<T> target);
 
-    ComplexSteeringBehaviorBuilder pursue(Steerable<T> target);
+    ComplexSteeringBehaviorBuilder<T> pursue(Steerable<T> target);
 
-    ComplexSteeringBehaviorBuilder evadeFrom(Steerable<T> target);
+    ComplexSteeringBehaviorBuilder<T> evadeFrom(Steerable<T> target);
 
-    ComplexSteeringBehaviorBuilder hideFrom(Steerable<T> target);
+    ComplexSteeringBehaviorBuilder<T> hideFrom(Steerable<T> target);
 
-    ComplexSteeringBehaviorBuilder add(SteeringBehavior<T> steeringBehavior);
+    ComplexSteeringBehaviorBuilder<T> add(SteeringBehavior<T> steeringBehavior);
 
-    ComplexSteeringBehaviorBuilder avoidCollisionsWithWorld();
+    ComplexSteeringBehaviorBuilder<T> avoidCollisionsWithWorld();
 
-    ComplexSteeringBehaviorBuilder wander();
+    ComplexSteeringBehaviorBuilder<T> wander();
 
     SteeringBehavior<T> buildPriority();
 

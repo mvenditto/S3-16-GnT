@@ -42,6 +42,8 @@ public class Box2dRaycastCollisionDetector implements RaycastCollisionDetector<V
 		this.callback = callback;
 	}
 
+	public World getWorld() {return world;}
+
 	@Override
 	public boolean collides (Ray<Vector2> ray) {
 		return findCollision(null, ray);

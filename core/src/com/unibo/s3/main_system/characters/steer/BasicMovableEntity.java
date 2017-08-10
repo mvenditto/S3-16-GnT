@@ -12,7 +12,9 @@ import com.badlogic.gdx.ai.steer.utils.rays.RayConfigurationBase;
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dRaycastCollisionDetector;
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dSquareAABBProximity;
@@ -20,7 +22,7 @@ import com.unibo.s3.main_system.characters.steer.collisions.Box2dSquareAABBProxi
 import java.util.ArrayList;
 import java.util.List;
 
-public class BasicMovableEntity extends BasicSteeringEntity implements MovableEntity<Vector2>{
+public class BasicMovableEntity extends BasicSteeringEntity implements MovableEntity<Vector2> {
 
     private RayConfigurationBase<Vector2> rayConfiguration;
 
@@ -58,6 +60,9 @@ public class BasicMovableEntity extends BasicSteeringEntity implements MovableEn
     private final static float hideDistFromBoundary = 2f;
     private final static float hideMaxTimePrediction = 0.3f;
 
+    private Color color = Color.WHITE;
+    private Object userData;
+
     public BasicMovableEntity(Vector2 position) {
         super(position);
 
@@ -74,7 +79,7 @@ public class BasicMovableEntity extends BasicSteeringEntity implements MovableEn
 
         flee = new Flee<>(this);
 
-        pursue = new Pursue<Vector2>(this, null);
+        pursue = new Pursue<>(this, null);
 
         evade =  new Evade<>(this, null, hideMaxTimePrediction);
 
@@ -91,9 +96,32 @@ public class BasicMovableEntity extends BasicSteeringEntity implements MovableEn
     }
 
     @Override
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    @Override
+    public Object getUserData() {
+        return userData;
+    }
+
+    @Override
+    public void setUserData(Object userData) {
+        this.userData = userData;
+    }
+
+    @Override
+    public Color getColor() {
+        return color;
+    }
+
+    @Override
     public void act(float dt) {
         super.act(dt);
-        ((CentralRayWithWhiskersConfiguration<Vector2>)rayConfiguration).setRayLength(Math.max(getLinearVelocity().len(), minMainRayLenght));
+        if (rayConfiguration != null) {
+            ((CentralRayWithWhiskersConfiguration<Vector2>) rayConfiguration)
+                    .setRayLength(Math.max(getLinearVelocity().len(), minMainRayLenght));
+        }
     }
 
     @Override
@@ -166,7 +194,7 @@ public class BasicMovableEntity extends BasicSteeringEntity implements MovableEn
         }
 
         @Override
-        public ComplexSteeringBehaviorBuilder arriveTo(Location<Vector2> target) {
+        public BehaviorBuilder arriveTo(Location<Vector2> target) {
             behaviorQueue.add(arrive.setTarget(target));
             return this;
         }
@@ -186,7 +214,7 @@ public class BasicMovableEntity extends BasicSteeringEntity implements MovableEn
         }
 
         @Override
-        public ComplexSteeringBehaviorBuilder avoidCollisionsWithWorld() {
+        public BehaviorBuilder avoidCollisionsWithWorld() {
             if (raycastObstacleAvoidance != null) {
                 behaviorQueue.add(raycastObstacleAvoidance);
             }

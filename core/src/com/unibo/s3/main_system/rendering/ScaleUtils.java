@@ -1,6 +1,6 @@
 package com.unibo.s3.main_system.rendering;
 
-public class ScaleUtils {
+public final class ScaleUtils {
 
     private static final int PIXELS_PER_METER = 50;
     private static final float METERS_PER_PIXEL = 1.0f / PIXELS_PER_METER;

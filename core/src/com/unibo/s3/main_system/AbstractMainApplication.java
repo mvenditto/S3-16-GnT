@@ -28,9 +28,10 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
     private float cameraZoomSpeed = 0.1f;
     private float cameraViewportWidthMeters = 30f;
 
-    private boolean pause = true;
+    protected boolean pause = true;
 
     protected abstract void doRender();
+
     protected abstract void doUpdate(float delta);
 
     @Override
@@ -134,7 +135,5 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
         cam.project(p);
         return new Vector2(p.x, p.y);
     }
-
-
 
 }
