@@ -6,6 +6,10 @@ import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
+/**
+ *
+ * @author mvenditto
+ * */
 public class BaseSteeringEntity implements SteeringEntity<Vector2> {
 
     private Vector2 position;

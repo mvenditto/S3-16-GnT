@@ -9,5 +9,4 @@ public interface GraphRenderingConfig {
     Color getVertexColor();
 
     float getVertexRadiusMeters();
-
 }

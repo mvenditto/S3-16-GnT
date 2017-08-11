@@ -18,7 +18,6 @@ package com.unibo.s3.main_system.characters.steer.collisions;
 
 import com.badlogic.gdx.ai.steer.Proximity;
 import com.badlogic.gdx.ai.steer.Steerable;
-import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.QueryCallback;
