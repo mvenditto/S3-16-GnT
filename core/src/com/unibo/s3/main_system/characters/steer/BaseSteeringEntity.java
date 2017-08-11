@@ -6,7 +6,7 @@ import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-public class BasicSteeringEntity implements SteeringEntity<Vector2> {
+public class BaseSteeringEntity implements SteeringEntity<Vector2> {
 
     private Vector2 position;
     private Vector2 linearVelocity;
@@ -26,7 +26,7 @@ public class BasicSteeringEntity implements SteeringEntity<Vector2> {
 
     private static final SteeringAcceleration<Vector2> steeringOutput = new SteeringAcceleration<>(new Vector2());
 
-    public BasicSteeringEntity(Vector2 position) {
+    public BaseSteeringEntity(Vector2 position) {
         this.position = position.cpy();
         this.linearVelocity = new Vector2(0.0f, 0.0f);
     }

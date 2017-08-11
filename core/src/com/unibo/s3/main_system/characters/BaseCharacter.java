@@ -2,9 +2,9 @@ package com.unibo.s3.main_system.characters;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.unibo.s3.main_system.characters.steer.BasicMovableEntity;
+import com.unibo.s3.main_system.characters.steer.BaseMovableEntity;
 
-public class BaseCharacter extends BasicMovableEntity implements Character {
+public class BaseCharacter extends BaseMovableEntity implements Character {
 
     private Color color;
     private final int id;

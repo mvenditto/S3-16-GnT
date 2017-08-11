@@ -13,7 +13,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import static com.unibo.s3.main_system.rendering.ScaleUtils.getPixelsPerMeter;
 import static com.unibo.s3.main_system.rendering.ScaleUtils.metersToPixels;
 
-public class BasicGeometryRenderer implements GeometryRenderer {
+public class GeometryRendererImpl implements GeometryRenderer {
 
     @Override
     public void renderCharacter(ShapeRenderer shapeRenderer, MovableEntity<Vector2> character) {

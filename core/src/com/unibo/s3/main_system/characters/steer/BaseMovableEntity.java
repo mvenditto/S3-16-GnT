@@ -14,15 +14,12 @@ import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
-import com.unibo.s3.main_system.characters.steer.collisions.Box2dRaycastCollisionDetector;
-import com.unibo.s3.main_system.characters.steer.collisions.Box2dSquareAABBProximity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BasicMovableEntity extends BasicSteeringEntity implements MovableEntity<Vector2> {
+public class BaseMovableEntity extends BaseSteeringEntity implements MovableEntity<Vector2> {
 
     private RayConfigurationBase<Vector2> rayConfiguration;
 
@@ -63,7 +60,7 @@ public class BasicMovableEntity extends BasicSteeringEntity implements MovableEn
     private Color color = Color.WHITE;
     private Object userData;
 
-    public BasicMovableEntity(Vector2 position) {
+    public BaseMovableEntity(Vector2 position) {
         super(position);
 
         wander = new Wander<>(this)
@@ -156,9 +153,9 @@ public class BasicMovableEntity extends BasicSteeringEntity implements MovableEn
     private class BehaviorBuilder implements ComplexSteeringBehaviorBuilder<Vector2> {
 
         private List<SteeringBehavior<Vector2>> behaviorQueue;
-        private BasicSteeringEntity owner;
+        private BaseSteeringEntity owner;
 
-        BehaviorBuilder(BasicSteeringEntity owner) {
+        BehaviorBuilder(BaseSteeringEntity owner) {
             behaviorQueue = new ArrayList<>();
             this.owner = owner;
         }
