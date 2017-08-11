@@ -124,12 +124,22 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
         }
     }
 
+    /**
+     *
+     * @param screenPosition a {@link Vector2} in screen space to be converted to world coordinate.
+     * @return the converted {@link Vector2} in world space.
+     */
     public Vector2 screenToWorld(Vector2 screenPosition) {
         Vector3 u = new Vector3(screenPosition.x, screenPosition.y, 0);
         cam.unproject(u);
         return new Vector2(u.x, u.y);
     }
 
+    /**
+     *
+     * @param worldPosition a {@link Vector2} in world space to be converted to screen coordinate.
+     * @return the converted {@link Vector2} in screen space.
+     */
     public Vector2 worldToScreen(Vector2 worldPosition) {
         Vector3 p = new Vector3(worldPosition.x, worldPosition.y, 0);
         cam.project(p);

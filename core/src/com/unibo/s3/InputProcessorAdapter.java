@@ -2,6 +2,10 @@ package com.unibo.s3;
 
 import com.badlogic.gdx.InputProcessor;
 
+/**
+ * {@link InputProcessorAdapter} is an adapter interface with default empty implementation of {@link InputProcessor}
+ * interface methods.
+ * */
 public interface InputProcessorAdapter extends InputProcessor {
 
     default boolean keyDown(int keycode) {
