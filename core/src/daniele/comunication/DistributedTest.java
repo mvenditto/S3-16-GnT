@@ -4,11 +4,39 @@ import akka.actor.*;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import daniele.comunication.Messages.IntMsg;
+import org.jgrapht.UndirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.net.Inet4Address;
 
 public class DistributedTest {
+
+    private UndirectedGraph<String, DefaultEdge> graph;
+
+    @Before
+    public void initialization() {
+        this.graph = new SimpleGraph<>(DefaultEdge.class);
+
+        String v1 = "v1";
+        String v2 = "v2";
+        String v3 = "v3";
+        String v4 = "v4";
+
+        this.graph.addVertex(v1);
+        this.graph.addVertex(v2);
+        this.graph.addVertex(v3);
+        this.graph.addVertex(v4);
+
+        this.graph.addEdge(v1, v2);
+        this.graph.addEdge(v2, v3);
+        this.graph.addEdge(v3, v4);
+        this.graph.addEdge(v4, v1);
+
+        System.out.println("initial graph: " + this.graph.toString());
+    }
 
     @Test
     public void testCommunicationBetweenSystems() {
@@ -20,34 +48,24 @@ public class DistributedTest {
                             ",\"netty\":{\"tcp\":{\"hostname\":\""+ Inet4Address.getLocalHost().getHostAddress()+"\",\"port\":2727}}}}}";
             Config customConf = ConfigFactory.parseString(confText);
             SystemManager.getInstance().createSystem("RemoteSystem", customConf);
-            ActorRef remote = SystemManager.getInstance().createActor(IntActor.props("Remote"), "remote");
+            ActorRef remote = SystemManager.getInstance().createActor(GraphActor.props("Remote"), "remote");
             customConf = ConfigFactory.parseString(confText.replace("2727", "5050"));
-            ActorSystem RemoteSystem = ActorSystem.create("LocalSystem", customConf);
-            ActorRef local = RemoteSystem.actorOf
-                    (IntActor.props("Local"), "local");
-            remote.tell(new IntMsg(0), local);
+            ActorSystem LocalSystem = ActorSystem.create("LocalSystem", customConf);
+            ActorRef local = LocalSystem.actorOf
+                    (GraphActor.props("Local"), "local");
+            remote.tell(this.graph, local);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Test
-    public void testCommunicationBetweenSameSystem() {
-        SystemManager.getInstance().createSystem("LocalSystem", null);
-        ActorRef firstLocal = SystemManager.getInstance().createActor(IntActor.props("First Local"), "firstLocal");
-        ActorRef secondLocal =SystemManager.getInstance().createActor(IntActor.props("Second Local"), "secondLocal");
-        firstLocal.tell(new IntMsg(0), secondLocal);
-    }
-
-    @Test
-    public void testSelectionOnLocalSystem() {
+    public void testCommunicationAndSelectionOnLocalSystem() {
         SystemManager.getInstance().createSystem("System", null);
-        SystemManager.getInstance().createActor(IntActor.props("First Local"), "firstLocal");
-        SystemManager.getInstance().createActor(IntActor.props("Second Local"), "secondLocal");
+        SystemManager.getInstance().createActor(GraphActor.props("First Local"), "firstLocal");
+        SystemManager.getInstance().createActor(GraphActor.props("Second Local"), "secondLocal");
         ActorRef first = SystemManager.getInstance().getLocalActor("firstLocal");
         ActorRef second = SystemManager.getInstance().getLocalActor("secondLocal");
-        second.tell(new IntMsg(0), first);
+        second.tell(this.graph, first);
     }
-
-
 }
