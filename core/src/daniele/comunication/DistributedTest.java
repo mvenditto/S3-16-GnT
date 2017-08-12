@@ -3,7 +3,6 @@ package daniele.comunication;
 import akka.actor.*;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import daniele.comunication.Messages.IntMsg;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
