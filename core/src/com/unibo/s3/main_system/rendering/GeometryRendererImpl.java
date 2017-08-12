@@ -93,6 +93,5 @@ public class GeometryRendererImpl implements GeometryRenderer<Vector2> {
 
     @Override
     public void renderMap(ShapeRenderer shapeRenderer, Object map) {
-        throw new NotImplementedException();
     }
 }
