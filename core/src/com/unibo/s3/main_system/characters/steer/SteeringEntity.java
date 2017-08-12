@@ -5,9 +5,11 @@ import com.badlogic.gdx.ai.steer.SteeringBehavior;
 import com.badlogic.gdx.math.Vector;
 
 /**
-* A SteeringEntity is a {@link Steerable} entity that as a {@link SteeringBehavior} linked to it
-* and that updates itself accordingly each time {@link #act(float)} is called.
-* */
+ * A SteeringEntity is a {@link Steerable} entity that as a {@link SteeringBehavior} linked to it
+ * and that updates itself accordingly each time {@link #act(float)} is called.
+ *
+ * @author mvenditto
+**/
 public interface SteeringEntity<T extends Vector<T>> extends Steerable<T> {
 
     /**

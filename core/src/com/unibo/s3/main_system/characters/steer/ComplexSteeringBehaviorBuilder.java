@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector;
  * that is the result of a set of single {@link SteeringBehavior} summed up with some strategy.
  *
  * @param <T> Type of vector, either 2D or 3D, implementing the {@link Vector} interface
+ * @author mvenditto
  */
 public interface ComplexSteeringBehaviorBuilder<T extends Vector<T>> {
 

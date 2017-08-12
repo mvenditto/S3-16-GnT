@@ -1,5 +1,9 @@
 package com.unibo.s3.main_system.rendering;
 
+/**
+ *
+ * @author mvenditto
+ * */
 public final class ScaleUtils {
 
     private static final int PIXELS_PER_METER = 50;

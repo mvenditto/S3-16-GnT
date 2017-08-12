@@ -19,6 +19,10 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+*
+* @author mvenditto
+* */
 public class BaseMovableEntity extends BaseSteeringEntity implements MovableEntity<Vector2> {
 
     private RayConfigurationBase<Vector2> rayConfiguration;

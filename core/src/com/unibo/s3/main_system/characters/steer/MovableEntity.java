@@ -6,6 +6,10 @@ import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector;
 
+/**
+ *
+ * @author mvenditto
+ * */
 public interface MovableEntity<T extends Vector<T>> extends SteeringEntity<T>{
 
     /**
