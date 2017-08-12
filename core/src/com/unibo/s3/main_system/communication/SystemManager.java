@@ -5,10 +5,10 @@ import akka.actor.ActorSelection;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import com.typesafe.config.Config;
-import javafx.util.Pair;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SystemManager {
     private static SystemManager ourInstance = new SystemManager();
@@ -18,7 +18,7 @@ public class SystemManager {
     }
 
     private ActorSystem system;
-    private List<Pair<String, ActorRef>> actorList;
+    private Map<String, ActorRef> actorList;
 
     private SystemManager() { }
 
@@ -28,15 +28,15 @@ public class SystemManager {
 
     public ActorRef createActor(Props props, String actorName) {
         if(this.actorList == null) {
-            this.actorList = new ArrayList<>();
+            this.actorList = new HashMap<>();
         }
         ActorRef ref = this.system.actorOf(props, actorName);
-        this.actorList.add(new Pair<>(actorName, ref));
+        this.actorList.put(actorName, ref);
         return ref;
     }
 
     public ActorRef getLocalActor(String actorName) {
-        return  this.actorList.stream().filter(x -> x.getKey().equals(actorName)).findFirst().get().getValue();
+        return  this.actorList.entrySet().stream().filter(x -> x.getKey().equals(actorName)).findFirst().get().getValue();
     }
 
     public ActorSelection getRemoteActor(String systemName, String ip, String portNumber, String path) {
