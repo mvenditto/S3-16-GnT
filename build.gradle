@@ -53,6 +53,7 @@ project(":core") {
     apply plugin: "scala"
 
     dependencies {
+        compile 'junit:junit:4.12'
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
