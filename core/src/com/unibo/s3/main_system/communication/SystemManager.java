@@ -1,20 +1,14 @@
-package daniele.comunication;
+package com.unibo.s3.main_system.communication;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSelection;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import akka.util.Timeout;
 import com.typesafe.config.Config;
 import javafx.util.Pair;
-import scala.concurrent.Future;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class SystemManager {
     private static SystemManager ourInstance = new SystemManager();
