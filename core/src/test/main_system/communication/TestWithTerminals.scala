@@ -1,8 +1,9 @@
-package com.unibo.s3.main_system.communication
+package communication
 
 import java.net.InetAddress
 
 import com.typesafe.config.ConfigFactory
+import com.unibo.s3.main_system.communication.{GraphActor, SystemManager}
 import org.jgrapht.graph.{DefaultEdge, SimpleGraph}
 
 object RemoteLauncher extends App {

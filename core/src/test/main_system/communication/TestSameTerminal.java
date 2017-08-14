@@ -1,17 +1,20 @@
-package com.unibo.s3.main_system.communication;
+package communication;
+
+import com.unibo.s3.main_system.communication.GraphActor;
+import com.unibo.s3.main_system.communication.SystemManager;
+import org.jgrapht.graph.DefaultEdge;
 
 import akka.actor.*;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.jgrapht.UndirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.Inet4Address;
 
-public class DistributedTest {
+public class TestSameTerminal {
 
     private UndirectedGraph<String, DefaultEdge> graph;
 
