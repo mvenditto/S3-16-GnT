@@ -59,7 +59,7 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
 
     /*hide behavior*/
     private final static float hideDistFromBoundary = 2f;
-    private final static float hideMaxTimePrediction = 0.3f;
+    private final static float maxPredictionTime = 0.3f;
 
     private Color color = Color.WHITE;
     private Object userData;
@@ -80,9 +80,9 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
 
         flee = new Flee<>(this);
 
-        pursue = new Pursue<>(this, null);
+        pursue = new Pursue<>(this, null, maxPredictionTime);
 
-        evade =  new Evade<>(this, null, hideMaxTimePrediction);
+        evade =  new Evade<>(this, null, maxPredictionTime);
 
         arrive = new Arrive<>(this, null)
                 .setTimeToTarget(defaultTimeToTarget)
@@ -165,6 +165,11 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
         }
 
         @Override
+        public int getBehaviorsNumber() {
+            return behaviorQueue.size();
+        }
+
+        @Override
         public BehaviorBuilder pursue(Steerable<Vector2> target) {
             behaviorQueue.add(pursue.setTarget(target));
             return this;
@@ -202,9 +207,7 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
 
         @Override
         public BehaviorBuilder hideFrom(Steerable<Vector2> target) {
-            if (hide.getProximity() != null) {
-                behaviorQueue.add(hide.setTarget(target));
-            }
+            behaviorQueue.add(hide.setTarget(target));
             return this;
         }
 
@@ -216,14 +219,12 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
 
         @Override
         public BehaviorBuilder avoidCollisionsWithWorld() {
-            if (raycastObstacleAvoidance != null) {
-                behaviorQueue.add(raycastObstacleAvoidance);
-            }
+            behaviorQueue.add(raycastObstacleAvoidance);
             return this;
         }
 
         @Override
-        public SteeringBehavior<Vector2> buildBlended(float... weights) {
+        public SteeringBehavior<Vector2> buildBlended(float[] weights, boolean setAsEntityBehavior) {
 
             if (weights.length < behaviorQueue.size()) {
                 throw new IllegalArgumentException("Too few weights");
@@ -235,16 +236,22 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
                 finalBehavior.add(behaviorQueue.get(i), weights[i]);
             }
 
-            owner.setSteeringBehavior(finalBehavior);
+            if (setAsEntityBehavior) {
+                owner.setSteeringBehavior(finalBehavior);
+            }
             behaviorQueue.clear();
             return finalBehavior;
         }
         
         @Override
-        public SteeringBehavior<Vector2> buildPriority() {
+        public SteeringBehavior<Vector2> buildPriority(boolean setAsEntityBehavior) {
             final PrioritySteering<Vector2> finalBehavior = new PrioritySteering<>(owner, 0.0001f);
             behaviorQueue.forEach(finalBehavior::add);
-            owner.setSteeringBehavior(finalBehavior);
+
+            if (setAsEntityBehavior) {
+                owner.setSteeringBehavior(finalBehavior);
+            }
+
             behaviorQueue.clear();
             return finalBehavior;
         }
