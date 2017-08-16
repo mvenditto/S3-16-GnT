@@ -3,6 +3,10 @@ package com.unibo.s3.main_system.characters.steer;
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector2;
 
+/**
+ *
+ * @author mvenditto
+ * */
 public class CustomLocation implements Location<Vector2> {
 
     private Vector2 position;

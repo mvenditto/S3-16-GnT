@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector;
  * that is the result of a set of single {@link SteeringBehavior} summed up with some strategy.
  *
  * @param <T> Type of vector, either 2D or 3D, implementing the {@link Vector} interface
+ * @author mvenditto
  */
 public interface ComplexSteeringBehaviorBuilder<T extends Vector<T>> {
 
@@ -99,7 +100,7 @@ public interface ComplexSteeringBehaviorBuilder<T extends Vector<T>> {
      * See: {@link com.badlogic.gdx.ai.steer.behaviors.PrioritySteering}
      * @return The resulting {@link com.badlogic.gdx.ai.steer.SteeringBehavior}.
      */
-    SteeringBehavior<T> buildPriority();
+    SteeringBehavior<T> buildPriority(boolean setAsEntityBehavior);
 
     /**
      * Build the resulting {@link com.badlogic.gdx.ai.steer.SteeringBehavior}, summing up all the single behaviors.
@@ -109,6 +110,8 @@ public interface ComplexSteeringBehaviorBuilder<T extends Vector<T>> {
      * See: {@link com.badlogic.gdx.ai.steer.behaviors.BlendedSteering}
      * @return The resulting {@link com.badlogic.gdx.ai.steer.SteeringBehavior}.
      */
-    SteeringBehavior<T> buildBlended(float... weights);
+    SteeringBehavior<T> buildBlended(float[] weights, boolean setAsEntityBehavior);
+
+    int getBehaviorsNumber();
 
 }

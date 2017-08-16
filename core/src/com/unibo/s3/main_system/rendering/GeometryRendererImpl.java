@@ -8,12 +8,17 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.characters.steer.MovableEntity;
 import com.unibo.s3.main_system.graph.Graph;
+import com.unibo.s3.main_system.graph.GraphAdapter;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static com.unibo.s3.main_system.rendering.ScaleUtils.getPixelsPerMeter;
 import static com.unibo.s3.main_system.rendering.ScaleUtils.metersToPixels;
 
-public class GeometryRendererImpl implements GeometryRenderer {
+/**
+ *
+ * @author mvenditto
+ * */
+public class GeometryRendererImpl implements GeometryRenderer<Vector2> {
 
     @Override
     public void renderCharacter(ShapeRenderer shapeRenderer, MovableEntity<Vector2> character) {
@@ -66,12 +71,27 @@ public class GeometryRendererImpl implements GeometryRenderer {
     }
 
     @Override
-    public void renderGraph(ShapeRenderer shapeRenderer, Graph graph) {
-        throw new NotImplementedException();
+    public void renderGraph(ShapeRenderer shapeRenderer, GraphAdapter<Vector2> graph, GraphRenderingConfig config) {
+        final Color edgeColor = config.getEdgeColor();
+        final Color vertexColor = config.getVertexColor();
+        final int scale = getPixelsPerMeter();
+        final float vertexRadiusPixel = config.getVertexRadiusMeters() * scale;
+        final Color backupColor = shapeRenderer.getColor();
+
+        graph.getVertices().forEachRemaining(v-> {
+            final float scaledX = v.x * scale;
+            final float scaledY = v.y * scale;
+            shapeRenderer.setColor(vertexColor);
+            shapeRenderer.circle(scaledX, scaledY, vertexRadiusPixel);
+            shapeRenderer.setColor(edgeColor);
+            graph.getNeighbors(v).forEachRemaining(n ->
+                    shapeRenderer.line(scaledX, scaledY, n.x * scale, n.y * scale));
+        });
+
+        shapeRenderer.setColor(backupColor);
     }
 
     @Override
     public void renderMap(ShapeRenderer shapeRenderer, Object map) {
-        throw new NotImplementedException();
     }
 }
