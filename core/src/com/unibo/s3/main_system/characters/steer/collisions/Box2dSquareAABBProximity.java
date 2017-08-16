@@ -57,7 +57,7 @@ public class Box2dSquareAABBProximity implements Proximity<Vector2>, QueryCallba
     }
 
     @Override
-    public int findNeighbors (ProximityCallback<Vector2> behaviorCallback) {
+    public int findNeighbors (Proximity.ProximityCallback<Vector2> behaviorCallback) {
         this.behaviorCallback = behaviorCallback;
         neighborCount = 0;
         prepareAABB(aabb);
