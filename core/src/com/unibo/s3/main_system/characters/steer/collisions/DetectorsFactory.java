@@ -7,8 +7,8 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public interface DetectorsFactory<T extends Vector<T>> {
 
-    RaycastCollisionDetector<T> newRaycastCollisionDetector(World world);
+    RaycastCollisionDetector<T> newRaycastCollisionDetector();
 
-    Proximity<T> newProximityDetector(World world, float detectRadius);
+    Proximity<T> newProximityDetector(float detectionRadius);
 
 }
