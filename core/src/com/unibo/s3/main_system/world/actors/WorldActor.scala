@@ -1,9 +1,11 @@
 package com.unibo.s3.main_system.world.actors
 
+import com.badlogic.gdx.ai.steer.Proximity.ProximityCallback
+import com.badlogic.gdx.ai.steer.Steerable
 import com.badlogic.gdx.ai.utils.{Collision, Ray}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
-import com.unibo.s3.main_system.characters.steer.collisions.Box2dRaycastCollisionDetector
+import com.unibo.s3.main_system.characters.steer.collisions.{Box2dDetectorsFactory, Box2dRaycastCollisionDetector, Box2dSquareAABBProximity}
 import com.unibo.s3.main_system.communication.NamedActor
 
 case class Act(dt: Float)
@@ -11,6 +13,8 @@ case class RayCastCollidesQuery(ray: Ray[Vector2])
 case class RayCastCollidesResponse(collides: Boolean)
 case class RayCastCollisionQuery(ray: Ray[Vector2])
 case class RayCastCollisionResponse(collided: Boolean, coll: Collision[Vector2])
+case class ProximityQuery(subject: Steerable[Vector2], detectionRadius: Float)
+case class ProximityQueryResponse(neghbors: Seq[Steerable[Vector2]])
 case class DeleteBodyAt(x: Float, y: Float)
 case class CreateBox(position: Vector2, size: Vector2)
 case class ResetWorld()
@@ -19,6 +23,7 @@ case class GetAllBodies()
 class WorldActor(val name: String, val world: World) extends NamedActor {
 
   private[this] val raycastCollisionDetector = new Box2dRaycastCollisionDetector(world)
+  private[this] val proximityDetector = new Box2dSquareAABBProximity(null, world, 2.0f)
   private[this] var bodiesToDelete: Seq[Body] = List()
   private[this] val aabbWidth = 0.1f
 
@@ -67,5 +72,13 @@ class WorldActor(val name: String, val world: World) extends NamedActor {
       val bodies = new com.badlogic.gdx.utils.Array[Body]()
       world.getBodies(bodies)
       sender() ! bodies
+
+    case ProximityQuery(owner, radius) =>
+      proximityDetector.setOwner(owner)
+      var neighbors: Seq[Steerable[Vector2]] = List()
+      proximityDetector.findNeighbors(new ProximityCallback[Vector2] {
+        override def reportNeighbor(n: Steerable[Vector2]): Boolean = {neighbors :+= n; true}
+      })
+      sender() ! ProximityQueryResponse(neighbors)
   }
 }

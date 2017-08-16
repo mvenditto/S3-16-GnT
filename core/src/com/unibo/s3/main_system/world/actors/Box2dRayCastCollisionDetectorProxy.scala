@@ -5,7 +5,6 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.badlogic.gdx.ai.utils.{Collision, Ray, RaycastCollisionDetector}
 import com.badlogic.gdx.math.Vector2
-import com.unibo.s3.main_system.characters.steer.collisions.Box2dRaycastCollisionDetector
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
