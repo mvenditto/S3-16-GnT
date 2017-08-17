@@ -9,7 +9,7 @@ class GraphActor(override val name: String) extends NamedActor {
 
   override def onReceive(message: Any): Unit = message match {
     case msg: UndirectedGraph[String, DefaultEdge] =>
-      println("received graph: " + msg.toString)
+      println("name: " + name + "| graph: " + msg.toString + " from: " + sender())
     case _ => println("unknown message")
   }
 }

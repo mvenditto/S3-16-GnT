@@ -1,6 +1,8 @@
 package communication;
 
+import com.unibo.s3.main_system.communication.FileActor;
 import com.unibo.s3.main_system.communication.GraphActor;
+import com.unibo.s3.main_system.communication.Messages;
 import com.unibo.s3.main_system.communication.SystemManager;
 import org.jgrapht.graph.DefaultEdge;
 
@@ -12,7 +14,12 @@ import org.jgrapht.graph.SimpleGraph;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.Inet4Address;
+
+import static javax.script.ScriptEngine.FILENAME;
 
 public class TestSameTerminal {
 
@@ -36,12 +43,11 @@ public class TestSameTerminal {
         this.graph.addEdge(v2, v3);
         this.graph.addEdge(v3, v4);
         this.graph.addEdge(v4, v1);
-
-        System.out.println("initial graph: " + this.graph.toString());
     }
 
     @Test
     public void testCommunicationBetweenSystems() {
+        System.out.println("initial graph: " + this.graph.toString());
         try {
             String confText =
                     "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," +
@@ -64,10 +70,31 @@ public class TestSameTerminal {
     @Test
     public void testCommunicationAndSelectionOnLocalSystem() {
         SystemManager.getInstance().createSystem("System", null);
-        SystemManager.getInstance().createActor(GraphActor.props("First Local"), "firstLocal");
-        SystemManager.getInstance().createActor(GraphActor.props("Second Local"), "secondLocal");
+        SystemManager.getInstance().createActor(FileActor.props("First Local"), "firstLocal");
+        SystemManager.getInstance().createActor(FileActor.props("Second Local"), "secondLocal");
         ActorRef first = SystemManager.getInstance().getLocalActor("firstLocal");
         ActorRef second = SystemManager.getInstance().getLocalActor("secondLocal");
-        second.tell(this.graph, first);
+
+        BufferedReader br = null;
+        FileReader fr = null;
+        try {
+            fr = new FileReader("assets/Trial");
+            br = new BufferedReader(fr);
+            String sCurrentLine;
+            while ((sCurrentLine = br.readLine()) != null) {
+                second.tell(new Messages.FileMsg(sCurrentLine), first);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (br != null)
+                    br.close();
+                if (fr != null)
+                    fr.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 }
