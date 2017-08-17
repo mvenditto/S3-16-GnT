@@ -1,5 +1,6 @@
 package com.unibo.s3.main_system.graph;
 
+import akka.actor.ActorRef;
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.math.Vector2;
 import org.jgrapht.UndirectedGraph;
@@ -20,7 +21,5 @@ public interface Graph {
     UndirectedGraph<Vector2, DefaultEdge> createGraph() throws Exception;
 
     UndirectedGraph<Vector2, DefaultEdge> getGraph();
-
-    void setRaycastCollisionDetector(RaycastCollisionDetector<Vector2> collisionDetector);
 
 }

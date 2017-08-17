@@ -1,10 +1,16 @@
 package com.unibo.s3.main_system.graph;
 
+import akka.actor.ActorRef;
 import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
+import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory;
+import com.unibo.s3.main_system.world.actors.Box2dRayCastCollisionDetectorProxy;
+import com.unibo.s3.main_system.world.actors.WorldActor;
 import org.jgrapht.GraphPath;
 import org.jgrapht.UndirectedGraph;
+import org.jgrapht.alg.NeighborIndex;
 import org.jgrapht.alg.shortestpath.KShortestPaths;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
@@ -14,9 +20,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
-public class GraphImpl implements Graph {
+public class GraphImpl implements Graph, GraphAdapter<Vector2> {
     private Integer[][] grid;
     private String mapFilename;
 
@@ -24,10 +31,13 @@ public class GraphImpl implements Graph {
     private UndirectedGraph<Vector2, DefaultEdge> graph;
     private RaycastCollisionDetector<Vector2> collisionDetector;
 
-    public GraphImpl() {}
+    public GraphImpl() {
 
-    public GraphImpl(RaycastCollisionDetector<Vector2> collisionDetector) {
-        this.collisionDetector = collisionDetector;
+    }
+
+    private void setWorldActor() {
+        ActorRef worldActor = null; //in qualche modo lo ottieni
+        this.collisionDetector = new Box2dProxyDetectorsFactory(worldActor).newRaycastCollisionDetector();
     }
 
     @Override
@@ -43,6 +53,7 @@ public class GraphImpl implements Graph {
     @Override
     public void receivedMapfile(String name) {
         this.mapFilename = name;
+        this.setWorldActor();
         try {
             this.readMap();
         } catch (IOException e) {
@@ -74,6 +85,21 @@ public class GraphImpl implements Graph {
     private void addEdges() {
         addFirstsEdges();
         checkUnconnectedNodes();
+    }
+
+    private void checkUnconnectedNode2() {
+        KShortestPaths<Vector2, DefaultEdge> ksp = new KShortestPaths<>(this.graph, 1);
+        this.graph.vertexSet().forEach(node -> {
+            float dist = 6f;
+            for(float x = node.x - dist; x <= node.x + dist; x++) {
+                for(float y = node.y - dist; x <= node.y + dist; y++) {
+                    Vector2 toCompare = createVector(x,y);
+                    if(this.graph.containsVertex(toCompare) && !toCompare.equals(node) &&
+                            ksp.getPaths(node, toCompare).size() == 0 && checkEdgeRayCast(node, toCompare, 0.5f, 16))
+                        this.graph.addEdge(node, toCompare);
+                }
+            }
+        });
     }
 
     private void checkUnconnectedNodes() {
@@ -258,11 +284,6 @@ public class GraphImpl implements Graph {
         return this.graph;
     }
 
-    @Override
-    public void setRaycastCollisionDetector(RaycastCollisionDetector<Vector2> collisionDetector) {
-        this.collisionDetector = collisionDetector;
-    }
-
     private void readMap() throws IOException {
         Files.lines(Paths.get(this.mapFilename + ".txt")).forEach(l -> {
             //System.out.println("Linea: " + l);
@@ -286,6 +307,17 @@ public class GraphImpl implements Graph {
                 }
             }*/
         });
+    }
+
+    @Override
+    public Iterator<Vector2> getVertices() {
+        return this.graph.vertexSet().iterator();
+    }
+
+    @Override
+    public Iterator<Vector2> getNeighbors(Vector2 vertex) {
+        NeighborIndex<Vector2, DefaultEdge> neighborIndex = new NeighborIndex<>(this.graph);
+        return neighborIndex.neighborsOf(vertex).iterator();
     }
 
     private class SetWall implements Runnable {
