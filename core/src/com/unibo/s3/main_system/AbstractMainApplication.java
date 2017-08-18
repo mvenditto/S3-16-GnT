@@ -23,7 +23,7 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
     protected SpriteBatch textBatch;
 
     /*camera*/
-    private OrthographicCamera cam;
+    protected OrthographicCamera cam;
     private float cameraSpeed = 20f;
     private float cameraZoomSpeed = 0.1f;
     private float cameraViewportWidthMeters = 30f;

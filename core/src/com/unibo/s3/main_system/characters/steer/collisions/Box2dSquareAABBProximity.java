@@ -18,7 +18,6 @@ package com.unibo.s3.main_system.characters.steer.collisions;
 
 import com.badlogic.gdx.ai.steer.Proximity;
 import com.badlogic.gdx.ai.steer.Steerable;
-import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.QueryCallback;
@@ -57,28 +56,8 @@ public class Box2dSquareAABBProximity implements Proximity<Vector2>, QueryCallba
         this.owner = owner;
     }
 
-    /** Returns the box2d world. */
-    public World getWorld () {
-        return world;
-    }
-
-    /** Sets the box2d world. */
-    public void setWorld (World world) {
-        this.world = world;
-    }
-
-    /** Returns the detection radius that is half the side of the square AABB. */
-    public float getDetectionRadius () {
-        return detectionRadius;
-    }
-
-    /** Sets the detection radius that is half the side of the square AABB. */
-    public void setDetectionRadius (float detectionRadius) {
-        this.detectionRadius = detectionRadius;
-    }
-
     @Override
-    public int findNeighbors (ProximityCallback<Vector2> behaviorCallback) {
+    public int findNeighbors (Proximity.ProximityCallback<Vector2> behaviorCallback) {
         this.behaviorCallback = behaviorCallback;
         neighborCount = 0;
         prepareAABB(aabb);
@@ -108,7 +87,6 @@ public class Box2dSquareAABBProximity implements Proximity<Vector2>, QueryCallba
     public boolean reportFixture (Fixture fixture) {
         Steerable<Vector2> steerable = getSteerable(fixture);
         if (steerable != owner && accept(steerable)) {
-            //steerable.getPosition().y += steerable.getBoundingRadius() / 2;
             if (behaviorCallback.reportNeighbor(steerable)) neighborCount++;
         }
         return true;
