@@ -1,14 +1,46 @@
 package com.unibo.s3;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.AbstractMainApplication;
+import com.unibo.s3.main_system.modules.BasicModule;
+import com.unibo.s3.main_system.modules.CommandModule;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.unibo.s3.main_system.rendering.ScaleUtils.*;
 
 
 public class Main extends AbstractMainApplication {
+    private List<BasicModule> modules = new ArrayList<>();
+    private InputMultiplexer inputMultiplexer;
+
+    @Override
+    public void create() {
+        super.create();
+        inputMultiplexer = new InputMultiplexer();
+        addModules();
+
+        this.modules.forEach(m -> {
+            m.init(this);
+            m.attachInputProcessors(inputMultiplexer);
+        });
+
+        this.inputMultiplexer.addProcessor(this);
+        Gdx.input.setInputProcessor(inputMultiplexer);
+
+    }
+
+    private void addModules() {
+        CommandModule cm = new CommandModule();
+        cm.enable(true);
+        modules.add(cm);
+        cm.setTextRenderer(textBatch);
+    }
 
     private void renderAxis(ShapeRenderer shapeRenderer) {
         final Color oldColor = shapeRenderer.getColor();
@@ -74,10 +106,25 @@ public class Main extends AbstractMainApplication {
     protected void doRender() {
         renderAxis(shapeRenderer);
         renderingTest(shapeRenderer);
+
+        modules.stream()
+                .filter(BasicModule::isEnabled)
+                .forEach(m -> m.render(shapeRenderer));
+        modules.stream()
+                .filter(BasicModule::isEnabled)
+                .forEach(BasicModule::renderGui);
     }
 
     @Override
     protected void doUpdate(float delta) {
-        //Do nothing
+        modules.stream()
+                .filter(BasicModule::isEnabled)
+                .forEach(m -> m.update(delta));
+    }
+
+    @Override
+    public void resize(int newWidth, int newHeight) {
+        super.resize(newWidth, newHeight);
+        modules.forEach(m -> m.resize(newWidth, newHeight));
     }
 }
