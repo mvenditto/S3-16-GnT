@@ -250,10 +250,11 @@ public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements E
                     numToSpawn = Integer.parseInt(numAgentsToSpawn.getText());
                 } catch (Exception e) {}
 
+                final Vector2 p = new Vector2(10, 10);
                 for (int i = 0; i < numToSpawn; i++) {
                     float ax = MathUtils.random(-2f, 2f);
                     float ay = MathUtils.random(-2f, 2f);
-                    MovableEntity<Vector2> newAgent = spawnEntityAt(new Vector2(ax, ay));
+                    MovableEntity<Vector2> newAgent = spawnEntityAt(new Vector2(p.x+ax, p.y+ay));
                     newAgent.setCollisionDetector(collisionDetector);
 
                     newAgent.setComplexSteeringBehavior()
