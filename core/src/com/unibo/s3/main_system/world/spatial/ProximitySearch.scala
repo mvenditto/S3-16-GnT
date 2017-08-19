@@ -1,10 +1,9 @@
 package com.unibo.s3.main_system.world.spatial
 
+import com.badlogic.gdx.ai.steer.Steerable
 import com.badlogic.gdx.math.Vector2
-import com.unibo.s3.main_system.characters.steer.{BaseMovableEntity, SteeringEntity}
 
 import scala.collection.mutable.ListBuffer
-
 
 case class Bounds(x: Float, y: Float, w: Float, h: Float) {
 
@@ -14,7 +13,7 @@ case class Bounds(x: Float, y: Float, w: Float, h: Float) {
 
 }
 
-case class QuadTreeNode[T <: SteeringEntity[Vector2]](bounds: Bounds){
+case class QuadTreeNode[T <: Steerable[Vector2]](bounds: Bounds){
 
   private var entities: ListBuffer[T] = ListBuffer[T]()
   private val max_entities: Int = 4
@@ -23,6 +22,18 @@ case class QuadTreeNode[T <: SteeringEntity[Vector2]](bounds: Bounds){
   private var nw: QuadTreeNode[T] = _
   private var se: QuadTreeNode[T] = _
   private var sw: QuadTreeNode[T] = _
+
+  private def split(): Unit = {
+
+    val hw = bounds.w / 2
+    val hh = bounds.h / 2
+
+    sw = QuadTreeNode(Bounds(bounds.x, bounds.y, hw, hh))
+    se = QuadTreeNode(Bounds(bounds.x + hw, bounds.y, hw, hh))
+    nw = QuadTreeNode(Bounds(bounds.x, bounds.y + hh, hw, hh))
+    ne = QuadTreeNode(Bounds(bounds.x + hw, bounds.y + hh, hw, hh))
+
+  }
 
   def insert(p: T): Boolean = {
 
@@ -41,18 +52,6 @@ case class QuadTreeNode[T <: SteeringEntity[Vector2]](bounds: Bounds){
       if (sw.insert(p)) return true
     }
     false
-  }
-
-  def split(): Unit = {
-
-    val hw = bounds.w / 2
-    val hh = bounds.h / 2
-
-    sw = QuadTreeNode(Bounds(bounds.x, bounds.y, hw, hh))
-    se = QuadTreeNode(Bounds(bounds.x + hw, bounds.y, hw, hh))
-    nw = QuadTreeNode(Bounds(bounds.x, bounds.y + hh, hw, hh))
-    ne = QuadTreeNode(Bounds(bounds.x + hw, bounds.y + hh, hw, hh))
-
   }
 
   def rangeQuery(queryArea: Bounds): Iterable[T] = {
@@ -93,3 +92,4 @@ case class QuadTreeNode[T <: SteeringEntity[Vector2]](bounds: Bounds){
     }
   }
 }
+
