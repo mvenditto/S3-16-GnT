@@ -8,6 +8,7 @@ import com.unibo.s3.main_system.AbstractMainApplication;
 import com.unibo.s3.main_system.world.actors.Box2dRayCastCollisionDetectorProxy;
 import com.unibo.s3.testbed.testbed_modules.Box2dActorBasedModule;
 import com.unibo.s3.testbed.testbed_modules.EntitiesSystemModule;
+import com.unibo.s3.testbed.testbed_modules.QuadTreeTest;
 import com.unibo.s3.testbed.testbed_modules.TestbedModule;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class BaseTestbed extends AbstractMainApplication implements Testbed {
     /*core modules*/
     private EntitiesSystemModule msm;
     private Box2dActorBasedModule b2dm;
+    private QuadTreeTest qtt;
 
     private static final String PAUSED = "paused";
     private static final String FPS = "FPS";
@@ -65,7 +67,7 @@ public class BaseTestbed extends AbstractMainApplication implements Testbed {
 
     private void postInitSetup() {
         RaycastCollisionDetector<Vector2> collisionDetector = new Box2dRayCastCollisionDetectorProxy(b2dm.worldActor);
-        msm.setCollisionDetector(collisionDetector);
+        qtt.setCollisionDetector(collisionDetector);
     }
 
     private void preInitSetup() {
@@ -77,6 +79,10 @@ public class BaseTestbed extends AbstractMainApplication implements Testbed {
         b2dm.enable(true);
         modules.add(b2dm);
         b2dm.setTextRenderer(textBatch);
+
+        qtt = new QuadTreeTest();
+        qtt.enable(true);
+        modules.add(qtt);
     }
 
     private void renderInfo() {
