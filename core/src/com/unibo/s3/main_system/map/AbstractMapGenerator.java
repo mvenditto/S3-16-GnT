@@ -85,8 +85,6 @@ public abstract class AbstractMapGenerator implements MapGenerator{
         return out;
     }
 
-
-
     protected boolean isIntersection(int x, int y){
         if(x > 1 && y > 1 && x < WIDTH_SPLITS-1 && y < HEIGHT_SPLITS-1){
             System.out.println("up dx down sx");
