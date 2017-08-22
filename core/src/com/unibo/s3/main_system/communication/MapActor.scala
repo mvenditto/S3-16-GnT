@@ -13,7 +13,6 @@ class MapActor extends UntypedAbstractActor {
 
   override def onReceive(message: Any): Unit = message match {
     case _: StartMsg =>
-      println("map start")
       //qui generi la mappa e la scrivi su un file(Santo)
       val file = Gdx.files.local(FILEPATH)
       file.readString().split("\\n").foreach(line => SystemManager.getInstance().getLocalActor("graphActor").tell(MapMsg(line), getSelf()))

@@ -15,9 +15,9 @@ class GraphActor extends  UntypedAbstractActor {
 
   override def onReceive(message: Any): Unit = message match {
     case msg: MapMsg =>
-      val verifyClose = msg.line.split(":").map(_.toFloat) //prova con un forAll
+      val verifyClose = msg.line.split(":").map(_.toFloat)
       def writeFunction(verifyClose: Array[Float]): Unit = verifyClose match {
-        case _ if verifyClose(0) == 0.0 && verifyClose(1) == 0.0 && verifyClose(2) == 0.0 && verifyClose(3) == 0.0 =>
+        case _ if verifyClose.forall(value => value == 0.0) =>
           getSelf().tell(GraphGenerationMsg(), getSender())
         case _ => file.writeString(msg.line + "\n", true)
       }
