@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.AbstractMainApplication;
 import com.unibo.s3.main_system.modules.BasicModule;
-import com.unibo.s3.main_system.modules.CommandModule;
+import com.unibo.s3.main_system.modules.MenuModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class Main extends AbstractMainApplication {
     }
 
     private void addModules() {
-        CommandModule cm = new CommandModule();
+        MenuModule cm = new MenuModule();
         cm.enable(true);
         modules.add(cm);
         cm.setTextRenderer(textBatch);

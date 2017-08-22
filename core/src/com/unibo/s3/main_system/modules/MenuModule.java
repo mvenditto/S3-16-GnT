@@ -33,7 +33,7 @@ import static com.unibo.s3.main_system.rendering.ScaleUtils.getPixelsPerMeter;
 import static com.unibo.s3.main_system.rendering.ScaleUtils.metersToPixels;
 import static com.unibo.s3.main_system.rendering.ScaleUtils.pixelsToMeters;
 
-public class CommandModule extends BasicModuleWithGui {
+public class MenuModule extends BasicModuleWithGui {
     private SpriteBatch textBatch;
     private World world;
     private BitmapFont font;
@@ -163,110 +163,6 @@ public class CommandModule extends BasicModuleWithGui {
     @Override
     public boolean isEnabled() {
         return this.enabled;
-    }
-
-    @Override
-    public void render(ShapeRenderer shapeRenderer) {
-        if(enableGrid)
-            renderGrid(shapeRenderer, 200, 200);
-
-        /*Timeout timeout = new Timeout(Duration.create(5, "seconds"));
-        Future<Object> future = Patterns.ask(worldActor, new GetAllBodies(), timeout);
-
-        Array<Body> bodies = null;
-        try {
-            bodies = (Array<Body>) Await.result(future, timeout.duration());
-            bodies.forEach(b->renderBox(shapeRenderer, b, false));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-
-        if(bodyEditorEnabled && topLeft != null && delta != null) {
-            shapeRenderer.setColor(Color.GREEN);
-            Vector2 tmp = topLeft.cpy().scl(getPixelsPerMeter());
-            Vector2 tmp2 = delta.cpy().scl(getPixelsPerMeter());
-            shapeRenderer.rect(tmp.x,tmp.y,tmp2.x-tmp.x, tmp2.y-tmp.y);
-
-            float cx = tmp.x + ((tmp2.x-tmp.x) / 2);
-            float cy = tmp.y + ((tmp2.y - tmp.y) / 2);
-            shapeRenderer.circle(cx, cy, 10);
-
-            Vector2 wTextPos = owner.worldToScreen(new Vector2(cx, (cy + (tmp2.y - tmp.y) / 2) - 30));
-            Vector2 hTextPos = owner.worldToScreen(new Vector2((cx + (tmp2.x-tmp.x)/2) + 30, cy));
-
-            if (textBatch != null) {
-                textBatch.begin();
-
-                font.draw(textBatch, ""+Math.round(pixelsToMeters((int)(tmp2.x - tmp.x))), wTextPos.x, wTextPos.y);
-                font.draw(textBatch, ""+Math.abs(Math.round(pixelsToMeters((int)(tmp2.y - tmp.y)))), hTextPos.x, hTextPos.y);
-
-                textBatch.end();
-            }
-        }
-
-    }
-
-    private void renderBox(ShapeRenderer renderer, Body b, boolean underMouse) {
-        Vector2 position = b.getWorldCenter();
-        float angle = b.getAngle();
-        PolygonShape poly = (PolygonShape) b.getFixtureList().get(0).getShape();
-
-        float[] vertices = new float[poly.getVertexCount() * 2];
-
-        int j = 0;
-        for (int i = 0; i < poly.getVertexCount(); i++) {
-            Vector2 v = new Vector2();
-            poly.getVertex(i, v);
-            Vector2 worldVertex = b.getWorldPoint(v);
-            vertices[j] = metersToPixels(worldVertex.x);
-            vertices[j + 1] = metersToPixels(worldVertex.y);
-            j += 2;
-        }
-
-        Color c = renderer.getColor();
-
-        if (underMouse) {
-            renderer.setColor(Color.CYAN);
-        } else {
-            renderer.setColor(Color.GRAY);
-        }
-
-        Vector2 v0 = new Vector2(vertices[0],vertices[1]);
-        String[] t = ((String) b.getUserData()).split(":");
-        float s = getPixelsPerMeter();
-
-        renderer.setAutoShapeType(true);
-        renderer.set(ShapeRenderer.ShapeType.Filled);
-        renderer.rect(v0.x, v0.y, Float.parseFloat(t[0]) * s, Float.parseFloat(t[1]) * s);
-        renderer.set(ShapeRenderer.ShapeType.Line);
-        renderer.setColor(Color.BLACK);
-        renderer.rect(v0.x, v0.y, Float.parseFloat(t[0]) * s, Float.parseFloat(t[1]) * s);
-        renderer.setAutoShapeType(false);
-        renderer.setColor(c);
-    }
-
-    private void renderGrid(ShapeRenderer renderer, int width, int height) {
-        float s = ScaleUtils.getPixelsPerMeter();
-        int halfWidth = width / 2;
-        int halhHeight = height / 2;
-
-        Color oldColor = renderer.getColor();
-        Color greyColor = Color.LIGHT_GRAY;
-        renderer.setColor(greyColor.r, greyColor.g, greyColor.b, 0.10f);
-
-        for(int y = -halhHeight; y <= halhHeight; y += 5)
-            renderer.line((- halfWidth*s), (-halhHeight * s), (halfWidth * s), (y * s));
-
-        for(int x = -halfWidth; x <= halfWidth; x += 5)
-            renderer.line((x*s), (-halhHeight * s), (x * s), (halhHeight * s));
-
-        renderer.setColor(oldColor);
-    }
-
-
-    @Override
-    public void update(float dt) {
-        //Fa qualcosa con l'attore
     }
 
 
