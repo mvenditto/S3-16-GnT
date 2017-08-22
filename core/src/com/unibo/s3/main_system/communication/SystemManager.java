@@ -50,4 +50,8 @@ public class SystemManager {
         tmp.append(path);
         return this.system.actorSelection(tmp.toString());
     }
+
+    public void shutdownSystem() {
+        this.system.terminate();
+    }
 }
