@@ -72,7 +72,7 @@ public class CommandModule extends BasicModuleWithGui {
         table.row();
         Slider guardsNumS = new Slider(2f, 20f, 1f, false, skin);
         guardsNumS.setValue(this.guardsNum);
-        Label labGuardsNum = new Label(" " + (int) guardsNumS.getValue(), skin);
+        Label labGuardsNum = new Label(" " + String.format("%02d", (int) guardsNumS.getValue()), skin);
         table.add(new Label("Guards number: ", skin));
         table.row();
         table.add(guardsNumS);
@@ -81,14 +81,14 @@ public class CommandModule extends BasicModuleWithGui {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 guardsNum = (int) guardsNumS.getValue();
-                labGuardsNum.setText(" "+guardsNum);
+                labGuardsNum.setText(" "+String.format("%02d", guardsNum));
             }
         });
 
         table.row();
         Slider thiefsNumS = new Slider(1f, 20f, 1f, false, skin);
         thiefsNumS.setValue(this.thiefsNum);
-        Label labThiefsNum = new Label(" " + (int) thiefsNumS.getValue(), skin);
+        Label labThiefsNum = new Label(" " + String.format("%02d", (int) thiefsNumS.getValue()), skin);
         table.add(new Label("Thiefs number: ", skin));
         table.row();
         table.add(thiefsNumS);
@@ -97,7 +97,7 @@ public class CommandModule extends BasicModuleWithGui {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 thiefsNum = (int) thiefsNumS.getValue();
-                labThiefsNum.setText(" "+thiefsNum);
+                labThiefsNum.setText(" "+String.format("%02d", thiefsNum));
             }
         });
 
