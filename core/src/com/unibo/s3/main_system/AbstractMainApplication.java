@@ -98,7 +98,9 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
         cam = new OrthographicCamera(cameraViewportWidthMeters *  getPixelsPerMeter(),
                 (cameraViewportWidthMeters *  getPixelsPerMeter()) * aspectRatio);
 
-        cam.position.set(cam.viewportWidth / 2, cam.viewportHeight / 2,0);
+        //cam.position.set(2550,1630,0);
+        cam.position.set(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 0);
+        //cam.position.set(cam.viewportWidth / 2 , cam.viewportHeight / 2,0);
         cam.zoom = 5;
         cam.update();
     }
