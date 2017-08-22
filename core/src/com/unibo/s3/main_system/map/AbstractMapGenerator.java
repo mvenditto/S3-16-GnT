@@ -1,7 +1,8 @@
 package com.unibo.s3.main_system.map;
 
-import sun.security.provider.SHA;
+import com.badlogic.gdx.math.Vector2;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -13,11 +14,22 @@ public abstract class AbstractMapGenerator implements MapGenerator{
     public static final int MAP_HEIGHT = 60;
     public static final int WIDTH_SPLITS = (int) (MAP_WIDTH / BASE_UNIT);
     public static final int HEIGHT_SPLITS = (int) (MAP_HEIGHT / BASE_UNIT);
+    private static final String END_OF_FILE = "0.0:0.0:0.0:0.0";
 
     private int[][] maze = new int[WIDTH_SPLITS][HEIGHT_SPLITS];
 
-    public int[][] getMap(){
-        return this.maze;
+    public List<String> getMap(){
+        ArrayList<String> map = new ArrayList<>();
+        for(int i = 0; i < WIDTH_SPLITS; i++){
+            for (int j = 0; j < HEIGHT_SPLITS; j++){
+                if(maze[i][j] == 1){
+                    System.out.println((i * BASE_UNIT + HALF_BASE_UNIT) + ":" + (j * BASE_UNIT + HALF_BASE_UNIT) + ":" + BASE_UNIT + ":" + BASE_UNIT);
+                    map.add((i * BASE_UNIT + HALF_BASE_UNIT) + ":" + (j * BASE_UNIT + HALF_BASE_UNIT) + ":" + BASE_UNIT + ":" + BASE_UNIT);
+                }
+            }
+        }
+        map.add(END_OF_FILE);
+        return map;
     }
 
 
