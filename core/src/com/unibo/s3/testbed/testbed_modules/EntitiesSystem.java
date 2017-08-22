@@ -13,4 +13,5 @@ public interface EntitiesSystem<T extends Vector<T>> {
 
     List<MovableEntity<T>> getEntities();
 
+    Iterable<MovableEntity<T>> getNeighborsOf(MovableEntity<T> entity, float searchRadius);
 }
