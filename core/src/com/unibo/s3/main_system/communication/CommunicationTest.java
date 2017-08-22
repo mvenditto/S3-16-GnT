@@ -20,6 +20,16 @@ public class CommunicationTest extends ApplicationAdapter {
         SystemManager.getInstance().createSystem("System", null);
         SystemManager.getInstance().createActor(GraphActor.props(), "graphActor");
         SystemManager.getInstance().createActor(MapActor.props(), "mapActor").tell(new Messages.StartMsg(), ActorRef.noSender());
+
+        ActorRef quadTree = SystemManager.getInstance().createActor(QuadTreeActor.props(), "quadTree");
+
+        ActorRef copOne = SystemManager.getInstance().createActor(CharacterActor.props(), "copOne");
+        ActorRef copTwo = SystemManager.getInstance().createActor(CharacterActor.props(), "copTwo");
+        ActorRef copThree = SystemManager.getInstance().createActor(CharacterActor.props(), "copThree");
+
+        quadTree.tell(new Messages.askNeighbourMsg(), copOne);
+        quadTree.tell(new Messages.askNeighbourMsg(), copTwo);
+        quadTree.tell(new Messages.askNeighbourMsg(), copThree);
     }
 
     @Override
