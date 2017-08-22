@@ -62,7 +62,7 @@ project(":core") {
         compile group: 'com.typesafe.akka', name: 'akka-remote_2.11', version: '2.5.3'
         compile 'org.json:json:20170516'
 
-        testCompile 'junit:junit:4.12'
+        compile 'junit:junit:4.12'
     }
 }
 

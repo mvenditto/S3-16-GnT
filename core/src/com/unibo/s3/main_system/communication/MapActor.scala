@@ -9,7 +9,8 @@ import com.unibo.s3.main_system.communication.Messages.{MapMsg, StartMsg}
 
 class MapActor extends UntypedAbstractActor {
 
-  val FILEPATH = "prova1.txt" //ci va il percorso del file con la mappa(Santo)
+  val FILEPATH = "mapFile.txt" //ci va il percorso del file con la mappa(Santo)
+
   override def onReceive(message: Any): Unit = message match {
     case _: StartMsg =>
       println("map start")
