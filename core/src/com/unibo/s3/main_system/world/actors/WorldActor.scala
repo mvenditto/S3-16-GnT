@@ -1,12 +1,12 @@
 package com.unibo.s3.main_system.world.actors
 
+import akka.actor.UntypedAbstractActor
 import com.badlogic.gdx.ai.steer.Proximity.ProximityCallback
 import com.badlogic.gdx.ai.steer.Steerable
 import com.badlogic.gdx.ai.utils.{Collision, Ray}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 import com.unibo.s3.main_system.characters.steer.collisions.{Box2dDetectorsFactory, Box2dRaycastCollisionDetector, Box2dSquareAABBProximity}
-import com.unibo.s3.main_system.communication.NamedActor
 
 case class Act(dt: Float)
 case class RayCastCollidesQuery(ray: Ray[Vector2])
@@ -20,7 +20,7 @@ case class CreateBox(position: Vector2, size: Vector2)
 case class ResetWorld()
 case class GetAllBodies()
 
-class WorldActor(val name: String, val world: World) extends NamedActor {
+class WorldActor(val world: World) extends UntypedAbstractActor {
 
   private[this] val raycastCollisionDetector = new Box2dRaycastCollisionDetector(world)
   private[this] val proximityDetector = new Box2dSquareAABBProximity(null, world, 2.0f)

@@ -53,7 +53,6 @@ project(":core") {
     apply plugin: "scala"
 
     dependencies {
-        compile 'junit:junit:4.12'
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
@@ -61,6 +60,9 @@ project(":core") {
         compile "org.scala-lang:scala-library:2.11.7"
         compile group: 'com.typesafe.akka', name: 'akka-actor_2.11', version: '2.5.3'
         compile group: 'com.typesafe.akka', name: 'akka-remote_2.11', version: '2.5.3'
+        compile 'org.json:json:20170516'
+
+        compile 'junit:junit:4.12'
     }
 }
 

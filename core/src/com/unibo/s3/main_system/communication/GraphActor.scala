@@ -1,19 +1,34 @@
 package com.unibo.s3.main_system.communication
 
-import akka.actor.Props
-import org.jgrapht.UndirectedGraph
-import org.jgrapht.graph.DefaultEdge
+import akka.actor.{Props, UntypedAbstractActor}
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.files.FileHandle
+import com.unibo.s3.main_system.communication.Messages.{GraphGenerationMsg, MapMsg}
 
 
-class GraphActor(override val name: String) extends NamedActor {
+class GraphActor extends  UntypedAbstractActor {
+
+  val FILEPATH = "outputGraphActor.txt" //ci va il percorso del file dove salvare la mappa(Sara)
+
+  val file: FileHandle = Gdx.files.local(FILEPATH)
+  file.writeString("", false)
 
   override def onReceive(message: Any): Unit = message match {
-    case msg: UndirectedGraph[String, DefaultEdge] =>
-      println("received graph: " + msg.toString)
-    case _ => println("unknown message")
+    case msg: MapMsg =>
+      val verifyClose = msg.line.split(":").map(_.toFloat)
+      def writeFunction(verifyClose: Array[Float]): Unit = verifyClose match {
+        case _ if verifyClose.forall(value => value == 0.0) =>
+          getSelf().tell(GraphGenerationMsg(), getSender())
+        case _ => file.writeString(msg.line + "\n", true)
+      }
+      writeFunction(verifyClose)
+    case _: GraphGenerationMsg =>
+      //qui ho il file con la mappa, bisogna generare il grafo(Sara)
+      println("graph created!")
+    case _ => println("(graph actor) message unknown: " + message)
   }
 }
 
 object GraphActor {
-  def props(name: String) : Props = Props(new GraphActor(name))
+  def props() : Props = Props(new GraphActor())
 }
