@@ -9,10 +9,10 @@ public abstract class AbstractMapGenerator implements MapGenerator{
 
     private static final float BASE_UNIT = 3;
     private static final float HALF_BASE_UNIT = BASE_UNIT/2;
-    private static final int MAP_WIDTH = 60;
-    private static final int MAP_HEIGHT = 60;
-    private static final int WIDTH_SPLITS = (int) (MAP_WIDTH / BASE_UNIT);
-    private static final int HEIGHT_SPLITS = (int) (MAP_HEIGHT / BASE_UNIT);
+    public static final int MAP_WIDTH = 60;
+    public static final int MAP_HEIGHT = 60;
+    public static final int WIDTH_SPLITS = (int) (MAP_WIDTH / BASE_UNIT);
+    public static final int HEIGHT_SPLITS = (int) (MAP_HEIGHT / BASE_UNIT);
 
     private int[][] maze = new int[WIDTH_SPLITS][HEIGHT_SPLITS];
 
@@ -59,10 +59,6 @@ public abstract class AbstractMapGenerator implements MapGenerator{
     protected void buildDoor(int x, int y){
         System.out.println("Building hole in " + x + "," + y);
         maze[x][y] = 0;
-    }
-
-    protected int generateInCore(int splits){
-        return generateInRange(2, splits - 2);
     }
 
     /**true vertical, false horizontal**/
