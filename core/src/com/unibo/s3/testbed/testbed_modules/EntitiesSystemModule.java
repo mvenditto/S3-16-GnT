@@ -3,6 +3,7 @@ package com.unibo.s3.testbed.testbed_modules;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -15,17 +16,21 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.unibo.s3.main_system.characters.steer.BaseMovableEntity;
 import com.unibo.s3.main_system.characters.steer.MovableEntity;
-import com.unibo.s3.main_system.characters.steer.collisions.Box2dRaycastCollisionDetector;
-import com.unibo.s3.main_system.rendering.GeometryRendererImpl;
 import com.unibo.s3.main_system.rendering.GeometryRenderer;
+import com.unibo.s3.main_system.rendering.GeometryRendererImpl;
+import com.unibo.s3.main_system.rendering.ScaleUtils;
+import com.unibo.s3.main_system.world.spatial.Bounds;
+import com.unibo.s3.main_system.world.spatial.QuadTreeNode;
 import com.unibo.s3.testbed.Testbed;
+import scala.runtime.BoxedUnit;
+import scala.collection.JavaConversions;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Vector;
+import java.util.List;
 
-import static com.unibo.s3.main_system.rendering.ScaleUtils.*;
+import static com.unibo.s3.main_system.rendering.ScaleUtils.getMetersPerPixel;
+import static com.unibo.s3.main_system.rendering.ScaleUtils.getPixelsPerMeter;
 
 public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements EntitiesSystem<Vector2> {
 
@@ -49,6 +54,8 @@ public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements E
     private Label numAgentsL;
     private TextField numAgentsToSpawn;
 
+    private QuadTreeNode<MovableEntity<Vector2>> qtree;
+
     /*rendering*/
     private GeometryRenderer<Vector2> gr = new GeometryRendererImpl();
     private boolean debugRender = false;
@@ -62,6 +69,7 @@ public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements E
         this.collisionDetector = collisionDetector;
     }
 
+    @Override
     public MovableEntity<Vector2> spawnEntityAt(Vector2 position) {
         final MovableEntity<Vector2> newAgent = new BaseMovableEntity(position);
         entitiesToAdd.add(newAgent);
@@ -79,8 +87,17 @@ public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements E
         entitiesToAdd.add(newEntity);
     }
 
+    @Override
     public List<MovableEntity<Vector2>> getEntities() {
         return Collections.unmodifiableList(entities);
+    }
+
+    @Override
+    public Iterable<MovableEntity<Vector2>> getNeighborsOf(MovableEntity<Vector2> entity, float searchRadius) {
+        final Vector2 ePos = entity.getPosition();
+        return JavaConversions.asJavaIterable(
+                qtree.rangeQuery(new Bounds(ePos.x - searchRadius/2, ePos.y - searchRadius/2,
+                        searchRadius, searchRadius)));
     }
 
     private void renderSelectedAgentMarker(ShapeRenderer shapeRenderer) {
@@ -250,10 +267,11 @@ public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements E
                     numToSpawn = Integer.parseInt(numAgentsToSpawn.getText());
                 } catch (Exception e) {}
 
+                final Vector2 p = new Vector2(10, 10);
                 for (int i = 0; i < numToSpawn; i++) {
                     float ax = MathUtils.random(-2f, 2f);
                     float ay = MathUtils.random(-2f, 2f);
-                    MovableEntity<Vector2> newAgent = spawnEntityAt(new Vector2(ax, ay));
+                    MovableEntity<Vector2> newAgent = spawnEntityAt(new Vector2(p.x+ax, p.y+ay));
                     newAgent.setCollisionDetector(collisionDetector);
 
                     newAgent.setComplexSteeringBehavior()
@@ -306,6 +324,7 @@ public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements E
         this.entities = new ArrayList<>();
         this.entitiesToAdd = new ArrayList<>();
         this.entitiesToRemove = new ArrayList<>();
+        this.qtree = new QuadTreeNode<>(new Bounds(0, 0, 100, 100));
         initGui();
     }
 
@@ -317,10 +336,13 @@ public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements E
         }
         entities.forEach(e -> gr.renderCharacter(shapeRenderer, e));
         renderSelectedAgentMarker(shapeRenderer);
+
+        final float s = ScaleUtils.getPixelsPerMeter();
     }
 
     @Override
     public void update(float dt) {
+
 
         if(entitiesToAdd.size() > 0) {
             entities.addAll(entitiesToAdd);
@@ -331,6 +353,9 @@ public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements E
             entities.removeAll(entitiesToRemove);
             entitiesToRemove.clear();
         }
+
+        qtree = new QuadTreeNode<>(new Bounds(0, 0, 100, 100));
+        entities.forEach(e -> qtree.insert(e));
 
         entities.forEach(e->e.act(dt));
 
