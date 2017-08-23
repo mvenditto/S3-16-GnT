@@ -23,7 +23,7 @@ public abstract class AbstractMapGenerator implements MapGenerator{
         for(int i = 0; i < WIDTH_SPLITS; i++){
             for (int j = 0; j < HEIGHT_SPLITS; j++){
                 if(maze[i][j] == 1){
-                    System.out.println((i * BASE_UNIT + HALF_BASE_UNIT) + ":" + (j * BASE_UNIT + HALF_BASE_UNIT) + ":" + BASE_UNIT + ":" + BASE_UNIT);
+                    //System.out.println((i * BASE_UNIT + HALF_BASE_UNIT) + ":" + (j * BASE_UNIT + HALF_BASE_UNIT) + ":" + BASE_UNIT + ":" + BASE_UNIT);
                     map.add((i * BASE_UNIT + HALF_BASE_UNIT) + ":" + (j * BASE_UNIT + HALF_BASE_UNIT) + ":" + BASE_UNIT + ":" + BASE_UNIT);
                 }
             }
@@ -35,12 +35,12 @@ public abstract class AbstractMapGenerator implements MapGenerator{
 
     protected void buildWall(boolean orientation, int coord){
         if(orientation){ //vertical wall
-            System.out.println("Build vertical wall in " + coord);
+            //System.out.println("Build vertical wall in " + coord);
             for(int i = 0; i < WIDTH_SPLITS; i++){
                 this.maze[coord - 1][i] = 1;
             }
         } else{
-            System.out.println("Build horizontal wall in " + coord);
+            //System.out.println("Build horizontal wall in " + coord);
             for(int i = 0; i < HEIGHT_SPLITS; i++){
                 this.maze[i][coord - 1] = 1;
             }
@@ -53,7 +53,7 @@ public abstract class AbstractMapGenerator implements MapGenerator{
             if (stop > HEIGHT_SPLITS){
                 stop = HEIGHT_SPLITS;
             }
-            System.out.println("Build vertical wall in " + coord + " from " + start + " to " + stop);
+            //System.out.println("Build vertical wall in " + coord + " from " + start + " to " + stop);
             for(int i = start; i < stop; i++){
                 this.maze[coord][i] = 1;
             }
@@ -61,7 +61,7 @@ public abstract class AbstractMapGenerator implements MapGenerator{
             if (stop > WIDTH_SPLITS){
                 stop = WIDTH_SPLITS;
             }
-            System.out.println("Build horizontal wall in " + coord + " from " + start + " to " + stop);
+          //  System.out.println("Build horizontal wall in " + coord + " from " + start + " to " + stop);
             for(int i = start; i < stop; i++){
                 this.maze[i][coord] = 1;
             }
@@ -69,7 +69,7 @@ public abstract class AbstractMapGenerator implements MapGenerator{
     }
 
     protected void buildDoor(int x, int y){
-        System.out.println("Building hole in " + x + "," + y);
+        //System.out.println("Building hole in " + x + "," + y);
         maze[x][y] = 0;
     }
 
@@ -130,26 +130,19 @@ public abstract class AbstractMapGenerator implements MapGenerator{
 
     protected boolean isVerticalWallDenied(int coord, int startY, int endY){
         if (startY == 0 && endY == HEIGHT_SPLITS) {
-            System.out.println("Initial wall OK");
+            //System.out.println("Initial wall OK");
         }
         else if(endY == HEIGHT_SPLITS){
             if (maze[coord][startY - 1] == 0) {
-                System.out.println();
-                System.out.println("Wall from " + coord + ", " + startY + " to " + coord + "," + endY + " ends in 0");
-                System.out.println();
                 return  true;
             }
         }else if(startY == 0){
             if (maze[coord][endY] == 0) {
                 System.out.println();
-                System.out.println("Wall from " + coord + ", " + startY + " to " + coord + "," + endY + " starts in 0");
-                System.out.println();
                 return true;
             }
         } else {
             if (maze[coord][startY - 1] == 0 || maze[coord][endY] == 0) {
-                System.out.println();
-                System.out.println("Wall from " + coord + ", " + startY + " to " + coord + "," + endY + " not good");
                 System.out.println();
                 return true;
             }
@@ -159,26 +152,20 @@ public abstract class AbstractMapGenerator implements MapGenerator{
 
     protected boolean isHorizontalWallDenied(int coord, int startX, int endX) {
         if (startX == 0 && endX == WIDTH_SPLITS) {
-            System.out.println("Initial wall OK");
+            //System.out.println("Initial wall OK");
         }
         else if(endX == WIDTH_SPLITS){
             if(maze[startX - 1][coord] == 0){
-                System.out.println();
-                System.out.println("Wall from " + startX + ", " + coord + " to " + endX + "," + coord + " starts in 0");
                 System.out.println();
                 return true;
             }
         } else if(startX == 0){
             if (maze[endX][coord] == 0) {
                 System.out.println();
-                System.out.println("Wall from " + startX + ", " + coord + " to " + endX + "," + coord + " ends in 0");
-                System.out.println();
                 return true;
             }
         } else {
             if (maze[startX - 1][coord] == 0 || maze[endX][coord] == 0) {
-                System.out.println();
-                System.out.println("Wall from " + startX + ", " + coord + " to " + endX + "," + coord + " not good");
                 System.out.println();
                 return true;
             }
