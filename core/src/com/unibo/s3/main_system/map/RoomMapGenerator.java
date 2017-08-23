@@ -1,6 +1,6 @@
 package com.unibo.s3.main_system.map;
 
-public class VariantMapGenerator extends AbstractMapGenerator {
+public class RoomMapGenerator extends AbstractMapGenerator {
 
     @Override
     public void generate(int n, int width, int height, int startX, int startY){
@@ -28,8 +28,17 @@ public class VariantMapGenerator extends AbstractMapGenerator {
         System.out.println("Second door " + door2Coord + "," + (startY + wallH));
         System.out.println("Third door " + (startX + wallV) + "," + door3Coord);
 
-        buildWallWithRange(true, startX + wallV, startY, startY+height+1);
-        buildWallWithRange(false, startY + wallH, startX, startX+width+1);
+        if(isHorizontalWallDenied(startY + wallH, startX, startX+width+1)){
+            buildWallWithRange(false, startY + wallH, startX + 1, startX+width);
+        }else{
+            buildWallWithRange(false, startY + wallH, startX, startX+width+1);
+        }
+
+        if(isVerticalWallDenied(startX + wallV, startY, startY+height+1 )){
+            buildWallWithRange(true, startX + wallV, startY + 1, startY+height);
+        }else{
+            buildWallWithRange(true, startX + wallV, startY, startY+height+1);
+        }
 
         buildDoor((startX + wallV), door1Coord);
         buildDoor(door2Coord, (startY + wallH));

@@ -186,7 +186,7 @@ public class Box2dActorBasedModule extends BasicTestbedModuleWithGui {
 
         Config customConf = ConfigFactory.parseString(confText);
         SystemManager.getInstance().createSystem("b2d", customConf);
-        SystemManager.getInstance().createActor(Props.create(WorldActor.class, "world", world), "world");
+        SystemManager.getInstance().createActor(Props.create(WorldActor.class, world), "world");
         worldActor = SystemManager.getInstance().getLocalActor("world");
     }
 
