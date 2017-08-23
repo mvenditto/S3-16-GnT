@@ -20,7 +20,7 @@ import com.unibo.s3.testbed.Testbed
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class ScalaBox2dModule extends SampleWithGui with InputProcessorAdapter {
+class ScalaBox2dModule extends BaseSample with InputProcessorAdapter {
 
   private var world: World = _
   private var worldActor: ActorRef = _
@@ -75,9 +75,6 @@ class ScalaBox2dModule extends SampleWithGui with InputProcessorAdapter {
 
     if (keycode == Input.Keys.G) {
       bodyEditorEnabled = !bodyEditorEnabled
-    }
-    if (keycode == Input.Keys.U) {
-      enableGui(!guiEnabled)
     }
     false
   }

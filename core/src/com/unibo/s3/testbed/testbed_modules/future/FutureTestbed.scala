@@ -4,7 +4,7 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.ui.{Cell, Table}
+import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Tree.Node
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent
 import com.badlogic.gdx.scenes.scene2d.utils.{ChangeListener, ClickListener}
@@ -14,20 +14,19 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.{Gdx, InputMultiplexer}
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.util.ToastManager
-import com.kotcrab.vis.ui.widget.tabbedpane.{Tab, TabbedPane}
 import com.kotcrab.vis.ui.widget.toast.Toast
 import com.kotcrab.vis.ui.widget.{VisLabel, VisTree, _}
 import com.unibo.s3.main_system.AbstractMainApplication
 import com.unibo.s3.testbed.Testbed
 import com.unibo.s3.testbed.testbed_modules.future.ui.KeyHelpTable
 
-import scala.Option
-
 trait Sample {
 
   var enabled: Boolean = true
 
   def init(owner: Testbed): Unit
+
+  def initGui(pane: VisWindow): Unit
 
   def setup(): Unit
 
@@ -45,47 +44,12 @@ trait Sample {
 
   def description: String
 
-  def getKeybindings: Option[Map[String, String]]
+  def getSubmodules: Iterable[Sample]
+
+  def getKeyShortcuts: Option[Map[String, String]]
 
 }
 
-abstract class SampleWithGui extends BaseSample {
-
-  var gui: Stage = _
-  var guiEnabled = true
-
-  override def init(owner: Testbed): Unit = {
-    super.init(owner)
-    gui = new Stage(new ScreenViewport())
-  }
-
-  override def update(dt: Float): Unit = {
-    super.update(dt)
-    gui.act(dt)
-  }
-
-  override def cleanup(): Unit = {
-    super.cleanup()
-    gui.dispose()
-  }
-
-  override def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit = {
-    super.attachInputProcessors(inputMultiplexer)
-    inputMultiplexer.addProcessor(gui)
-  }
-
-  override def resize(newWidth: Int, newHeight: Int): Unit = {
-    super.resize(newWidth, newHeight)
-    gui.getViewport.update(newWidth, newHeight, true)
-  }
-
-  def enableGui(flag: Boolean): Unit = guiEnabled = flag
-
-  def renderGui(): Unit = if (guiEnabled) gui.draw()
-
-  def initGui(menuTable: VisWindow): Unit
-
-}
 
 abstract class BaseSample extends Sample {
 
@@ -99,10 +63,6 @@ abstract class BaseSample extends Sample {
 
   override def render(shapeRenderer: ShapeRenderer): Unit =
     submodules.foreach(sm => sm.render(shapeRenderer))
-    submodules.foreach {
-      case sm: SampleWithGui => sm.renderGui()
-      case _ => None
-    }
 
   override def update(dt: Float): Unit =
     submodules.foreach(sm => sm.update(dt))
@@ -119,10 +79,15 @@ abstract class BaseSample extends Sample {
   override def setup(): Unit =
     submodules.foreach(sm => sm.setup())
 
-  override def getKeybindings: Option[Map[String, String]] = None
+  override def initGui(window: VisWindow): Unit = {}
+
+  override def getKeyShortcuts: Option[Map[String, String]] = None
+
+  override def getSubmodules: Iterable[Sample] = submodules
 }
 
 case class DummyCircleSample() extends BaseSample {
+
   override def render(shapeRenderer: ShapeRenderer): Unit = {
     super.render(shapeRenderer)
     shapeRenderer.circle(0f, 0f, 100f)
@@ -131,21 +96,6 @@ case class DummyCircleSample() extends BaseSample {
   override def description: String = "Just a dummy circle."
 }
 
-case class DummyCircleSample2() extends BaseSample {
-  override def render(shapeRenderer: ShapeRenderer): Unit = {
-    super.render(shapeRenderer)
-    shapeRenderer.circle(0f, 0f, 200f)
-  }
-
-  override def description: String = "Just a dummy circle."
-}
-
-case class TableTab(
-  title: String,
-  table: VisTable) extends Tab {
-  override def getTabTitle: String = title
-  override def getContentTable: Table = table
-}
 
 case class ScalaTestbed() extends AbstractMainApplication with Testbed {
 
@@ -232,7 +182,6 @@ case class ScalaTestbed() extends AbstractMainApplication with Testbed {
     toastManager.setAlignment(Align.bottomRight)
 
     val eastPane = new VisWindow("")
-    val westPane = new VisWindow("")
 
     eastPane.getTitleLabel.setText("Testbed menu")
     eastPane.getTitleLabel.setColor(new Color(2/255f, 179/255f, 255/255f, 1f))
@@ -298,7 +247,6 @@ case class ScalaTestbed() extends AbstractMainApplication with Testbed {
 
   private def matchSample(sampleName: String): Option[Sample] = sampleName match {
     case "Dummy Circle" => Option(DummyCircleSample())
-    case "Dummy Circle 2" => Option(DummyCircleSample2())
     case "Entities Playground" => Option(new ScalaEntitySystemModule())
     case "Box2d World" => Option(new ScalaBox2dModule())
     case _ => None
@@ -313,10 +261,7 @@ case class ScalaTestbed() extends AbstractMainApplication with Testbed {
     samplePane.clear()
     samplePane.setKeepWithinParent(false)
     samplePane.setKeepWithinStage(false)
-    sample match {
-      case s: SampleWithGui => s.initGui(samplePane)
-      case _ => ()
-    }
+    sample.initGui(samplePane)
 
     loadingBar.setValue(25)
 
@@ -328,7 +273,7 @@ case class ScalaTestbed() extends AbstractMainApplication with Testbed {
     loadingBar.setValue(50)
 
     currSampleKeybindings = None
-    sample.getKeybindings foreach(kb => {
+    sample.getKeyShortcuts foreach(kb => {
       var cskb = new KeyHelpTable(true)
       kb.foreach(k => {
         if (!k._1.contains("+")) cskb.addKeyBinding(k._1, k._2)
@@ -371,11 +316,6 @@ case class ScalaTestbed() extends AbstractMainApplication with Testbed {
 
   override def doRender(): Unit = {
     currentSample.foreach(s => s.render(shapeRenderer))
-    currentSample.foreach {
-      case s: SampleWithGui =>
-        s.renderGui()
-      case _ => ()
-    }
     gui.draw()
   }
 

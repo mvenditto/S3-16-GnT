@@ -18,7 +18,7 @@ import com.unibo.s3.testbed.testbed_modules.EntitiesSystem
 
 import scala.collection.JavaConversions
 
-class ScalaEntitySystemModule extends SampleWithGui
+class ScalaEntitySystemModule extends BaseSample
   with EntitiesSystem[Vector2]
   with InputProcessorAdapter {
 
@@ -50,10 +50,8 @@ class ScalaEntitySystemModule extends SampleWithGui
   /*input*/
   private var isLeftCtrlPressed: Boolean = false
 
-  override def setup(): Unit = {
-  }
 
-  override def getKeybindings: Option[Map[String, String]] = {
+  override def getKeyShortcuts: Option[Map[String, String]] = {
     Option(Map("ctrl+mouse-left" -> "select an entity"))
   }
 
@@ -90,6 +88,7 @@ class ScalaEntitySystemModule extends SampleWithGui
   }
 
   override def initGui(window: VisWindow): Unit = {
+    println("init gui")
     maxLinearSpeedL = new VisLabel("0.0")
     maxAngularSpeedL = new VisLabel("0.0")
     maxLinearAccelerationL = new VisLabel("0.0")
@@ -261,7 +260,6 @@ class ScalaEntitySystemModule extends SampleWithGui
 
   override def keyUp(keycode: Int): Boolean = {
     if (keycode == Input.Keys.CONTROL_LEFT) isLeftCtrlPressed = false
-    if (keycode == Input.Keys.U) enableGui(!guiEnabled)
     false
   }
 
