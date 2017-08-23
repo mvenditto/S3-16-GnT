@@ -1,21 +1,17 @@
 package com.unibo.s3.main_system.map;
 
-public class BalancedMapGenerator extends AbstractMapGenerator {
+public class MazeMapGenerator extends AbstractMapGenerator {
 
     @Override
     public void generate(int n, int width, int height, int startX, int startY){
         System.out.println(n + " Matrice " + width + "x" + height + " starting from " + startX + "," + startY);
-        int lowerX = (width/2);
-        int upperX = (width/2);
-        int lowerY = (height/2);
-        int upperY = (height/2);
         //System.out.println("V  range is " + width + " good value between " + lowerX + " and " + upperX);
         //System.out.println("H  range is " + height + " good value between " + lowerY + " and " + upperY);
+        /**relative position, not absolute*/
+        int wallV = width/2;
+        int wallH = height/2;
         width--;
         height--;
-        /**relative position, not absolute*/
-        int wallV = generateInRange(lowerX, upperX);
-        int wallH = generateInRange(lowerY, upperY);
         /**senso antiorario partendo da sopra*/
         int door1Coord = generateInRange(startY + wallH + 1, startY + height);
         int door2Coord = generateInRange(startX + 1, startX + wallV - 1);
@@ -26,8 +22,16 @@ public class BalancedMapGenerator extends AbstractMapGenerator {
         System.out.println("Third door " + (startX + wallV) + "," + door3Coord);
         System.out.println("Fourth door " + door4Coord + "," + (startY + wallH));
 
-        buildWallWithRange(true, startX + wallV, startY, startY+height+1);
-        buildWallWithRange(false, startY + wallH, startX, startX+width+1);
+        if(isHorizontalWallDenied(startY + wallH, startX, startX+width+1)){
+            buildWallWithRange(false, startY + wallH, startX + 1, startX+width);
+        }else{
+            buildWallWithRange(false, startY + wallH, startX, startX+width+1);
+        }
+        if(isVerticalWallDenied(startX+wallV, startY,startY+height+1)){
+            buildWallWithRange(true, startX + wallV, startY + 1, startY+height);
+        }else{
+            buildWallWithRange(true, startX + wallV, startY, startY+height+1);
+        }
 
         buildDoor((startX + wallV), door1Coord);
         buildDoor(door2Coord, (startY + wallH));
