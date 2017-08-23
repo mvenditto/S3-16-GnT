@@ -42,11 +42,13 @@ class ScalaBox2dModule extends BaseSample with InputProcessorAdapter {
   override def init(owner: Testbed): Unit = {
     super.init(owner)
     textBatch = new SpriteBatch()
-    world = new World(new Vector2(0, 0), true)
     font = new BitmapFont
     font.getRegion.getTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
     font.getData.setScale(1.5f)
+  }
 
+  override def setup(): Unit = {
+    world = new World(new Vector2(0, 0), true)
     val conf = "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," + "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" + ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" + ",\"netty\":{\"tcp\":{\"hostname\":\"" + "127.0.0.1" + "\",\"port\":5050}}}}}"
     val customConfig = ConfigFactory.parseString(conf)
     SystemManager.getInstance.createSystem("b2d", customConfig)
@@ -121,7 +123,7 @@ class ScalaBox2dModule extends BaseSample with InputProcessorAdapter {
     super.render(shapeRenderer)
 
     val timeout = new Timeout(Duration.create(5, "seconds"))
-    val future = Patterns.ask(worldActor, new GetAllBodies, timeout)
+    val future = Patterns.ask(worldActor, GetAllBodies(), timeout)
     try {
       val bodies = Await.result(future, timeout.duration).asInstanceOf[com.badlogic.gdx.utils.Array[Body]]
       for (i <- 0 until bodies.size) {

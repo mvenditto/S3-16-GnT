@@ -2,7 +2,6 @@ package com.unibo.s3.testbed.testbed_modules.future
 
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Tree.Node
@@ -20,84 +19,12 @@ import com.unibo.s3.main_system.AbstractMainApplication
 import com.unibo.s3.testbed.Testbed
 import com.unibo.s3.testbed.testbed_modules.future.ui.KeyHelpTable
 
-trait Sample {
 
-  var enabled: Boolean = true
-
-  def init(owner: Testbed): Unit
-
-  def initGui(pane: VisWindow): Unit
-
-  def setup(): Unit
-
-  def render(shapeRenderer: ShapeRenderer): Unit
-
-  def update(dt: Float): Unit
-
-  def cleanup(): Unit
-
-  def enable(flag: Boolean): Unit = enabled = flag
-
-  def resize(newWidth: Int, newHeight: Int): Unit
-
-  def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit
-
-  def description: String
-
-  def getSubmodules: Iterable[Sample]
-
-  def getKeyShortcuts: Option[Map[String, String]]
-
+case class ProgressTask(owner: Testbed, onProgress: Float => Unit) extends Runnable {
+  override def run(): Unit = {}
 }
 
-
-abstract class BaseSample extends Sample {
-
-  protected var submodules: Seq[Sample] = List[Sample]()
-  protected var owner: Testbed = _
-
-  override def init(owner: Testbed): Unit =
-    this.owner = owner
-    setup()
-    submodules.foreach(sm => sm.init(owner))
-
-  override def render(shapeRenderer: ShapeRenderer): Unit =
-    submodules.foreach(sm => sm.render(shapeRenderer))
-
-  override def update(dt: Float): Unit =
-    submodules.foreach(sm => sm.update(dt))
-
-  override def cleanup(): Unit =
-    submodules.foreach(sm => sm.cleanup())
-
-  override def resize(newWidth: Int, newHeight: Int): Unit =
-    submodules.foreach(sm => sm.resize(newWidth, newHeight))
-
-  override def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit =
-    submodules.foreach(sm => sm.attachInputProcessors(inputMultiplexer))
-
-  override def setup(): Unit =
-    submodules.foreach(sm => sm.setup())
-
-  override def initGui(window: VisWindow): Unit = {}
-
-  override def getKeyShortcuts: Option[Map[String, String]] = None
-
-  override def getSubmodules: Iterable[Sample] = submodules
-}
-
-case class DummyCircleSample() extends BaseSample {
-
-  override def render(shapeRenderer: ShapeRenderer): Unit = {
-    super.render(shapeRenderer)
-    shapeRenderer.circle(0f, 0f, 100f)
-  }
-
-  override def description: String = "Just a dummy circle."
-}
-
-
-case class ScalaTestbed() extends AbstractMainApplication with Testbed {
+case class FutureTestbed() extends AbstractMainApplication with Testbed {
 
   private[this] var currentSample: Option[Sample] = None
   private[this] var nextSample: Option[Sample] = None
@@ -109,6 +36,7 @@ case class ScalaTestbed() extends AbstractMainApplication with Testbed {
   private[this] var loadingBar: VisProgressBar = _
   private[this] var samplePane: VisWindow = _
   private[this] var lastTransitionOut = false
+  private[this] var loadingFinished = true
   private[this] var toastManager: ToastManager = _
   private[this] var currSampleName: String = _
   private[this] var menuBar: MenuBar = _
@@ -252,49 +180,79 @@ case class ScalaTestbed() extends AbstractMainApplication with Testbed {
     case _ => None
   }
 
-  private def setSample(sample: Sample): Unit = {
+  private def resetLoadingBar(): Unit = {
     loadingBar.setAnimateDuration(0)
     loadingBar.setValue(0)
     loadingBar.setAnimateDuration(0.2f)
+  }
 
-    sample.init(this)
-    samplePane.clear()
-    samplePane.setKeepWithinParent(false)
-    samplePane.setKeepWithinStage(false)
-    sample.initGui(samplePane)
-
-    loadingBar.setValue(25)
-
+  private def resetInputProcessor(sample: Sample): Unit = {
     inputMultiplexer.clear()
     sample.attachInputProcessors(inputMultiplexer)
     inputMultiplexer.addProcessor(this)
     inputMultiplexer.addProcessor(gui)
     Gdx.input.setInputProcessor(inputMultiplexer)
-    loadingBar.setValue(50)
+  }
 
+  private def buildSampleShortcutTable(sample: Sample): Unit = {
     currSampleKeybindings = None
     sample.getKeyShortcuts foreach(kb => {
-      var cskb = new KeyHelpTable(true)
+      val shortcuts = new KeyHelpTable(true)
       kb.foreach(k => {
-        if (!k._1.contains("+")) cskb.addKeyBinding(k._1, k._2)
-        else cskb.addKeyBinding(k._1.split("\\+"), k._2)
+        if (!k._1.contains("+")) shortcuts.addKeyBinding(k._1, k._2)
+        else shortcuts.addKeyBinding(k._1.split("\\+"), k._2)
       })
-      currSampleKeybindings = Option(cskb)
+      currSampleKeybindings = Option(shortcuts)
     })
-    loadingBar.setValue(75)
+  }
 
-    currentSample.foreach(old => old.cleanup())
-    currentSample = Some(sample)
-    nextSample = None
-    loadingBar.setValue(100)
+  private def resetSamplePane() = {
+    samplePane.clear()
+    samplePane.setKeepWithinParent(false)
+    samplePane.setKeepWithinStage(false)
+  }
 
+  private def displayModuleLoadedToast() = {
     val toast = new Toast("dark", new VisTable(true))
     toast.getContentTable.add(new VisLabel("Loaded module: "))
-    val t = new VisLabel(currSampleName+"!")
+    val t = new VisLabel(currSampleName + "!")
     t.setColor(Color.CORAL)
     toast.getContentTable.add(t)
     toastManager.show(toast, 5)
     centerToast(toast)
+  }
+
+  private def setSample(sample: Sample): Unit = {
+    if (loadingFinished) {
+      loadingFinished = false
+
+      resetLoadingBar()
+      resetSamplePane()
+      sample.init(this)
+      loadingBar.setValue(5)
+
+      sample.initGui(samplePane)
+      loadingBar.setValue(20)
+
+      resetInputProcessor(sample)
+      loadingBar.setValue(50)
+
+      buildSampleShortcutTable(sample)
+      loadingBar.setValue(80)
+
+      currentSample.foreach(old => old.cleanup())
+      currentSample = Some(sample)
+      nextSample = None
+
+      new Thread(new Runnable {
+        override def run(): Unit = {
+          sample.setup()
+          loadingFinished = true
+          loadingBar.setValue(100)
+          displayModuleLoadedToast()
+        }
+      }).start()
+    }
   }
 
   override def create(): Unit = {
@@ -315,14 +273,14 @@ case class ScalaTestbed() extends AbstractMainApplication with Testbed {
   }
 
   override def doRender(): Unit = {
-    currentSample.foreach(s => s.render(shapeRenderer))
+    if (loadingFinished) currentSample.foreach(s => s.render(shapeRenderer))
     gui.draw()
   }
 
   override def doUpdate(delta: Float): Unit = {
     gui.act(delta)
     nextSample.foreach(s => setSample(s))
-    currentSample.foreach(s => s.update(delta))
+    if (loadingFinished) currentSample.foreach(s => s.update(delta))
   }
 
   override def resize(newWidth: Int, newHeight: Int): Unit = {
