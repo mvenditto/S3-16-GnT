@@ -1,6 +1,6 @@
 package com.unibo.s3.main_system.world.actors
 
-import akka.actor.UntypedAbstractActor
+import akka.actor.{Props, UntypedAbstractActor}
 import com.badlogic.gdx.ai.steer.Proximity.ProximityCallback
 import com.badlogic.gdx.ai.steer.Steerable
 import com.badlogic.gdx.ai.utils.{Collision, Ray}
@@ -81,4 +81,8 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       })
       sender() ! ProximityQueryResponse(neighbors)
   }
+}
+
+object WorldActor {
+  def props(world: World): Props = Props(new WorldActor(world))
 }
