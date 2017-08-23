@@ -50,7 +50,7 @@ class ScalaBox2dModule extends SampleWithGui with InputProcessorAdapter {
     val conf = "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," + "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" + ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" + ",\"netty\":{\"tcp\":{\"hostname\":\"" + "127.0.0.1" + "\",\"port\":5050}}}}}"
     val customConfig = ConfigFactory.parseString(conf)
     SystemManager.getInstance.createSystem("b2d", customConfig)
-    SystemManager.getInstance.createActor(Props.create(classOf[WorldActor], "world", world), "world")
+    SystemManager.getInstance.createActor(Props.create(classOf[WorldActor], world), "world")
     worldActor = SystemManager.getInstance.getLocalActor("world")
   }
 
