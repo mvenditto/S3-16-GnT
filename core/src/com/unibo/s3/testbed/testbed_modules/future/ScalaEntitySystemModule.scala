@@ -53,6 +53,10 @@ class ScalaEntitySystemModule extends SampleWithGui
   override def setup(): Unit = {
   }
 
+  override def getKeybindings: Option[Map[String, String]] = {
+    Option(Map("ctrl+mouse-left" -> "select an entity"))
+  }
+
   private def renderSelectedAgentMarker(shapeRenderer: ShapeRenderer) = {
     if (selectedAgent != null) {
       val center = selectedAgent.getPosition.cpy.scl(getPixelsPerMeter)

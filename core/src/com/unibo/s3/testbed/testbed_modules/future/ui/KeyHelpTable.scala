@@ -14,8 +14,8 @@ class KeyHelpTable(
 
   private def loadKeyIcon(key: String): VisImage = {
     val texture = new Texture(Gdx.files.internal(iconsPath + key + png), true)
-    texture.setFilter(TextureFilter.MipMapLinearLinear,
-      TextureFilter.MipMapLinearLinear)
+    texture.setFilter(TextureFilter.Linear,
+      TextureFilter.Linear)
     new VisImage(texture)
   }
 

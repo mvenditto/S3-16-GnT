@@ -4,7 +4,7 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.ui.Cell
+import com.badlogic.gdx.scenes.scene2d.ui.{Cell, Table}
 import com.badlogic.gdx.scenes.scene2d.ui.Tree.Node
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent
 import com.badlogic.gdx.scenes.scene2d.utils.{ChangeListener, ClickListener}
@@ -14,11 +14,14 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.{Gdx, InputMultiplexer}
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.util.ToastManager
+import com.kotcrab.vis.ui.widget.tabbedpane.{Tab, TabbedPane}
 import com.kotcrab.vis.ui.widget.toast.Toast
 import com.kotcrab.vis.ui.widget.{VisLabel, VisTree, _}
 import com.unibo.s3.main_system.AbstractMainApplication
 import com.unibo.s3.testbed.Testbed
 import com.unibo.s3.testbed.testbed_modules.future.ui.KeyHelpTable
+
+import scala.Option
 
 trait Sample {
 
@@ -41,6 +44,8 @@ trait Sample {
   def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit
 
   def description: String
+
+  def getKeybindings: Option[Map[String, String]]
 
 }
 
@@ -113,6 +118,8 @@ abstract class BaseSample extends Sample {
 
   override def setup(): Unit =
     submodules.foreach(sm => sm.setup())
+
+  override def getKeybindings: Option[Map[String, String]] = None
 }
 
 case class DummyCircleSample() extends BaseSample {
@@ -133,14 +140,21 @@ case class DummyCircleSample2() extends BaseSample {
   override def description: String = "Just a dummy circle."
 }
 
+case class TableTab(
+  title: String,
+  table: VisTable) extends Tab {
+  override def getTabTitle: String = title
+  override def getContentTable: Table = table
+}
+
 case class ScalaTestbed() extends AbstractMainApplication with Testbed {
 
-  private[this] var currentSample: Option[Sample] = Option(DummyCircleSample())
+  private[this] var currentSample: Option[Sample] = None
   private[this] var nextSample: Option[Sample] = None
   private[this] var inputMultiplexer: InputMultiplexer = _
   private[this] var gui: Stage = _
-  private[this] var defaultPaneSize = 200f
-  private[this] var currentSampleMenuWidth = 250f
+  private[this] val defaultPaneSize = 200f
+  private[this] val currentSampleMenuWidth = 250f
   private[this] var viewport: Cell[_ <: Actor] = _
   private[this] var loadingBar: VisProgressBar = _
   private[this] var samplePane: VisWindow = _
@@ -148,6 +162,7 @@ case class ScalaTestbed() extends AbstractMainApplication with Testbed {
   private[this] var toastManager: ToastManager = _
   private[this] var currSampleName: String = _
   private[this] var menuBar: MenuBar = _
+  private[this] var currSampleKeybindings: Option[KeyHelpTable] = None
 
   def resizeGui(): Unit = {
     viewport.width(Gdx.graphics.getWidth - (currentSampleMenuWidth + defaultPaneSize))
@@ -169,7 +184,7 @@ case class ScalaTestbed() extends AbstractMainApplication with Testbed {
     val fileMenu = new Menu("File")
     val helpMenu = new Menu("Help")
 
-    val keysHelp = new MenuItem("Shortcuts", new ChangeListener {
+    val testbedKeysHelp = new MenuItem("Testbed shortcuts", new ChangeListener {
       override def changed(event: ChangeEvent, actor: Actor): Unit = {
         val keys = new KeyHelpTable(true)
         keys.addKeyBinding("p", "pause.")
@@ -181,15 +196,31 @@ case class ScalaTestbed() extends AbstractMainApplication with Testbed {
         keys.addKeyBinding("arrow-up", "move camera up")
         keys.addKeyBinding("arrow-down", "move camera down")
         keys.addKeyBinding(List("ctrl", "a"), "test combination")
+        keys.addKeyBinding(List("ctrl", "mouse-left"), "test combination + mouse")
+
         val t = new Toast("dark", keys)
         toastManager.show(t)
-        t.getMainTable.setY(
-          gui.getHeight - t.getMainTable.getPrefHeight - toastManager.getScreenPadding)
-        t.getMainTable.setX((gui.getWidth / 2) - t.getMainTable.getPrefWidth / 2 )
+        centerToast(t)
       }
     })
 
-    helpMenu.addItem(keysHelp)
+    val sampleKeysHelp = new MenuItem("Sample shortcuts", new ChangeListener {
+      override def changed(event: ChangeEvent, actor: Actor): Unit = {
+        val t = currSampleKeybindings match {
+          case Some(keys) =>
+            new Toast("dark", keys)
+          case _ =>
+            val tab = new VisTable()
+            tab.add(new VisLabel("No provided keybindigs!"))
+            new Toast("dark", tab)
+        }
+        toastManager.show(t)
+        centerToast(t)
+      }
+    })
+
+    helpMenu.addItem(testbedKeysHelp)
+    helpMenu.addItem(sampleKeysHelp)
     menuBar.addMenu(fileMenu)
     menuBar.addMenu(helpMenu)
 
@@ -259,6 +290,12 @@ case class ScalaTestbed() extends AbstractMainApplication with Testbed {
     gui.addActor(root)
   }
 
+  private def centerToast(toast: Toast) = {
+    toast.getMainTable.setY(
+      gui.getHeight - toast.getMainTable.getPrefHeight - toastManager.getScreenPadding)
+    toast.getMainTable.setX((gui.getWidth / 2) - toast.getMainTable.getPrefWidth / 2 )
+  }
+
   private def matchSample(sampleName: String): Option[Sample] = sampleName match {
     case "Dummy Circle" => Option(DummyCircleSample())
     case "Dummy Circle 2" => Option(DummyCircleSample2())
@@ -290,6 +327,17 @@ case class ScalaTestbed() extends AbstractMainApplication with Testbed {
     Gdx.input.setInputProcessor(inputMultiplexer)
     loadingBar.setValue(50)
 
+    currSampleKeybindings = None
+    sample.getKeybindings foreach(kb => {
+      var cskb = new KeyHelpTable(true)
+      kb.foreach(k => {
+        if (!k._1.contains("+")) cskb.addKeyBinding(k._1, k._2)
+        else cskb.addKeyBinding(k._1.split("\\+"), k._2)
+      })
+      currSampleKeybindings = Option(cskb)
+    })
+    loadingBar.setValue(75)
+
     currentSample.foreach(old => old.cleanup())
     currentSample = Some(sample)
     nextSample = None
@@ -301,9 +349,7 @@ case class ScalaTestbed() extends AbstractMainApplication with Testbed {
     t.setColor(Color.CORAL)
     toast.getContentTable.add(t)
     toastManager.show(toast, 5)
-    toast.getMainTable.setY(
-      gui.getHeight - toast.getMainTable.getPrefHeight - toastManager.getScreenPadding)
-    toast.getMainTable.setX((gui.getWidth / 2) - toast.getMainTable.getPrefWidth / 2 )
+    centerToast(toast)
   }
 
   override def create(): Unit = {
