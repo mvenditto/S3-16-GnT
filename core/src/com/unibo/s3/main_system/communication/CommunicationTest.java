@@ -1,11 +1,16 @@
 package com.unibo.s3.main_system.communication;
 
 import akka.actor.ActorRef;
+import akka.actor.Props;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
+import com.unibo.s3.main_system.graph.GraphImpl;
+import com.unibo.s3.main_system.world.actors.WorldActor;
 
 public class CommunicationTest extends ApplicationAdapter {
 
@@ -30,6 +35,10 @@ public class CommunicationTest extends ApplicationAdapter {
         quadTree.tell(new Messages.askNeighbourMsg(), copOne);
         quadTree.tell(new Messages.askNeighbourMsg(), copTwo);
         quadTree.tell(new Messages.askNeighbourMsg(), copThree);
+
+        SystemManager.getInstance().createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor");
+
+        new GraphImpl();
     }
 
     @Override
