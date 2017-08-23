@@ -20,10 +20,6 @@ import com.unibo.s3.testbed.Testbed
 import com.unibo.s3.testbed.testbed_modules.future.ui.KeyHelpTable
 
 
-case class ProgressTask(owner: Testbed, onProgress: Float => Unit) extends Runnable {
-  override def run(): Unit = {}
-}
-
 case class FutureTestbed() extends AbstractMainApplication with Testbed {
 
   private[this] var currentSample: Option[Sample] = None
@@ -34,6 +30,7 @@ case class FutureTestbed() extends AbstractMainApplication with Testbed {
   private[this] val currentSampleMenuWidth = 250f
   private[this] var viewport: Cell[_ <: Actor] = _
   private[this] var loadingBar: VisProgressBar = _
+  private[this] var loadingLog: VisLabel = _
   private[this] var samplePane: VisWindow = _
   private[this] var lastTransitionOut = false
   private[this] var loadingFinished = true
@@ -111,8 +108,9 @@ case class FutureTestbed() extends AbstractMainApplication with Testbed {
 
     val eastPane = new VisWindow("")
 
+    val blue = new Color(2/255f, 179/255f, 255/255f, 1f)
     eastPane.getTitleLabel.setText("Testbed menu")
-    eastPane.getTitleLabel.setColor(new Color(2/255f, 179/255f, 255/255f, 1f))
+    eastPane.getTitleLabel.setColor(blue)
 
     val tree = new VisTree
     val core = new Node(new VisLabel("Core"))
@@ -146,6 +144,10 @@ case class FutureTestbed() extends AbstractMainApplication with Testbed {
     eastPane.add(samplesLabel).fillX().expandX().row()
     eastPane.add(tree).expand().fill().row()
     eastPane.setMovable(false)
+
+    loadingLog = new VisLabel("")
+    loadingLog.setColor(blue)
+    eastPane.add(loadingLog).fillX().expandX().row()
 
     loadingBar = new VisProgressBar(0f, 100f, 1f, false)
     loadingBar.setAnimateDuration(2)
@@ -246,10 +248,11 @@ case class FutureTestbed() extends AbstractMainApplication with Testbed {
 
       new Thread(new Runnable {
         override def run(): Unit = {
-          sample.setup()
+          sample.setup((msg: String) => loadingLog.setText(msg))
           loadingFinished = true
           loadingBar.setValue(100)
           displayModuleLoadedToast()
+          loadingLog.setText("")
         }
       }).start()
     }
