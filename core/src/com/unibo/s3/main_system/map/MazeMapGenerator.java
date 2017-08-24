@@ -4,7 +4,7 @@ public class MazeMapGenerator extends AbstractMapGenerator {
 
     @Override
     public void generate(int n, int width, int height, int startX, int startY){
-        System.out.println(n + " Matrice " + width + "x" + height + " starting from " + startX + "," + startY);
+        //System.out.println(n + " Matrice " + width + "x" + height + " starting from " + startX + "," + startY);
         //System.out.println("V  range is " + width + " good value between " + lowerX + " and " + upperX);
         //System.out.println("H  range is " + height + " good value between " + lowerY + " and " + upperY);
         /**relative position, not absolute*/

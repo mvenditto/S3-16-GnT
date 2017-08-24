@@ -11,7 +11,7 @@ public class TestMapGeneration {
         RoomMapGenerator generator = new RoomMapGenerator();
         for(int i = 0; i < 100; i++){
             try{
-                generator.generate(4, AbstractMapGenerator.WIDTH_SPLITS, AbstractMapGenerator.HEIGHT_SPLITS, 0, 0);
+                generator.generate(4, 20, 20, 0, 0);
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -23,7 +23,7 @@ public class TestMapGeneration {
         MazeMapGenerator generator = new MazeMapGenerator();
         for(int i = 0; i < 100; i++){
             try{
-                generator.generate(4, AbstractMapGenerator.WIDTH_SPLITS, AbstractMapGenerator.HEIGHT_SPLITS, 0, 0);
+                generator.generate(4, 20, 20, 0, 0);
             }catch (Exception e){
                 e.printStackTrace();
             }
