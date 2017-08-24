@@ -68,14 +68,16 @@ public class GraphTest {
         }
 
         UndirectedGraph<Vector2, DefaultEdge> myGraph = new SimpleGraph<>(DefaultEdge.class);
-        Vector2 v1 = new Vector2(2f,2f);
+        Vector2 v1 = new Vector2(3f,3f);
         myGraph.addVertex(v1);
-        Vector2 v2 = new Vector2(5f,2f);
+        Vector2 v2 = new Vector2(7f,3f);
         myGraph.addVertex(v2);
-        Vector2 v3 = new Vector2(11f,5f);
+        Vector2 v3 = new Vector2(11f,3f);
         myGraph.addVertex(v3);
-        Vector2 v4 = new Vector2(8f,8f);
+        Vector2 v4 = new Vector2(11f,7f);
         myGraph.addVertex(v4);
+        Vector2 v5 = new Vector2(7f,7f);
+        myGraph.addVertex(v5);
 
         /*myGraph.addEdge(v1, v2);
         myGraph.addEdge(v2, v3);
@@ -83,4 +85,5 @@ public class GraphTest {
 
         assertEquals(objectGraph, myGraph);
     }
+
 }

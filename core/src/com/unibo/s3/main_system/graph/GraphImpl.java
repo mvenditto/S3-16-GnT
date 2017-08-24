@@ -37,7 +37,7 @@ public class GraphImpl implements Graph, GraphAdapter<Vector2> {
     }
 
     private void setWorldActor() {
-        ActorRef worldActor = SystemManager.getInstance().getLocalActor("worldActor"); //in qualche modo lo ottieni
+        ActorRef worldActor = SystemManager.getInstance().getLocalActor("worldActor");
         this.collisionDetector = new Box2dProxyDetectorsFactory(worldActor).newRaycastCollisionDetector();
     }
 
@@ -77,7 +77,7 @@ public class GraphImpl implements Graph, GraphAdapter<Vector2> {
         } else {
             this.graph = new SimpleGraph<>(DefaultEdge.class);
             addNodes();
-            //addEdges();
+            addEdges();
         }
         System.out.println("Grafo creato: " + this.graph.toString());
         return this.graph;
