@@ -24,9 +24,9 @@ public class RoomMapGenerator extends AbstractMapGenerator {
         }
         int door3Coord = generateInRange(startY + 1, startY + wallH - 1);
         door2Coord = generateInRange(startX + wallV + 1, startX + width);
-        System.out.println("First door " + (startX + wallV) + "," + door1Coord);
-        System.out.println("Second door " + door2Coord + "," + (startY + wallH));
-        System.out.println("Third door " + (startX + wallV) + "," + door3Coord);
+       // System.out.println("First door " + (startX + wallV) + "," + door1Coord);
+       // System.out.println("Second door " + door2Coord + "," + (startY + wallH));
+       // System.out.println("Third door " + (startX + wallV) + "," + door3Coord);
 
         if(isHorizontalWallDenied(startY + wallH, startX, startX+width+1)){
             buildWallWithRange(false, startY + wallH, startX + 1, startX+width);
