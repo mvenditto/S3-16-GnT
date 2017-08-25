@@ -6,7 +6,6 @@ import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory;
 import com.unibo.s3.main_system.communication.SystemManager;
-import org.jgrapht.GraphPath;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.alg.shortestpath.KShortestPaths;
 import org.jgrapht.graph.DefaultEdge;
@@ -61,7 +60,6 @@ public class GraphGenerator {
         }
 
         //printGrid(grid);
-        log("Collision detector: " + collisionDetector.toString());
 
         UndirectedGraph<Vector2, DefaultEdge> graph = create(grid, walls, collisionDetector);
 
@@ -96,7 +94,7 @@ public class GraphGenerator {
                             //log(node.toString() + " non arriva a " + toCompare.toString());
                             if(checkEdgeRayCast(collisionDetector, node, toCompare, 0.5f, 16)) {
                                 DefaultEdge edge = graph.addEdge(node, toCompare);
-                                //System.out.println("Arco " + edge.toString() +" aggiunto!");
+                                log("Secondi archi: aggiunto " + edge.toString());
                             }
                         }
 
@@ -160,9 +158,9 @@ public class GraphGenerator {
             tmp2.x = (float)(vertexRadius * Math.cos(iRad) + v1.x);
             tmp2.y = (float)(vertexRadius * Math.sin(iRad) + v1.y);
 
-            log("Analisi: " + tmp2.toString() + " con " + tmp.toString());
+            //log("Analisi: " + tmp2.toString() + " con " + tmp.toString());
             if (!collisionDetector.collides(new Ray<>(tmp2, tmp))) {
-                log(tmp2.toString() + " e " + tmp.toString() + " collidono");
+                //log(tmp2.toString() + " e " + tmp.toString() + " collidono");
                 return true;
             }
         }
@@ -177,7 +175,7 @@ public class GraphGenerator {
                 if(vertex != node && checkNodeProximity(vertex, node)
                         && checkEdgeRayCast(collisionDetector, vertex, node, 0.5f, 16)) {
                     DefaultEdge edge = graph.addEdge(vertex, node);
-                    log("Aggiunto arco " + edge.toString());
+                    log("Primi archi: aggiunto " + edge.toString());
                 }
             });
             nodes.remove(vertex);
@@ -233,6 +231,7 @@ public class GraphGenerator {
                 if(checkGrid(row, col, grid)) {
                     Vector2 v = createVector(row, col);
                     graph.addVertex(v);
+                    log("Primi nodi: " + v.toString());
                 }
             }
         }
@@ -276,8 +275,10 @@ public class GraphGenerator {
                     y1 = y + 1;
                     modified = true;
                 }
-                if(modified && checkForAddingNode(x1, y1, grid, graph))
-                    graph.addVertex(createVector(x1, y1));
+                if(modified && checkForAddingNode(x1, y1, grid, graph)) {
+                    Vector2 v = createVector(x1, y1);
+                    graph.addVertex(v);
+                }
 
             }
         });
