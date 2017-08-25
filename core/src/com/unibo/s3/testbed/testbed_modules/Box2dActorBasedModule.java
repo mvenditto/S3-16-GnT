@@ -23,6 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import com.unibo.s3.main_system.communication.Messages.ActMsg;
 import com.unibo.s3.main_system.communication.SystemManager;
 import com.unibo.s3.main_system.world.actors.*;
 import com.unibo.s3.testbed.Testbed;
@@ -244,7 +245,7 @@ public class Box2dActorBasedModule extends BasicTestbedModuleWithGui {
 
     @Override
     public void update(float dt) {
-        worldActor.tell(new Act(dt), null);
+        worldActor.tell(new ActMsg(dt), null);
     }
 
     @Override

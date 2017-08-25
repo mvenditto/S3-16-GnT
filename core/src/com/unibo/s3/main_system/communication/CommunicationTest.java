@@ -25,7 +25,7 @@ public class CommunicationTest extends ApplicationAdapter {
         SystemManager.getInstance().createSystem("System", null);
         SystemManager.getInstance().createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor");
         SystemManager.getInstance().createActor(GraphActor.props(), "graphActor");
-        SystemManager.getInstance().createActor(MapActor.props(), "mapActor").tell(new Messages.StartMsg(), ActorRef.noSender());
+        SystemManager.getInstance().createActor(MapActor.props(), "mapActor").tell(new Messages.GenerateMapMsg(), ActorRef.noSender());
 
         ActorRef quadTree = SystemManager.getInstance().createActor(QuadTreeActor.props(), "quadTree");
 
@@ -33,9 +33,9 @@ public class CommunicationTest extends ApplicationAdapter {
         ActorRef copTwo = SystemManager.getInstance().createActor(CharacterActor.props(), "copTwo");
         ActorRef copThree = SystemManager.getInstance().createActor(CharacterActor.props(), "copThree");
 
-        quadTree.tell(new Messages.askNeighbourMsg(), copOne);
-        quadTree.tell(new Messages.askNeighbourMsg(), copTwo);
-        quadTree.tell(new Messages.askNeighbourMsg(), copThree);
+        quadTree.tell(new Messages.AskNeighboursMsg(), copOne);
+        quadTree.tell(new Messages.AskNeighboursMsg(), copTwo);
+        quadTree.tell(new Messages.AskNeighboursMsg(), copThree);
 
 
     }
