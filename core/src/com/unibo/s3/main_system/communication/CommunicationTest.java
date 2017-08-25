@@ -23,6 +23,7 @@ public class CommunicationTest extends ApplicationAdapter {
         img = new Texture("badlogic.jpg");
 
         SystemManager.getInstance().createSystem("System", null);
+        SystemManager.getInstance().createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor");
         SystemManager.getInstance().createActor(GraphActor.props(), "graphActor");
         SystemManager.getInstance().createActor(MapActor.props(), "mapActor").tell(new Messages.StartMsg(), ActorRef.noSender());
 
@@ -36,7 +37,7 @@ public class CommunicationTest extends ApplicationAdapter {
         quadTree.tell(new Messages.askNeighbourMsg(), copTwo);
         quadTree.tell(new Messages.askNeighbourMsg(), copThree);
 
-        SystemManager.getInstance().createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor");
+
     }
 
     @Override
