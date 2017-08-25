@@ -7,6 +7,7 @@ import com.badlogic.gdx.ai.utils.{Collision, Ray}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 import com.unibo.s3.main_system.characters.steer.collisions.{Box2dDetectorsFactory, Box2dRaycastCollisionDetector, Box2dSquareAABBProximity}
+import com.unibo.s3.main_system.communication.Messages.MapMsg
 
 case class Act(dt: Float)
 case class RayCastCollidesQuery(ray: Ray[Vector2])
@@ -80,6 +81,10 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
         override def reportNeighbor(n: Steerable[Vector2]): Boolean = {neighbors :+= n; true}
       })
       sender() ! ProximityQueryResponse(neighbors)
+
+    case msg: MapMsg =>
+      val b = msg.line.split(":").map(v => v.toFloat).toList
+      createBox(new Vector2(b.head, b(1)), new Vector2(b(2), b.last))
   }
 }
 
