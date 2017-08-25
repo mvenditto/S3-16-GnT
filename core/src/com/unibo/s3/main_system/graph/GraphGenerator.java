@@ -85,7 +85,26 @@ public class GraphGenerator {
     private static void checkUnconnectedNodes(UndirectedGraph<Vector2, DefaultEdge> graph,
                                               RaycastCollisionDetector<Vector2> collisionDetector) {
         KShortestPaths<Vector2, DefaultEdge> ksp = new KShortestPaths<Vector2, DefaultEdge>(graph, 1);
-        List<Vector2> nodes = new ArrayList<>(graph.vertexSet());
+        //System.out.println(ksp.getPaths(new MyNode(3f,11f, false), new MyNode(25f,30f, false)).toString());
+        graph.vertexSet().forEach(node ->{
+            float maxDist = 7f;
+            for(float x = node.x - maxDist; x <= node.x + maxDist; x++) {
+                for(float y = node.y - maxDist; y <= node.y + maxDist; y++) {
+                    Vector2 toCompare = new Vector2(x, y);
+                    if(graph.containsVertex(toCompare)) {
+                        if (!toCompare.equals(node) && ksp.getPaths(node, toCompare).size() == 0) {
+                            //log(node.toString() + " non arriva a " + toCompare.toString());
+                            if(checkEdgeRayCast(collisionDetector, node, toCompare, 0.5f, 16)) {
+                                DefaultEdge edge = graph.addEdge(node, toCompare);
+                                //System.out.println("Arco " + edge.toString() +" aggiunto!");
+                            }
+                        }
+
+                    }
+                }
+            }
+        });
+        /*List<Vector2> nodes = new ArrayList<>(graph.vertexSet());
         graph.vertexSet().forEach(vertex -> {
             if(graph.degreeOf(vertex) <= 1) {
                 Vector2 nearest = null;
@@ -113,7 +132,7 @@ public class GraphGenerator {
                     graph.addEdge(vertex, nearest);
                 nodes.remove(vertex);
             }
-        });
+        });*/
     }
 
 
@@ -211,8 +230,10 @@ public class GraphGenerator {
         int step = 4;
         for(int row = (step - 1); row < grid.length; row+=step) {
             for(int col = (step - 1); col < grid[0].length; col+=step) {
-                if(checkGrid(row, col, grid))
-                    graph.addVertex(createVector(row, col));
+                if(checkGrid(row, col, grid)) {
+                    Vector2 v = createVector(row, col);
+                    graph.addVertex(v);
+                }
             }
         }
     }
