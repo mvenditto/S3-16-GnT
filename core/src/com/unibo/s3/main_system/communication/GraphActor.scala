@@ -9,8 +9,7 @@ import com.unibo.s3.main_system.graph.GraphGenerator
 
 class GraphActor extends  UntypedAbstractActor {
 
-  val FILEPATH = "/maps/outputGraphActor.txt" //ci va il percorso del file dove salvare la mappa(Sara)
-  val testPath = "test.txt" //ci va il percorso del file dove salvare la mappa(Sara)
+  val FILEPATH = "test.txt" //ci va il percorso del file dove salvare la mappa(Sara)
 
   val file: FileHandle = Gdx.files.local(FILEPATH)
   file.writeString("", false)
@@ -26,7 +25,7 @@ class GraphActor extends  UntypedAbstractActor {
       writeFunction(verifyClose)
     case _: GraphGenerationMsg =>
       //GraphGenerator.createGraph("C:\\Users\\Sara\\Maps\\test.txt");
-      GraphGenerator.createGraph(testPath);
+      GraphGenerator.createGraph(FILEPATH);
       //qui ho il file con la mappa, bisogna generare il grafo(Sara)
       //println("graph created!")
     case _ => println("(graph actor) message unknown: " + message)

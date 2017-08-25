@@ -6,6 +6,7 @@ import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory;
 import com.unibo.s3.main_system.communication.SystemManager;
+import org.jgrapht.GraphPath;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.alg.shortestpath.KShortestPaths;
 import org.jgrapht.graph.DefaultEdge;
@@ -45,7 +46,7 @@ public class GraphGenerator {
         ActorRef worldActor = SystemManager.getInstance().getLocalActor("worldActor");
         RaycastCollisionDetector<Vector2> collisionDetector = new Box2dProxyDetectorsFactory(worldActor).newRaycastCollisionDetector();
         HashMap<Vector2, Vector2> walls = new HashMap<>();
-        Integer[][] grid = new Integer[15][9];
+        Integer[][] grid = new Integer[60][60];
 
         try {
             readMap(mapFilename, walls, grid);
@@ -84,11 +85,12 @@ public class GraphGenerator {
                                               RaycastCollisionDetector<Vector2> collisionDetector) {
         KShortestPaths<Vector2, DefaultEdge> ksp = new KShortestPaths<Vector2, DefaultEdge>(graph, 1);
         //System.out.println(ksp.getPaths(new MyNode(3f,11f, false), new MyNode(25f,30f, false)).toString());
-        graph.vertexSet().forEach(node ->{
+        /*graph.vertexSet().forEach(node ->{
             float maxDist = 7f;
             for(float x = node.x - maxDist; x <= node.x + maxDist; x++) {
                 for(float y = node.y - maxDist; y <= node.y + maxDist; y++) {
-                    Vector2 toCompare = new Vector2(x, y);
+                    Vector2 toCompare = createVector(x, y);
+                    log("Sto comparando " + node.toString() + " con " + toCompare.toString());
                     if(graph.containsVertex(toCompare)) {
                         if (!toCompare.equals(node) && ksp.getPaths(node, toCompare).size() == 0) {
                             //log(node.toString() + " non arriva a " + toCompare.toString());
@@ -101,8 +103,8 @@ public class GraphGenerator {
                     }
                 }
             }
-        });
-        /*List<Vector2> nodes = new ArrayList<>(graph.vertexSet());
+        });*/
+        List<Vector2> nodes = new ArrayList<>(graph.vertexSet());
         graph.vertexSet().forEach(vertex -> {
             if(graph.degreeOf(vertex) <= 1) {
                 Vector2 nearest = null;
@@ -130,7 +132,9 @@ public class GraphGenerator {
                     graph.addEdge(vertex, nearest);
                 nodes.remove(vertex);
             }
-        });*/
+        });
+
+        log("Finiti secondi archi");
     }
 
 
@@ -180,6 +184,7 @@ public class GraphGenerator {
             });
             nodes.remove(vertex);
         });
+        log("Finiti primi archi");
     }
 
     private static boolean checkNodeProximity(Vector2 first, Vector2 second) {
@@ -235,6 +240,7 @@ public class GraphGenerator {
                 }
             }
         }
+        log("Finiti primi nodi");
     }
 
     /**
@@ -282,6 +288,7 @@ public class GraphGenerator {
 
             }
         });
+        log("Finiti i nodi dei muri");
     }
 
     private static boolean checkForAddingNode(int x, int y, Integer[][] grid, UndirectedGraph<Vector2, DefaultEdge> graph) {
