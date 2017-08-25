@@ -42,7 +42,6 @@ public class GraphGenerator {
     }
 
     public static UndirectedGraph<Vector2, DefaultEdge> createGraph(String mapFilename) {
-        log("Mi hanno detto di crearlo");
         ActorRef worldActor = SystemManager.getInstance().getLocalActor("worldActor");
         RaycastCollisionDetector<Vector2> collisionDetector = new Box2dProxyDetectorsFactory(worldActor).newRaycastCollisionDetector();
         HashMap<Vector2, Vector2> walls = new HashMap<>();
@@ -64,7 +63,7 @@ public class GraphGenerator {
 
         UndirectedGraph<Vector2, DefaultEdge> graph = create(grid, walls, collisionDetector);
 
-        System.out.println("Grafo creato: " + graph.toString());
+        log("Grafo creato: " + graph.toString());
         return graph;
     }
 
@@ -85,26 +84,26 @@ public class GraphGenerator {
                                               RaycastCollisionDetector<Vector2> collisionDetector) {
         KShortestPaths<Vector2, DefaultEdge> ksp = new KShortestPaths<Vector2, DefaultEdge>(graph, 1);
         //System.out.println(ksp.getPaths(new MyNode(3f,11f, false), new MyNode(25f,30f, false)).toString());
-        /*graph.vertexSet().forEach(node ->{
+        graph.vertexSet().forEach(node ->{
             float maxDist = 7f;
             for(float x = node.x - maxDist; x <= node.x + maxDist; x++) {
                 for(float y = node.y - maxDist; y <= node.y + maxDist; y++) {
                     Vector2 toCompare = createVector(x, y);
-                    log("Sto comparando " + node.toString() + " con " + toCompare.toString());
+                    //log("Sto comparando " + node.toString() + " con " + toCompare.toString());
                     if(graph.containsVertex(toCompare)) {
                         if (!toCompare.equals(node) && ksp.getPaths(node, toCompare).size() == 0) {
                             //log(node.toString() + " non arriva a " + toCompare.toString());
                             if(checkEdgeRayCast(collisionDetector, node, toCompare, 0.5f, 16)) {
                                 DefaultEdge edge = graph.addEdge(node, toCompare);
-                                log("Secondi archi: aggiunto " + edge.toString());
+                                //log("Secondi archi: aggiunto " + edge.toString());
                             }
                         }
 
                     }
                 }
             }
-        });*/
-        List<Vector2> nodes = new ArrayList<>(graph.vertexSet());
+        });
+        /*List<Vector2> nodes = new ArrayList<>(graph.vertexSet());
         graph.vertexSet().forEach(vertex -> {
             if(graph.degreeOf(vertex) <= 1) {
                 Vector2 nearest = null;
@@ -128,11 +127,13 @@ public class GraphGenerator {
                     }
 
                 }
-                if(nearest != null)
-                    graph.addEdge(vertex, nearest);
+                if(nearest != null) {
+                    DefaultEdge edge = graph.addEdge(vertex, nearest);
+                    log("Secondi archi: aggiunto " + edge);
+                }
                 nodes.remove(vertex);
             }
-        });
+        });*/
 
         log("Finiti secondi archi");
     }
@@ -176,10 +177,11 @@ public class GraphGenerator {
         List<Vector2> nodes = new ArrayList<>(graph.vertexSet());
         graph.vertexSet().forEach(vertex -> {
             nodes.forEach(node -> {
+                //log("Controllo " + vertex.toString() + " - " + node.toString());
                 if(vertex != node && checkNodeProximity(vertex, node)
                         && checkEdgeRayCast(collisionDetector, vertex, node, 0.5f, 16)) {
                     DefaultEdge edge = graph.addEdge(vertex, node);
-                    log("Primi archi: aggiunto " + edge.toString());
+                    //log("Primi archi: aggiunto " + edge.toString());
                 }
             });
             nodes.remove(vertex);
@@ -189,9 +191,9 @@ public class GraphGenerator {
 
     private static boolean checkNodeProximity(Vector2 first, Vector2 second) {
         int val = 3;
-        return ((Float.compare(first.x, second.x) == 0 && checkCoord(first.y, second.y,val)) ||
+        return ((Float.compare(first.x, second.x) == 0 && checkCoord(first.y, second.y, val)) ||
                 (Float.compare(first.y, second.y) == 0 && checkCoord(first.x, second.x, val)) ||
-                (checkCoord(first.x, second.x, 5) || checkCoord(first.y, second.y, 2)) ||
+                (checkCoord(first.x, second.x, 5) && checkCoord(first.y, second.y, 2)) ||
                 (checkCoord(first.x, second.x, 2) && checkCoord(first.y, second.y, 5)));
     }
 
@@ -236,7 +238,7 @@ public class GraphGenerator {
                 if(checkGrid(row, col, grid)) {
                     Vector2 v = createVector(row, col);
                     graph.addVertex(v);
-                    log("Primi nodi: " + v.toString());
+                    //log("Primi nodi: " + v.toString());
                 }
             }
         }
@@ -256,20 +258,24 @@ public class GraphGenerator {
 
     private static void addWallsNode(HashMap<Vector2, Vector2> walls, Integer[][] grid, UndirectedGraph<Vector2, DefaultEdge> graph) {
         walls.forEach((pos, size) -> {
+            //log("Muro in " + pos.toString() + " di " + size.toString());
             Vector2[] vertex = new Vector2[4];
             float halfWidth = size.x / 2;
             float halfHeight = size.y / 2;
             vertex[0] = createVector((pos.x - halfWidth - 2f), pos.y);
-            vertex[1] = createVector((pos.x - halfWidth + 2f), pos.y);
-            vertex[2] = createVector(pos.x, (pos.y - halfHeight + 2f));
+            vertex[1] = createVector((pos.x + halfWidth + 2f), pos.y);
+            vertex[2] = createVector(pos.x, (pos.y + halfHeight + 2f));
             vertex[3] = createVector(pos.x, (pos.y - halfHeight - 2f));
 
             for(int i = 0; i < 4; i++) {
                 int x = (int) vertex[i].x;
                 int y = (int) vertex[i].y;
 
-                if(checkForAddingNode(x, y, grid, graph))
-                    graph.addVertex(createVector(x,y));
+                if(checkForAddingNode(x, y, grid, graph)) {
+                    Vector2 v = createVector(x, y);
+                    graph.addVertex(v);
+                    //log("Secondi nodi: " + v.toString());
+                }
 
                 boolean modified = false;
                 int x1 = x, y1 = y;
@@ -281,10 +287,13 @@ public class GraphGenerator {
                     y1 = y + 1;
                     modified = true;
                 }
-                if(modified && checkForAddingNode(x1, y1, grid, graph)) {
+
+                if (modified && checkForAddingNode(x1, y1, grid, graph)) {
                     Vector2 v = createVector(x1, y1);
                     graph.addVertex(v);
+                    //log("Secondi nodi: " + v);
                 }
+
 
             }
         });
