@@ -36,8 +36,7 @@ trait Sample {
 }
 
 
-
-abstract class BaseSample extends Sample with Observable {
+abstract class BaseSample extends Sample {
 
   protected var submodules: Seq[Sample] = List[Sample]()
   protected var owner: Testbed = _
