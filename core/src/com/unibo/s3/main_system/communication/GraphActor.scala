@@ -3,7 +3,8 @@ package com.unibo.s3.main_system.communication
 import akka.actor.{Props, UntypedAbstractActor}
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
-import com.unibo.s3.main_system.communication.Messages.{GraphGenerationMsg, MapMsg}
+import com.unibo.s3.main_system.communication.Messages.{GenerateGraphMsg, MapElementMsg}
+import com.unibo.s3.main_system.graph.GraphGenerator
 
 
 class GraphActor extends  UntypedAbstractActor {
@@ -14,17 +15,19 @@ class GraphActor extends  UntypedAbstractActor {
   file.writeString("", false)
 
   override def onReceive(message: Any): Unit = message match {
-    case msg: MapMsg =>
+    case msg: MapElementMsg =>
       val verifyClose = msg.line.split(":").map(_.toFloat)
       def writeFunction(verifyClose: Array[Float]): Unit = verifyClose match {
         case _ if verifyClose.forall(value => value == 0.0) =>
-          getSelf().tell(GraphGenerationMsg(), getSender())
+          getSelf().tell(GenerateGraphMsg(), getSender())
         case _ => file.writeString(msg.line + "\n", true)
       }
       writeFunction(verifyClose)
-    case _: GraphGenerationMsg =>
+    case _: GenerateGraphMsg =>
+      //GraphGenerator.createGraph("C:\\Users\\Sara\\Maps\\test.txt");
+      GraphGenerator.createGraph(FILEPATH);
       //qui ho il file con la mappa, bisogna generare il grafo(Sara)
-      println("graph created!")
+      //println("graph created!")
     case _ => println("(graph actor) message unknown: " + message)
   }
 }

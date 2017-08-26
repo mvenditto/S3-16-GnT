@@ -1,13 +1,25 @@
 package com.unibo.s3.main_system.communication
 
 import akka.actor.ActorRef
+import com.unibo.s3.main_system.characters.BaseCharacter
 
 object Messages {
-  case class StartMsg()
-  case class MapMsg(line: String)
-  case class GraphGenerationMsg()
+  //message for synchronize
+  case class ActMsg(dt: Float)
 
-  case class askNeighbourMsg()
-  case class responseNeighbourMsg(neighbours: List[ActorRef])
-  case class sendCopInfoMsg()
+  //message for MapActor
+  case class GenerateMapMsg() //ci andranno le info per generare la mappa(width: int, height: int, campo per decidere il tipo di grafo)
+
+  //message for GraphActor
+  case class MapElementMsg(line: String)
+  case class GenerateGraphMsg()
+
+  //message for CharacterActor
+  case class AskNeighboursMsg()
+  case class SendNeighboursMsg(neighbours: List[ActorRef])
+  case class SendCopInfoMsg() //ci andranno le info che si devono scambiare i poliziotti
+
+  //message for MasterActor
+  case class AskCharactersMsg()
+  case class SendCharactersMsg(character: List[BaseCharacter])
 }

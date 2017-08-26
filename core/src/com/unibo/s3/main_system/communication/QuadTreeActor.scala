@@ -1,14 +1,19 @@
 package com.unibo.s3.main_system.communication
+import akka.actor.{ActorRef, Props, UntypedAbstractActor}
+import com.unibo.s3.main_system.characters.BaseCharacter
+import com.unibo.s3.main_system.communication.Messages.{AskNeighboursMsg, SendNeighboursMsg}
 
-import akka.actor.{Props, UntypedAbstractActor}
-import com.unibo.s3.main_system.communication.Messages.{askNeighbourMsg, responseNeighbourMsg}
+import scala.collection.mutable
 
 class QuadTreeActor extends UntypedAbstractActor{
 
+  //map[BaseCharacter, ActorRef]
+  var agentsTable : mutable.HashMap[BaseCharacter, ActorRef] = _
+
   override def onReceive(message: Any): Unit = message match {
-    case _: askNeighbourMsg =>
+    case _: AskNeighboursMsg =>
       //calcolo i vicini
-      getSender().tell(responseNeighbourMsg(List(
+      getSender().tell(SendNeighboursMsg(List(
         SystemManager.getInstance().getLocalActor("copOne"),
         SystemManager.getInstance().getLocalActor("copTwo"),
         SystemManager.getInstance().getLocalActor("copThree"))), getSelf())

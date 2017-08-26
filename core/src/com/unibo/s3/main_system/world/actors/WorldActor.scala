@@ -1,14 +1,14 @@
 package com.unibo.s3.main_system.world.actors
 
-import akka.actor.UntypedAbstractActor
+import akka.actor.{Props, UntypedAbstractActor}
 import com.badlogic.gdx.ai.steer.Proximity.ProximityCallback
 import com.badlogic.gdx.ai.steer.Steerable
 import com.badlogic.gdx.ai.utils.{Collision, Ray}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 import com.unibo.s3.main_system.characters.steer.collisions.{Box2dDetectorsFactory, Box2dRaycastCollisionDetector, Box2dSquareAABBProximity}
+import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
 
-case class Act(dt: Float)
 case class RayCastCollidesQuery(ray: Ray[Vector2])
 case class RayCastCollidesResponse(collides: Boolean)
 case class RayCastCollisionQuery(ray: Ray[Vector2])
@@ -51,7 +51,7 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
 
   override def onReceive(message: Any): Unit = message match {
 
-    case Act(dt) => act(dt)
+    case ActMsg(dt) => act(dt)
 
     case RayCastCollidesQuery(ray) =>
       sender() ! RayCastCollidesResponse(raycastCollisionDetector.collides(ray))
@@ -80,5 +80,13 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
         override def reportNeighbor(n: Steerable[Vector2]): Boolean = {neighbors :+= n; true}
       })
       sender() ! ProximityQueryResponse(neighbors)
+
+    case msg: MapElementMsg =>
+      val b = msg.line.split(":").map(v => v.toFloat).toList
+      createBox(new Vector2(b.head, b(1)), new Vector2(b(2), b.last))
   }
+}
+
+object WorldActor {
+  def props(world: World): Props = Props(new WorldActor(world))
 }
