@@ -1,4 +1,4 @@
-package com.unibo.s3.testbed.testbed_modules.future
+package com.unibo.s3.testbed.future.samples
 
 import akka.actor.{ActorRef, Props}
 import akka.pattern.Patterns
@@ -16,6 +16,7 @@ import com.unibo.s3.main_system.communication.SystemManager
 import com.unibo.s3.main_system.rendering.ScaleUtils.{getMetersPerPixel, getPixelsPerMeter, metersToPixels, pixelsToMeters}
 import com.unibo.s3.main_system.world.actors._
 import com.unibo.s3.testbed.Testbed
+import com.unibo.s3.testbed.future.BaseSample
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration

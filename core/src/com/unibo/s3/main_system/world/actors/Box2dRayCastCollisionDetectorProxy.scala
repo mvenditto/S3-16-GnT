@@ -27,6 +27,6 @@ class Box2dRayCastCollisionDetectorProxy(worldActor: ActorRef) extends RaycastCo
 
   override def collides(ray: Ray[Vector2]): Boolean = {
     val future = worldActor ? RayCastCollidesQuery(ray)
-    waitWorldResponse(future).asInstanceOf[Boolean]
+    waitWorldResponse(future).asInstanceOf[RayCastCollidesResponse].collides
   }
 }

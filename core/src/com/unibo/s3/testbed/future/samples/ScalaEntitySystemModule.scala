@@ -1,4 +1,4 @@
-package com.unibo.s3.testbed.testbed_modules.future
+package com.unibo.s3.testbed.future.samples
 
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector
 import com.badlogic.gdx.graphics.Color
@@ -14,6 +14,7 @@ import com.unibo.s3.main_system.rendering.ScaleUtils.{getMetersPerPixel, getPixe
 import com.unibo.s3.main_system.rendering.{GeometryRenderer, GeometryRendererImpl}
 import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
 import com.unibo.s3.testbed.Testbed
+import com.unibo.s3.testbed.future.BaseSample
 import com.unibo.s3.testbed.testbed_modules.EntitiesSystem
 
 import scala.collection.JavaConversions

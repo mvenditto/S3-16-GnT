@@ -1,4 +1,4 @@
-package com.unibo.s3.testbed.testbed_modules.future
+package com.unibo.s3.testbed.future
 
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -35,7 +35,9 @@ trait Sample {
 
 }
 
-abstract class BaseSample extends Sample {
+
+
+abstract class BaseSample extends Sample with Observable {
 
   protected var submodules: Seq[Sample] = List[Sample]()
   protected var owner: Testbed = _

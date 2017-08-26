@@ -1,4 +1,4 @@
-package com.unibo.s3.testbed.testbed_modules.future.ui
+package com.unibo.s3.testbed.future.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture

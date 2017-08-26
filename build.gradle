@@ -63,7 +63,8 @@ project(":core") {
         compile group: 'com.typesafe.akka', name: 'akka-actor_2.11', version: '2.5.3'
         compile group: 'com.typesafe.akka', name: 'akka-remote_2.11', version: '2.5.3'
         compile 'org.json:json:20170516'
-
+        compile group: 'org.scala-lang', name: 'scala-reflect', version: '2.11.7'
+        compile group: 'org.scala-lang', name: 'scala-compiler', version: '2.11.7'
         compile 'junit:junit:4.12'
     }
 }
