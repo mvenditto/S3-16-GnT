@@ -12,6 +12,7 @@ import com.badlogic.gdx.{Gdx, Input, InputMultiplexer}
 import com.kotcrab.vis.ui.widget.VisWindow
 import com.typesafe.config.ConfigFactory
 import com.unibo.s3.InputProcessorAdapter
+import com.unibo.s3.main_system.communication.Messages.ActMsg
 import com.unibo.s3.main_system.communication.SystemManager
 import com.unibo.s3.main_system.rendering.ScaleUtils.{getMetersPerPixel, getPixelsPerMeter, metersToPixels, pixelsToMeters}
 import com.unibo.s3.main_system.world.actors._
@@ -37,7 +38,7 @@ class ScalaBox2dModule extends BaseSample with InputProcessorAdapter {
 
   override def update(dt: Float): Unit = {
     super.update(dt)
-    worldActor ! Act(dt)
+    worldActor ! ActMsg(dt)
   }
 
   override def init(owner: Testbed): Unit = {
