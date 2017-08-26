@@ -1,8 +1,10 @@
 package com.unibo.s3.main_system.graph;
 
 import akka.actor.ActorRef;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory;
 import com.unibo.s3.main_system.communication.SystemManager;
@@ -61,6 +63,7 @@ public class GraphGenerator {
 
         //printGrid(grid);
 
+        //UndirectedGraph<Vector2, DefaultEdge> graph = null;
         UndirectedGraph<Vector2, DefaultEdge> graph = create(grid, walls, collisionDetector);
 
         log("Grafo creato: " + graph.toString());
@@ -206,9 +209,11 @@ public class GraphGenerator {
     }
 
     private static void readMap(String mapFilename, HashMap<Vector2, Vector2> walls, Integer[][] grid) throws IOException {
-        Files.lines(Paths.get(mapFilename)).forEach(l -> {
-            //log("Linea: " + l);
-            String[] toks = l.split(":");
+        FileHandle file = Gdx.files.internal(mapFilename);
+        String text = file.readString();
+        String[] lines = text.split("\\n");
+        for(int l = 0; l < lines.length; l++) {
+            String[] toks = lines[l].split(":");
             float x = Float.parseFloat(toks[0]);
             float y = Float.parseFloat(toks[1]);
             float w = Float.parseFloat(toks[2]);
@@ -220,8 +225,8 @@ public class GraphGenerator {
             Vector2 tr = createVector((x + halfw), (y + halfh));
 
             new Thread(new SetWall(bl, tr, grid)).start();
-            walls.put(createVector(x,y), createVector(w,h));
-        });
+            walls.put(createVector(x, y), createVector(w, h));
+        }
     }
 
     private static void addNodes(Integer[][] grid,
