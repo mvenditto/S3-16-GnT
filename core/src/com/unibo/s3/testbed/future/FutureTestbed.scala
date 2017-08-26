@@ -33,6 +33,7 @@ case class TestbedGui(controller: TestbedController) {
   private var stage: Stage = _
   private var menuBar: MenuBar = _
   private var viewport: Cell[_ <: Actor] = _
+  private var centerPane: VisTable = _
   private var loadingBar: VisProgressBar = _
   private var loadingLog: VisLabel = _
   private var samplePane: VisWindow = _
@@ -101,11 +102,15 @@ case class TestbedGui(controller: TestbedController) {
     createMenu()
 
     /*root table*/
+    centerPane = new VisTable()
+
+    //centerPane.add(new Toast("dark", new VisTable().add(new VisLabel("dasdasd")).getTable).getMainTable)
+
     val root = new VisTable()
     root.setFillParent(true)
-    root.add(menuBar.getTable).fillX().expandX().row()
+    root.add(menuBar.getTable).colspan(3).fillX().expandX().row()
     root.add(samplePane).width(currentSampleMenuWidth).fillY().expandY()
-    viewport = root.add()
+    viewport = root.add(centerPane).fillY()
     resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
     root.add(eastPane).width(defaultPaneSize).fillY().expandY()
 
@@ -134,6 +139,10 @@ case class TestbedGui(controller: TestbedController) {
   }
 
   def resetSamplePane(): Unit = samplePane.clear()
+
+  def test(s: String): Unit = {
+    stage.addActor(new Toast("dark", new VisTable()).fadeIn())
+  }
 
   def displayModuleLoadedToast(name: String): Unit = {
     val toast = new Toast("dark", new VisTable(true))
@@ -352,6 +361,7 @@ case class FutureTestbed() extends AbstractMainApplication with Testbed {
 
   override def resize(newWidth: Int, newHeight: Int): Unit = {
     super.resize(newWidth, newHeight)
+    gui.resize(newWidth, newHeight)
     currentSample.foreach(s => s.resize(newWidth, newHeight))
   }
 
