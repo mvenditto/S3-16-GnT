@@ -14,10 +14,11 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.kotcrab.vis.ui.widget.{VisSelectBox, VisTextButton, VisWindow}
 import com.unibo.s3.main_system.characters.steer.GdxImplicits._
-import com.unibo.s3.main_system.communication.Messages.{GenerateGraphMsg, GenerateMapMsg}
+import com.unibo.s3.main_system.communication.Messages.{ActMsg, GenerateGraphMsg, GenerateMapMsg}
 import com.unibo.s3.main_system.communication.SystemManager
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig, ScaleUtils}
+import com.unibo.s3.main_system.world.actors.{CreateBox, ResetWorld}
 import com.unibo.s3.testbed.Testbed
 import com.unibo.s3.testbed.future.BaseSample
 import org.jgrapht.UndirectedGraph
@@ -48,10 +49,14 @@ class GraphMapTest extends BaseSample {
   private def askForGraph(): Unit = {
     implicit val timeout = Timeout(120 seconds)
 
+    graph = None
     val map = Gdx.files.internal(mapFilePath)
+    worldActor ! ResetWorld
+    worldActor ! ActMsg(1)
     worldMap = map.readString().split("\n")
       .map(b => b.split(":").map(f => f.toFloat))
       .map(b => new Rectangle(b(0),b(1),b(2),b(3))).toList
+    worldMap.foreach(b => worldActor ! CreateBox(new Vector2(b.x, b.y), new Vector2(b.width, b.height)))
 
     new Thread(new Runnable {
       override def run(): Unit = {
@@ -134,6 +139,9 @@ class GraphMapTest extends BaseSample {
       shapeRenderer.setAutoShapeType(true)
       shapeRenderer.set(ShapeType.Filled)
       shapeRenderer.setColor(Color.GRAY)
+      shapeRenderer.rect(center.x * s, center.y * s, w.getWidth * s, w.getHeight * s)
+      shapeRenderer.set(ShapeType.Line)
+      shapeRenderer.setColor(Color.DARK_GRAY)
       shapeRenderer.rect(center.x * s, center.y * s, w.getWidth * s, w.getHeight * s)
       shapeRenderer.set(t)
       shapeRenderer.setColor(c)

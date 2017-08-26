@@ -9,6 +9,8 @@ import com.badlogic.gdx.physics.box2d._
 import com.unibo.s3.main_system.characters.steer.collisions.{Box2dDetectorsFactory, Box2dRaycastCollisionDetector, Box2dSquareAABBProximity}
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
 
+import com.unibo.s3.main_system.characters.steer.GdxImplicits._
+
 case class RayCastCollidesQuery(ray: Ray[Vector2])
 case class RayCastCollidesResponse(collides: Boolean)
 case class RayCastCollisionQuery(ray: Ray[Vector2])
@@ -49,6 +51,12 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
     groundBox.dispose()
   }
 
+  private def getBodies: com.badlogic.gdx.utils.Array[Body] = {
+    val bodies = new com.badlogic.gdx.utils.Array[Body]()
+    world.getBodies(bodies)
+    bodies
+  }
+
   override def onReceive(message: Any): Unit = message match {
 
     case ActMsg(dt) => act(dt)
@@ -68,10 +76,7 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
 
     case CreateBox(pos, size) => createBox(pos, size);
 
-    case GetAllBodies() =>
-      val bodies = new com.badlogic.gdx.utils.Array[Body]()
-      world.getBodies(bodies)
-      sender() ! bodies
+    case GetAllBodies() => sender() ! getBodies
 
     case ProximityQuery(owner, radius) =>
       proximityDetector.setOwner(owner)
@@ -84,6 +89,8 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
     case msg: MapElementMsg =>
       val b = msg.line.split(":").map(v => v.toFloat).toList
       createBox(new Vector2(b.head, b(1)), new Vector2(b(2), b.last))
+
+    case ResetWorld => getBodies.asScalaIterable.foreach( b => bodiesToDelete :+= b)
   }
 }
 
