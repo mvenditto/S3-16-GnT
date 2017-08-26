@@ -17,7 +17,7 @@ import com.kotcrab.vis.ui.widget.toast.Toast
 import com.kotcrab.vis.ui.widget.{VisLabel, VisTree, _}
 import com.unibo.s3.main_system.AbstractMainApplication
 import com.unibo.s3.testbed.Testbed
-import com.unibo.s3.testbed.future.samples.{ActorSystemModule, ScalaBox2dModule, ScalaEntitySystemModule}
+import com.unibo.s3.testbed.future.samples._
 import com.unibo.s3.testbed.future.ui.KeyHelpTable
 
 trait TestbedController {
@@ -40,7 +40,7 @@ case class TestbedGui(controller: TestbedController) {
   private var currSampleShortcuts: Option[KeyHelpTable] = None
 
   private val defaultPaneSize = 200f
-  private val currentSampleMenuWidth = 250f
+  private val currentSampleMenuWidth = 300f
   private var lastTransitionOut = false
   private var customBlue = new Color(2/255f, 179/255f, 255/255f, 1f)
 
@@ -230,6 +230,7 @@ case class TestbedGui(controller: TestbedController) {
     val core = new Node(new VisLabel("Core"))
     val dummy = new Node(new VisLabel("Dummy"))
     val actors = new Node(new VisLabel("Actors"))
+    val tests = new Node(new VisLabel("Test"))
     core.setExpanded(true)
 
     /*add samples by name*/
@@ -238,10 +239,12 @@ case class TestbedGui(controller: TestbedController) {
     addSample(core, "Entities Playground")
     addSample(core, "Box2d World")
     addSample(actors, "Actor System")
+    addSample(tests, "Graph/Map Test")
 
     tree.add(core)
     tree.add(dummy)
     tree.add(actors)
+    tree.add(tests)
     tree
   }
 
@@ -271,6 +274,7 @@ case class FutureTestbed() extends AbstractMainApplication with Testbed {
     case "Entities Playground" => Option(new ScalaEntitySystemModule())
     case "Box2d World" => Option(new ScalaBox2dModule())
     case "Actor System" => Option(new ActorSystemModule())
+    case "Graph/Map Test" => Option(new GraphMapTest())
     case _ => None
   }
 

@@ -25,7 +25,7 @@ class GraphActor extends  UntypedAbstractActor {
       writeFunction(verifyClose)
     case _: GenerateGraphMsg =>
       //GraphGenerator.createGraph("C:\\Users\\Sara\\Maps\\test.txt");
-      GraphGenerator.createGraph(FILEPATH);
+      sender ! GraphGenerator.createGraph(FILEPATH);
       //qui ho il file con la mappa, bisogna generare il grafo(Sara)
       //println("graph created!")
     case _ => println("(graph actor) message unknown: " + message)

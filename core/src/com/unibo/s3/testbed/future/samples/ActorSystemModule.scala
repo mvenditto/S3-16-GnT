@@ -114,3 +114,8 @@ class ActorSystemModule extends BaseSample {
     loggerActor = SystemManager.getInstance().getLocalActor("loggerActor")
   }
 }
+
+object ActorSystemModule {
+  def apply(): ActorSystemModule = new ActorSystemModule()
+}
+
