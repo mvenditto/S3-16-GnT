@@ -12,7 +12,7 @@ import com.unibo.s3.main_system.modules.MenuModule;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.unibo.s3.main_system.rendering.ScaleUtils.*;
+import static com.unibo.s3.main_system.util.ScaleUtils.*;
 
 
 public class Main extends AbstractMainApplication {

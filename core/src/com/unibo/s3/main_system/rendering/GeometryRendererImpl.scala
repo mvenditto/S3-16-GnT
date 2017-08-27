@@ -35,6 +35,7 @@ class GeometryRendererImpl extends GeometryRenderer[Vector2] {
     val v2 = new Vector2(v(2), v(3))
     val v3 = new Vector2(v(4), v(5))
 
+    val t = shapeRenderer.getCurrentType
     shapeRenderer.setColor(character.getColor)
     shapeRenderer.setAutoShapeType(true)
     shapeRenderer.set(ShapeRenderer.ShapeType.Filled)
@@ -43,6 +44,7 @@ class GeometryRendererImpl extends GeometryRenderer[Vector2] {
     shapeRenderer.rectLine(v3, v1, 4)
     shapeRenderer.set(ShapeRenderer.ShapeType.Line)
     shapeRenderer.setColor(backupColor)
+    shapeRenderer.set(t)
   }
 
   override def renderCharacterDebugInfo(shapeRenderer: ShapeRenderer, character: MovableEntity[Vector2]): Unit = {

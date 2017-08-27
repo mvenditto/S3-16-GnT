@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.unibo.s3.main_system.rendering.ScaleUtils.*;
+import static com.unibo.s3.main_system.util.ScaleUtils.*;
 
 @SuppressWarnings("Duplicates")
 public class Box2dModule extends BasicTestbedModuleWithGui {

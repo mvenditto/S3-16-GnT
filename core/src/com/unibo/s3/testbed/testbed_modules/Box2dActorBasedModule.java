@@ -39,7 +39,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.unibo.s3.main_system.rendering.ScaleUtils.*;
+import static com.unibo.s3.main_system.util.ScaleUtils.*;
 
 @SuppressWarnings("Duplicates")
 public class Box2dActorBasedModule extends BasicTestbedModuleWithGui {

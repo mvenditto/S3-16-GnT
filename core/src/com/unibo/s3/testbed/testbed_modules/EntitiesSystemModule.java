@@ -3,7 +3,6 @@ package com.unibo.s3.testbed.testbed_modules;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -18,19 +17,16 @@ import com.unibo.s3.main_system.characters.steer.BaseMovableEntity;
 import com.unibo.s3.main_system.characters.steer.MovableEntity;
 import com.unibo.s3.main_system.rendering.GeometryRenderer;
 import com.unibo.s3.main_system.rendering.GeometryRendererImpl;
-import com.unibo.s3.main_system.rendering.ScaleUtils;
+import com.unibo.s3.main_system.util.ScaleUtils;
+import com.unibo.s3.main_system.util.ScaleUtils.*;
 import com.unibo.s3.main_system.world.spatial.Bounds;
 import com.unibo.s3.main_system.world.spatial.QuadTreeNode;
 import com.unibo.s3.testbed.Testbed;
-import scala.runtime.BoxedUnit;
 import scala.collection.JavaConversions;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static com.unibo.s3.main_system.rendering.ScaleUtils.getMetersPerPixel;
-import static com.unibo.s3.main_system.rendering.ScaleUtils.getPixelsPerMeter;
 
 public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements EntitiesSystem<Vector2> {
 
@@ -103,10 +99,10 @@ public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements E
     private void renderSelectedAgentMarker(ShapeRenderer shapeRenderer) {
 
         if (selectedAgent != null ) {
-            final Vector2 center = selectedAgent.getPosition().cpy().scl(getPixelsPerMeter());
+            final Vector2 center = selectedAgent.getPosition().cpy().scl(ScaleUtils.getPixelsPerMeter());
             Color backupColor = shapeRenderer.getColor();
             shapeRenderer.setColor(Color.GREEN);
-            shapeRenderer.circle(center.x, center.y, getPixelsPerMeter());
+            shapeRenderer.circle(center.x, center.y, ScaleUtils.getPixelsPerMeter());
             shapeRenderer.setColor(backupColor);
         }
     }
@@ -405,7 +401,7 @@ public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements E
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 
         Vector2 click = new Vector2(screenX, screenY);
-        click = owner.screenToWorld(click).scl(getMetersPerPixel());
+        click = owner.screenToWorld(click).scl(ScaleUtils.getMetersPerPixel());
 
         if (isLeftCtrlPressed) {
             selectedAgent = null;
@@ -428,7 +424,7 @@ public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements E
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         if (selectedAgent != null && isLeftCtrlPressed) {
             Vector2 click = new Vector2(screenX, screenY);
-            click = owner.screenToWorld(click).scl(getMetersPerPixel());
+            click = owner.screenToWorld(click).scl(ScaleUtils.getMetersPerPixel());
             selectedAgent.getPosition().set(click);
         }
         return false;
