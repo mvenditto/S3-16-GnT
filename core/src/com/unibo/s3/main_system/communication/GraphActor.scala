@@ -9,7 +9,7 @@ import com.unibo.s3.main_system.graph.GraphGenerator
 
 class GraphActor extends  UntypedAbstractActor {
 
-  val FILEPATH = "test.txt" //ci va il percorso del file dove salvare la mappa(Sara)
+  val FILEPATH = "maps/outputGraphActor.txt" //ci va il percorso del file dove salvare la mappa(Sara)
 
   val file: FileHandle = Gdx.files.local(FILEPATH)
   file.writeString("", false)
