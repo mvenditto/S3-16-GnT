@@ -28,6 +28,7 @@ trait TestbedController {
 
 }
 
+
 case class TestbedGui(controller: TestbedController) {
 
   private var stage: Stage = _
@@ -37,6 +38,7 @@ case class TestbedGui(controller: TestbedController) {
   private var loadingBar: VisProgressBar = _
   private var loadingLog: VisLabel = _
   private var samplePane: VisWindow = _
+  private var console: VisTextArea = _
   private var toastManager: ToastManager = _
   private var currSampleShortcuts: Option[KeyHelpTable] = None
 
@@ -48,6 +50,7 @@ case class TestbedGui(controller: TestbedController) {
   def resize(newWidth: Integer, newHeight: Integer): Unit = {
     stage.getViewport.update(newWidth, newHeight, true)
     viewport.width(Gdx.graphics.getWidth - (currentSampleMenuWidth + defaultPaneSize))
+    console.setSize(stage.getWidth, stage.getHeight / 4.5f)
   }
 
   def init(): Unit = {
@@ -103,6 +106,7 @@ case class TestbedGui(controller: TestbedController) {
 
     /*root table*/
     centerPane = new VisTable()
+    console = new VisTextArea("")
 
     //centerPane.add(new Toast("dark", new VisTable().add(new VisLabel("dasdasd")).getTable).getMainTable)
 
@@ -115,6 +119,10 @@ case class TestbedGui(controller: TestbedController) {
     root.add(eastPane).width(defaultPaneSize).fillY().expandY()
 
     stage.addActor(root)
+
+    stage.addActor(console)
+    console.getColor.a = 0.50f
+    console.setPosition(0, -console.getHeight)
   }
 
   def addSample(node: Node, sampleName: String): Unit = {
@@ -178,6 +186,12 @@ case class TestbedGui(controller: TestbedController) {
       Actions.moveTo(if (lastTransitionOut) -samplePane.getWidth else 0,
         0, 0.30f))
     lastTransitionOut = !lastTransitionOut
+  }
+
+  def toggleConsole(): Unit = {
+    console.addAction(
+      Actions.moveTo(0, if (console.getY < 0) 0f else -console.getHeight, 0.30f)
+    )
   }
 
   private def createMenu() = {
@@ -372,9 +386,15 @@ case class FutureTestbed() extends AbstractMainApplication with Testbed {
 
   override def keyUp(keycode: Int): Boolean = {
     super.keyUp(keycode)
+
     if (keycode == Keys.H) {
       gui.toggleSamplePane()
     }
+
+    if (keycode == Keys.V) {
+      gui.toggleConsole()
+    }
+
     false
   }
 }
