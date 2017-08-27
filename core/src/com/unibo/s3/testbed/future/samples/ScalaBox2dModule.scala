@@ -14,7 +14,7 @@ import com.typesafe.config.ConfigFactory
 import com.unibo.s3.InputProcessorAdapter
 import com.unibo.s3.main_system.communication.Messages.ActMsg
 import com.unibo.s3.main_system.communication.SystemManager
-import com.unibo.s3.main_system.rendering.ScaleUtils.{getMetersPerPixel, getPixelsPerMeter, metersToPixels, pixelsToMeters}
+import com.unibo.s3.main_system.util.ScaleUtils.{getMetersPerPixel, getPixelsPerMeter, metersToPixels, pixelsToMeters}
 import com.unibo.s3.main_system.world.actors._
 import com.unibo.s3.testbed.Testbed
 import com.unibo.s3.testbed.future.BaseSample
@@ -141,8 +141,8 @@ class ScalaBox2dModule extends BaseSample with InputProcessorAdapter {
     if (bodyEditorEnabled && topLeft.isDefined && delta.isDefined) {
       shapeRenderer.setColor(Color.GREEN)
       //shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-      val tmp = topLeft.get.cpy().scl(getPixelsPerMeter)
-      val tmp2 = delta.get.cpy().scl(getPixelsPerMeter)
+      val tmp = topLeft.get.cpy().scl(getPixelsPerMeter.toFloat)
+      val tmp2 = delta.get.cpy().scl(getPixelsPerMeter.toFloat)
       shapeRenderer.rect(tmp.x, tmp.y, tmp2.x - tmp.x, tmp2.y - tmp.y)
 
       val cx = tmp.x + ((tmp2.x - tmp.x) / 2)
@@ -170,8 +170,8 @@ class ScalaBox2dModule extends BaseSample with InputProcessorAdapter {
       val v = new Vector2
       poly.getVertex(i, v)
       val worldVertex = b.getWorldPoint(v)
-      vertices(j) = metersToPixels(worldVertex.x)
-      vertices(j + 1) = metersToPixels(worldVertex.y)
+      vertices(j) = metersToPixels(worldVertex.x).toFloat
+      vertices(j + 1) = metersToPixels(worldVertex.y).toFloat
       j += 2
     }
 

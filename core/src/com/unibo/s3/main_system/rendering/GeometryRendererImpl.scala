@@ -6,7 +6,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.{MathUtils, Polygon, Rectangle, Vector2}
 import com.unibo.s3.main_system.characters.steer.MovableEntity
 import com.unibo.s3.main_system.graph.GraphAdapter
-import com.unibo.s3.main_system.rendering.ScaleUtils.{getPixelsPerMeter, metersToPixels}
+import com.unibo.s3.main_system.util.ScaleUtils
+import com.unibo.s3.main_system.util.ScaleUtils.{getPixelsPerMeter, metersToPixels}
 
 import scala.collection.JavaConversions._
 
@@ -53,11 +54,11 @@ class GeometryRendererImpl extends GeometryRenderer[Vector2] {
     val tmp2 = new Vector2()
     for (ray <- rays) {
       tmp.set(ray.start)
-      tmp.x = metersToPixels(tmp.x)
-      tmp.y = metersToPixels(tmp.y)
+      tmp.x = metersToPixels(tmp.x).toFloat
+      tmp.y = metersToPixels(tmp.y).toFloat
       tmp2.set(ray.end)
-      tmp2.x = metersToPixels(tmp2.x)
-      tmp2.y = metersToPixels(tmp2.y)
+      tmp2.x = metersToPixels(tmp2.x).toFloat
+      tmp2.y = metersToPixels(tmp2.y).toFloat
       shapeRenderer.line(tmp, tmp2)
     }
     shapeRenderer.setColor(backupColor)

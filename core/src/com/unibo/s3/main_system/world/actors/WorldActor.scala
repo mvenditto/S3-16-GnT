@@ -9,7 +9,7 @@ import com.badlogic.gdx.physics.box2d._
 import com.unibo.s3.main_system.characters.steer.collisions.{Box2dDetectorsFactory, Box2dRaycastCollisionDetector, Box2dSquareAABBProximity}
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
 
-import com.unibo.s3.main_system.characters.steer.GdxImplicits._
+import com.unibo.s3.main_system.util.GdxImplicits._
 
 case class RayCastCollidesQuery(ray: Ray[Vector2])
 case class RayCastCollidesResponse(collides: Boolean)

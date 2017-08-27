@@ -4,11 +4,10 @@ import com.badlogic.gdx.ai.steer.{Proximity, Steerable}
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.{MathUtils, Vector2}
-import com.unibo.s3.main_system.rendering.ScaleUtils
 import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
 import com.unibo.s3.testbed.Testbed
-
-import com.unibo.s3.main_system.characters.steer.GdxImplicits._
+import com.unibo.s3.main_system.util.GdxImplicits._
+import com.unibo.s3.main_system.util.ScaleUtils
 
 class QuadTreeTest extends EntitiesSystemModule {
 

@@ -10,7 +10,7 @@ import com.badlogic.gdx.{Input, InputMultiplexer}
 import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.InputProcessorAdapter
 import com.unibo.s3.main_system.characters.steer.{BaseMovableEntity, MovableEntity}
-import com.unibo.s3.main_system.rendering.ScaleUtils.{getMetersPerPixel, getPixelsPerMeter}
+import com.unibo.s3.main_system.util.ScaleUtils.{getMetersPerPixel, getPixelsPerMeter}
 import com.unibo.s3.main_system.rendering.{GeometryRenderer, GeometryRendererImpl}
 import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
 import com.unibo.s3.testbed.Testbed
@@ -58,10 +58,10 @@ class ScalaEntitySystemModule extends BaseSample
 
   private def renderSelectedAgentMarker(shapeRenderer: ShapeRenderer) = {
     if (selectedAgent != null) {
-      val center = selectedAgent.getPosition.cpy.scl(getPixelsPerMeter)
+      val center = selectedAgent.getPosition.cpy.scl(getPixelsPerMeter.toFloat)
       val backupColor = shapeRenderer.getColor
       shapeRenderer.setColor(Color.GREEN)
-      shapeRenderer.circle(center.x, center.y, getPixelsPerMeter)
+      shapeRenderer.circle(center.x, center.y, getPixelsPerMeter.toFloat)
       shapeRenderer.setColor(backupColor)
     }
   }

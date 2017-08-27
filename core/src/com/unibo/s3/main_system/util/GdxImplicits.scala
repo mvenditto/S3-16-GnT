@@ -1,4 +1,4 @@
-package com.unibo.s3.main_system.characters.steer
+package com.unibo.s3.main_system.util
 
 import scala.collection.JavaConversions._
 

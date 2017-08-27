@@ -14,11 +14,11 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.kotcrab.vis.ui.widget.toast.Toast
 import com.kotcrab.vis.ui.widget.{VisSelectBox, VisTextButton, VisWindow}
-import com.unibo.s3.main_system.characters.steer.GdxImplicits._
+import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, GenerateGraphMsg, GenerateMapMsg}
 import com.unibo.s3.main_system.communication.SystemManager
 import com.unibo.s3.main_system.graph.GraphAdapter
-import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig, ScaleUtils}
+import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig}
 import com.unibo.s3.main_system.world.actors.{CreateBox, ResetWorld}
 import com.unibo.s3.testbed.Testbed
 import com.unibo.s3.testbed.future.BaseSample
