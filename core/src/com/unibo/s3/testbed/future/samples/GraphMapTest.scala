@@ -38,11 +38,7 @@ class GraphMapTest extends BaseSample {
   private[this] var graph: Option[GraphAdapter[Vector2]] = None
   private[this] val renderer = new GeometryRendererImpl()
 
-  private[this] val graphRenderingConfig = new GraphRenderingConfig {
-    override def getEdgeColor: Color = Color.GREEN
-    override def getVertexColor: Color = Color.YELLOW
-    override def getVertexRadiusMeters: Float = 1.0f
-  }
+  private[this] val graphRenderingConfig = GraphRenderingConfig(Color.GREEN, Color.YELLOW, 1.0f)
   private[this] val mapFilePath = "maps/outputGraphActor.txt"
 
   private[this] var worldMap = List[Rectangle]()
@@ -130,24 +126,7 @@ class GraphMapTest extends BaseSample {
     graph.foreach(g =>
       renderer.renderGraph(shapeRenderer, g, graphRenderingConfig))
 
-    worldMap.foreach(w => {
-      val center = new Vector2()
-      w.getCenter(center)
-      center.sub(w.getWidth, w.getHeight)
-      val c = shapeRenderer.getColor
-      val t = shapeRenderer.getCurrentType
-      val s = ScaleUtils.getPixelsPerMeter
-      shapeRenderer.setAutoShapeType(true)
-      shapeRenderer.set(ShapeType.Filled)
-      shapeRenderer.setColor(Color.GRAY)
-      shapeRenderer.rect(center.x * s, center.y * s, w.getWidth * s, w.getHeight * s)
-      shapeRenderer.set(ShapeType.Line)
-      shapeRenderer.setColor(Color.DARK_GRAY)
-      shapeRenderer.rect(center.x * s, center.y * s, w.getWidth * s, w.getHeight * s)
-      shapeRenderer.set(t)
-      shapeRenderer.setColor(c)
-    })
-
+    renderer.renderMap(shapeRenderer, worldMap)
   }
 
   override def cleanup(): Unit = super.cleanup()
