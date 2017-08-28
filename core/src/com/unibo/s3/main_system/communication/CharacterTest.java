@@ -7,9 +7,14 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 import org.junit.*;
 
-import java.util.ArrayList;
-
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+
+import sun.security.provider.certpath.Vertex;
+
+import java.util.ArrayList;
+import java.util.Set;
 
 public class CharacterTest {
     private BaseCharacter character = new BaseCharacter(new Vector2(1,1), 0);
@@ -19,6 +24,7 @@ public class CharacterTest {
     private Vector2 v3 = new Vector2(11f,3f);
     private Vector2 v4 = new Vector2(11f,7f);
     private Vector2 v5 = new Vector2(7f,7f);
+    private Vector2 currentVertex = v1;
 
     @Before
     public void init(){
@@ -38,8 +44,8 @@ public class CharacterTest {
     @Test
     public void testCharacter(){
 
-        System.out.println(character.getPosition());
-        System.out.println(myGraph.toString());
+        System.out.println("Initial position: " + character.getPosition());
+        System.out.println("Graph: " + myGraph.toString());
        // System.out.println(myGraph.edgeSet().toString());
 
         System.out.println("Edges connected to " + v3);
@@ -63,24 +69,41 @@ public class CharacterTest {
         achievableVertices.add(v4);
         achievableVertices.add(v5);
 
+        Set<Vector2> set = myGraph.vertexSet();
 
-        System.out.println("Nearest vertex is " + computeNearest());
+        assertTrue(character.computeNearest(set) == v1);
+        System.out.println("Nearest vertex is " + character.computeNearest(set));
+        if(currentVertex != character.computeNearest(set)){
+            System.out.println("Nearest vertex changed!");
+        } else {
+            System.out.println("Nearest vertex NOT changed!");
+        }
+        currentVertex = character.computeNearest(set);
+
         System.out.println(character.getPosition().add(5, 5));
-        System.out.println("Nearest vertex is " + computeNearest());
+        assertFalse(character.computeNearest(set) == v1);
+        assertTrue(character.computeNearest(set) == v5);
+        System.out.println("Nearest vertex is " + character.computeNearest(set));
+        if(currentVertex != character.computeNearest(set)){
+            System.out.println("Nearest vertex changed!");
+        } else {
+            System.out.println("Nearest vertex NOT changed!");
+        }
+        currentVertex = character.computeNearest(set);
     }
 
-    private Vector2 computeNearest(){
+    /*private Vector2 computeNearest(Set<Vector2> set){
         Vector2 nearest = new Vector2(-1000, -1000);
         float minDistance = character.getPosition().dst2(new Vector2(nearest.x, nearest.y));
-        for(Vector2 v : myGraph.vertexSet()){
+        for(Vector2 v : set){
             float distance = (v.dst2(character.getPosition()));
-            System.out.println("Distance between " + character.getPosition() + " and " + v.x + "," + v.y + " is " + distance);
+            //System.out.println("Distance between " + character.getPosition() + " and " + v.x + "," + v.y + " is " + distance);
             if(distance < minDistance){
                 nearest = v;
                 minDistance = distance;
             }
         }
         return nearest;
-    }
+    }*/
 
 }

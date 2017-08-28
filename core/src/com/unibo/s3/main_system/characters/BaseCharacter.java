@@ -20,10 +20,11 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
     private int nNeighbours;
     private Vector2 currentNode;
     private ArrayList<ActorRef> neighbours;
+    private ArrayList<Vector2> visited;
 
     public BaseCharacter(Vector2 position, int id) {
         super(position);
-        this.currentNode = new Vector2(position.cpy());
+        //this.currentNode = computeNearest(this.graph.vertexSet());
         this.id = id;
     }
 
@@ -48,33 +49,23 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
 
     public void chooseBehaviour(){
 
-        Vector2 currentPosition = getPosition();
-
-        Set<DefaultEdge> edges = graph.edgeSet();
-        DefaultEdge edge = new DefaultEdge();
-
-
-        ArrayList<DefaultEdge> connectedEdges = computeConnectedEdgers();
+        //mi servono i miei vicini
         //guardo il grafo e ci penso
-        //aggiornare destinazione
-        ArrayList<Vector2> achievableVertices = new ArrayList<>();
-        Vector2 nearest = new Vector2(-1000, -1000);
-        float minDistance = currentPosition.dst2(currentPosition/*del current node*/);
-        for(Vector2 v : achievableVertices){
-            if(v.dst2(currentPosition) < minDistance){
-                //v è il più vicino
-            }
-        }
+        //aggiorno la destinazione
     }
 
     public void setnNeighbours(int n){
         this.nNeighbours = n;
     }
 
-    //
-    private void updateGraph(){
+    private void updateGraph(ArrayList<Vector2> colleagueList){
         this.nNeighbours--;
         //update lista
+        for(Vector2 v : colleagueList){
+            if(!visited.contains(v)){
+                visited.add(v);
+            }
+        }
         if(nNeighbours == 0){
             chooseBehaviour();
         }
@@ -88,10 +79,20 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
                 .buildPriority(true);
     }
 
-    private ArrayList<DefaultEdge> computeConnectedEdgers(){
-        ArrayList<DefaultEdge> out = new ArrayList<>();
 
-
-        return out;
+    //computo il mio nodo di riferimento
+    /**todo per ora tra tutti i nodi, modificare per cercare solo tra i vicini*/
+    public Vector2 computeNearest(Set<Vector2> set){
+        Vector2 nearest = new Vector2(-1000, -1000);
+        float minDistance = getPosition().dst2(new Vector2(nearest.x, nearest.y));
+        for(Vector2 v : set){
+            float distance = (v.dst2(getPosition()));
+            //System.out.println("Distance between " + character.getPosition() + " and " + v.x + "," + v.y + " is " + distance);
+            if(distance < minDistance){
+                nearest = v;
+                minDistance = distance;
+            }
+        }
+        return nearest;
     }
 }
