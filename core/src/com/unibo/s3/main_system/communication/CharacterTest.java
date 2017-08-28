@@ -11,14 +11,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
-import sun.security.provider.certpath.Vertex;
-
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 public class CharacterTest {
     private BaseCharacter character = new BaseCharacter(new Vector2(1,1), 0);
-    private UndirectedGraph<Vector2, DefaultEdge> myGraph = new SimpleGraph<>(DefaultEdge.class);
+    private UndirectedGraph<Vector2, DefaultEdge> testGraph = new SimpleGraph<>(DefaultEdge.class);
     private Vector2 v1 = new Vector2(3f,3f);
     private Vector2 v2 = new Vector2(7f,3f);
     private Vector2 v3 = new Vector2(11f,3f);
@@ -28,40 +28,28 @@ public class CharacterTest {
 
     @Before
     public void init(){
-        myGraph.addVertex(v1);
-        myGraph.addVertex(v2);
-        myGraph.addVertex(v3);
-        myGraph.addVertex(v4);
-        myGraph.addVertex(v5);
+        testGraph.addVertex(v1);
+        testGraph.addVertex(v2);
+        testGraph.addVertex(v3);
+        testGraph.addVertex(v4);
+        testGraph.addVertex(v5);
 
-        myGraph.addEdge(v1, v2);
-        myGraph.addEdge(v1, v5);
-        myGraph.addEdge(v2, v3);
-        myGraph.addEdge(v3, v4);
-        myGraph.addEdge(v5, v4);
+        testGraph.addEdge(v1, v2);
+        testGraph.addEdge(v1, v5);
+        testGraph.addEdge(v2, v3);
+        testGraph.addEdge(v3, v4);
+        testGraph.addEdge(v5, v4);
     }
 
     @Test
     public void testCharacter(){
 
         System.out.println("Initial position: " + character.getPosition());
-        System.out.println("Graph: " + myGraph.toString());
-       // System.out.println(myGraph.edgeSet().toString());
+        System.out.println("Graph: " + testGraph.toString());
+       // System.out.println(testGraph.edgeSet().toString());
 
         System.out.println("Edges connected to " + v3);
-       /* for(DefaultEdge d : myGraph.edgesOf(v3)){
-            String[] sourceAndTarget = d.toString().split(":");
-            String[] sourceXandY = sourceAndTarget[0].split(",");
-            String[] targetXandY = sourceAndTarget[1].split(",");
-            System.out.println(sourceXandY[0]);
-            String[] finalX = sourceXandY[0].split("7");
-            //float f = Float.parseFloat(sourceXandY[0]);
-            System.out.println(finalX[0]);
-           // System.out.println(sourceXandY[1]);
-           // System.out.println(targetXandY[0]);
-           // System.out.println(targetXandY[1]);
-        }*/
-        Vector2 currentPosition = character.getPosition();
+
         ArrayList<Vector2> achievableVertices = new ArrayList<>();
         achievableVertices.add(v1);
         achievableVertices.add(v2);
@@ -69,7 +57,7 @@ public class CharacterTest {
         achievableVertices.add(v4);
         achievableVertices.add(v5);
 
-        Set<Vector2> set = myGraph.vertexSet();
+        Set<Vector2> set = testGraph.vertexSet();
 
         assertTrue(character.computeNearest(set) == v1);
         System.out.println("Nearest vertex is " + character.computeNearest(set));
@@ -90,6 +78,22 @@ public class CharacterTest {
             System.out.println("Nearest vertex NOT changed!");
         }
         currentVertex = character.computeNearest(set);
+        System.out.println(character.getCurrentNode());
+        character.extractSourceAndTarget();
+    }
+
+    @Test
+    public void testConnectedVertices(){
+        character.setGraph(testGraph);
+        List<Vector2> l = character.extractSourceAndTarget();
+        System.out.println(l.toString());
+        assertEquals(l, Arrays.asList(v2, v5));
+        character.getPosition().add(5, 5);
+        character.setGraph(testGraph);
+        l.clear();
+        l = character.extractSourceAndTarget();
+        System.out.println(l.toString());
+        assertEquals(l, Arrays.asList(v1, v4));
     }
 
     /*private Vector2 computeNearest(Set<Vector2> set){

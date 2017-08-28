@@ -9,6 +9,7 @@ import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class BaseCharacter extends BaseMovableEntity implements Character {
@@ -45,6 +46,11 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
 
     public void setGraph(UndirectedGraph<Vector2, DefaultEdge> g){
         this.graph = g;
+        currentNode = computeNearest(graph.vertexSet());
+    }
+
+    public Vector2 getCurrentNode() {
+        return currentNode;
     }
 
     public void chooseBehaviour(){
@@ -56,6 +62,10 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
 
     public void setnNeighbours(int n){
         this.nNeighbours = n;
+    }
+
+    public List<Vector2> getInformations(){
+        return this.visited;
     }
 
     private void updateGraph(ArrayList<Vector2> colleagueList){
@@ -79,6 +89,24 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
                 .buildPriority(true);
     }
 
+    private void chooseNextDestination(){
+        //scegli prossimo nodo tra i raggiungibili
+    }
+
+    public List<Vector2> extractSourceAndTarget(){
+        System.out.println(currentNode);
+        Set<DefaultEdge> edges = graph.edgesOf(currentNode);
+        List<Vector2> connectedVerteces = new ArrayList<>();
+
+        for(DefaultEdge e : edges){
+             if(graph.getEdgeSource(e) == currentNode){
+                 connectedVerteces.add(graph.getEdgeTarget(e));
+             } else if (graph.getEdgeTarget(e) == currentNode){
+                 connectedVerteces.add(graph.getEdgeSource(e));
+             }
+        }
+        return connectedVerteces;
+    }
 
     //computo il mio nodo di riferimento
     /**todo per ora tra tutti i nodi, modificare per cercare solo tra i vicini*/
@@ -93,6 +121,7 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
                 minDistance = distance;
             }
         }
+        currentNode = nearest;
         return nearest;
     }
 }
