@@ -1,6 +1,9 @@
 package com.unibo.s3.main_system.communication
 
+import java.util
+
 import akka.actor.ActorRef
+import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.BaseCharacter
 
 object Messages {
@@ -20,6 +23,7 @@ object Messages {
   case class SendCopInfoMsg() //ci andranno le info che si devono scambiare i poliziotti
 
   //message for MasterActor
-  case class AskCharactersMsg()
-  case class SendCharactersMsg(character: List[BaseCharacter])
+  case class RebuildQuadTreeMsg(characterList: Iterable[BaseCharacter])
+  case class CreateCharacterMsg(position: Vector2)
+  case class InitialSavingCharacter(newCharacter: BaseCharacter, characterRef: ActorRef)
 }

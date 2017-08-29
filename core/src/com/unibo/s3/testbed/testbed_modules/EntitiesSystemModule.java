@@ -32,7 +32,7 @@ import java.util.List;
 import static com.unibo.s3.main_system.rendering.ScaleUtils.getMetersPerPixel;
 import static com.unibo.s3.main_system.rendering.ScaleUtils.getPixelsPerMeter;
 
-public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements EntitiesSystem<Vector2> {
+public class EntitiesSystemModule extends BasicTestbedModuleWithGui {
 
     /*simulation*/
     protected List<MovableEntity<Vector2>> entities;
@@ -69,7 +69,6 @@ public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements E
         this.collisionDetector = collisionDetector;
     }
 
-    @Override
     public MovableEntity<Vector2> spawnEntityAt(Vector2 position) {
         final MovableEntity<Vector2> newAgent = new BaseMovableEntity(position);
         entitiesToAdd.add(newAgent);
@@ -82,17 +81,14 @@ public class EntitiesSystemModule extends BasicTestbedModuleWithGui implements E
         return newAgent;
     }
 
-    @Override
     public void spawnEntity(MovableEntity<Vector2> newEntity) {
         entitiesToAdd.add(newEntity);
     }
 
-    @Override
     public List<MovableEntity<Vector2>> getEntities() {
         return Collections.unmodifiableList(entities);
     }
 
-    @Override
     public Iterable<MovableEntity<Vector2>> getNeighborsOf(MovableEntity<Vector2> entity, float searchRadius) {
         final Vector2 ePos = entity.getPosition();
         return JavaConversions.asJavaIterable(
