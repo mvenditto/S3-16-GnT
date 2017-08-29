@@ -70,7 +70,7 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
         return this.visited;
     }
 
-    private void updateGraph(ArrayList<Vector2> colleagueList){
+    public void updateGraph(ArrayList<Vector2> colleagueList){
         this.nNeighbours--;
         //update lista
         for(Vector2 v : colleagueList){

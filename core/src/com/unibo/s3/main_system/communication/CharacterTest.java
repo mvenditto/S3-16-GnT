@@ -97,6 +97,25 @@ public class CharacterTest {
 
     @Test
     public void testInformationExchange(){
+        BaseCharacter secondCharacter = new BaseCharacter(new Vector2(7, 8), 1);
+        secondCharacter.setGraph(testGraph);
+        secondCharacter.computeNearest();
+        assertEquals(secondCharacter.computeNearest(), v5);
+        testGraph.addEdge(v2, v5);
+        secondCharacter.getPosition().add(0, -4);
+        secondCharacter.computeNearest();
+        //System.out.println(secondCharacter.getPosition() + " " + secondCharacter.computeNearest());
+        assertEquals(secondCharacter.computeNearest(), v2);
+        assertEquals(secondCharacter.getInformations(), Arrays.asList(v5, v2));
+        character.computeNearest();
+        character.getPosition().add(6, 2);
+        assertEquals(character.computeNearest(), v2);
+        assertEquals(character.getInformations(), Arrays.asList(v1, v2));
 
+        //information exchange
+        character.updateGraph((ArrayList<Vector2>) secondCharacter.getInformations());
+        secondCharacter.updateGraph((ArrayList<Vector2>) character.getInformations());
+        assertEquals(character.getInformations(), Arrays.asList(v1, v2, v5));
+        assertEquals(secondCharacter.getInformations(), Arrays.asList(v5, v2, v1));
     }
 }
