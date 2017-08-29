@@ -40,7 +40,8 @@ public class CharacterTest {
         testGraph.addEdge(v3, v4);
         testGraph.addEdge(v5, v4);
 
-        character.setCurrentNode(v1);
+        character.setGraph(testGraph);
+        character.computeNearest();
     }
 
     @Test
@@ -49,8 +50,6 @@ public class CharacterTest {
         System.out.println("Initial position: " + character.getPosition());
         System.out.println("Graph: " + testGraph.toString());
        // System.out.println(testGraph.edgeSet().toString());
-
-        character.setGraph(testGraph);
         assertTrue(character.computeNearest() == v1);
         System.out.println("Nearest vertex is " + character.computeNearest());
         if(currentVertex != character.computeNearest()){
@@ -58,8 +57,6 @@ public class CharacterTest {
         } else {
             System.out.println("Nearest vertex NOT changed!");
         }
-        //currentVertex = character.computeNearest();
-
         System.out.println("new postiion " + character.getPosition().add(5, 5));
         assertFalse(character.computeNearest() == v1);
         assertTrue(character.computeNearest() == v5);
@@ -76,13 +73,12 @@ public class CharacterTest {
 
     @Test
     public void testConnectedVertices(){
-        character.setGraph(testGraph);
-        character.setCurrentNode(v1);
         List<Vector2> l = character.computeNeighbours();
         System.out.println("Neighbours: " + l.toString());
         assertEquals(l, Arrays.asList(v2, v5));
         character.getPosition().add(5, 5);
-        character.setCurrentNode(v5);
+        System.out.println(character.getPosition());
+        character.computeNearest();
         l.clear();
         l = character.computeNeighbours();
         System.out.println("Neighbours: " + l.toString());
@@ -90,4 +86,17 @@ public class CharacterTest {
         assertFalse(l == Arrays.asList(v1, v2));
     }
 
+    @Test
+    public void testDiscover(){
+        assertEquals(character.getInformations(),Arrays.asList(v1));
+        character.getPosition().add(5, 5);
+        character.computeNearest();
+        assertEquals(character.getInformations(),Arrays.asList(v1, v5));
+        assertFalse(character.getInformations().contains(v3));
+    }
+
+    @Test
+    public void testInformationExchange(){
+
+    }
 }

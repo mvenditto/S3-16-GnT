@@ -21,7 +21,8 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
     private int nNeighbours;
     private Vector2 currentNode;
     private ArrayList<ActorRef> neighbours;
-    private ArrayList<Vector2> visited;
+    private List<Vector2> visited = new ArrayList<>();
+    private Vector2 defaultVertex = new Vector2(-1000, -1000); //start utility vertex
 
     public BaseCharacter(Vector2 position, int id) {
         super(position);
@@ -46,11 +47,8 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
 
     public void setGraph(UndirectedGraph<Vector2, DefaultEdge> g){
         this.graph = g;
-        currentNode = computeNearest();
-    }
-
-    public void setCurrentNode(Vector2 currentNode) {
-        this.currentNode = currentNode;
+        graph.addVertex(defaultVertex);
+        currentNode = defaultVertex;
     }
 
     public Vector2 getCurrentNode() {
@@ -101,6 +99,7 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
         //System.out.println("  computeNeighbours Call");
         //System.out.println("Current node: " + currentNode);
         Set<DefaultEdge> edges = graph.edgesOf(currentNode);
+
         List<Vector2> connectedVertices = new ArrayList<>();
 
         for(DefaultEdge e : edges){
@@ -115,12 +114,16 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
     }
 
     //computo il mio nodo di riferimento
-    /**todo per ora tra tutti i nodi, modificare per cercare solo tra i vicini*/
     public Vector2 computeNearest(){
        // System.out.println("  computeNearest Call");
         Vector2 nearest = currentNode;
         float minDistance = getPosition().dst2(new Vector2(nearest.x, nearest.y));
         List<Vector2> list = computeNeighbours();
+        if(currentNode.equals(defaultVertex)){
+            list.addAll(graph.vertexSet());
+        } else {
+            list = computeNeighbours();
+        }
         //System.out.println("2 Neighbours of " + currentNode + ": " + list.toString());
         for(Vector2 v : list){
             float distance = (v.dst2(getPosition()));
@@ -131,7 +134,16 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
             }
         }
         //System.out.println("Nearest is " + nearest);
+        if(currentNode != nearest){
+            newVertexDiscovered(nearest);
+        }
         currentNode = nearest;
         return nearest;
+    }
+
+    private void newVertexDiscovered(Vector2 nearest){
+        //System.out.println("New vertex discovered: " + nearest);
+        visited.add(nearest);
+        //System.out.println("Visited: " + visited);
     }
 }
