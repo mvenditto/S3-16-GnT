@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Stream;
 
 public abstract class AbstractMapGenerator implements MapGenerator{
 
@@ -15,6 +16,7 @@ public abstract class AbstractMapGenerator implements MapGenerator{
     private static final int WIDTH_SPLITS = (int) (MAP_WIDTH / BASE_UNIT);
     private static final int HEIGHT_SPLITS = (int) (MAP_HEIGHT / BASE_UNIT);
     private static final String END_OF_FILE = "0.0:0.0:0.0:0.0";
+    private static final String SEPARATOR = ":";
 
     private int[][] maze = new int[WIDTH_SPLITS][HEIGHT_SPLITS];
 
@@ -24,14 +26,24 @@ public abstract class AbstractMapGenerator implements MapGenerator{
             for (int j = 0; j < HEIGHT_SPLITS; j++){
                 if(maze[i][j] == 1){
                     //System.out.println((i * BASE_UNIT + HALF_BASE_UNIT) + ":" + (j * BASE_UNIT + HALF_BASE_UNIT) + ":" + BASE_UNIT + ":" + BASE_UNIT);
-                    map.add((i * BASE_UNIT + HALF_BASE_UNIT) + ":" + (j * BASE_UNIT + HALF_BASE_UNIT) + ":" + BASE_UNIT + ":" + BASE_UNIT);
+                    map.add((i * BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + (j * BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + BASE_UNIT);
                 }
             }
         }
+       // map.addAll(generatePerimeterWalls());
         map.add(END_OF_FILE);
         return map;
     }
 
+/*todo correggi traslazione*/
+    private ArrayList<String> generatePerimeterWalls(){
+        ArrayList<String> perimeter = new ArrayList<>();
+        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((HEIGHT_SPLITS * BASE_UNIT)/2 + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + BASE_UNIT);
+        perimeter.add(((WIDTH_SPLITS * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + ((HEIGHT_SPLITS * BASE_UNIT)/2 + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + BASE_UNIT);
+        perimeter.add(((WIDTH_SPLITS * BASE_UNIT)/2 + HALF_BASE_UNIT) + SEPARATOR + HALF_BASE_UNIT + SEPARATOR + BASE_UNIT + SEPARATOR + BASE_UNIT);
+        perimeter.add(((WIDTH_SPLITS * BASE_UNIT)/2 + HALF_BASE_UNIT) + SEPARATOR + (HEIGHT_SPLITS * BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + BASE_UNIT);
+        return perimeter;
+    }
 
     protected void buildWall(boolean orientation, int coord){
         if(orientation){ //vertical wall
@@ -172,4 +184,6 @@ public abstract class AbstractMapGenerator implements MapGenerator{
         }
         return false;
     }
+
+    /*todo muri esterni*/
 }
