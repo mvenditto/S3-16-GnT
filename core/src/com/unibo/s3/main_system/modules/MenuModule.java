@@ -21,7 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.unibo.s3.Main;
-import com.unibo.s3.main_system.rendering.ScaleUtils;
+import com.unibo.s3.main_system.util.ScaleUtils;
 import com.unibo.s3.main_system.world.actors.GetAllBodies;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
@@ -29,9 +29,9 @@ import scala.concurrent.duration.Duration;
 
 import javax.xml.soap.Text;
 
-import static com.unibo.s3.main_system.rendering.ScaleUtils.getPixelsPerMeter;
-import static com.unibo.s3.main_system.rendering.ScaleUtils.metersToPixels;
-import static com.unibo.s3.main_system.rendering.ScaleUtils.pixelsToMeters;
+import static com.unibo.s3.main_system.util.ScaleUtils.getPixelsPerMeter;
+import static com.unibo.s3.main_system.util.ScaleUtils.metersToPixels;
+import static com.unibo.s3.main_system.util.ScaleUtils.pixelsToMeters;
 
 public class MenuModule extends BasicModuleWithGui {
     private SpriteBatch textBatch;
