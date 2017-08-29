@@ -4,6 +4,7 @@ import akka.actor.ActorRef;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.characters.steer.BaseMovableEntity;
+import com.unibo.s3.main_system.characters.steer.CustomLocation;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.alg.NeighborIndex;
 import org.jgrapht.graph.DefaultEdge;
@@ -26,7 +27,6 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
 
     public BaseCharacter(Vector2 position, int id) {
         super(position);
-        //this.currentNode = computeNearest(this.graph.vertexSet());
         this.id = id;
     }
 
@@ -47,8 +47,6 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
 
     public void setGraph(UndirectedGraph<Vector2, DefaultEdge> g){
         this.graph = g;
-        //graph.addVertex(defaultVertex);
-        //currentNode = defaultVertex;
         currentNode = computeInitialNearestNode();
         index = new NeighborIndex(graph);
     }
@@ -89,7 +87,7 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
         //setta destinazione
         this.setComplexSteeringBehavior()
                 .avoidCollisionsWithWorld()
-               //? .arriveTo()
+                .arriveTo(new CustomLocation(destination))
                 .buildPriority(true);
     }
 
@@ -98,27 +96,11 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
     }
 
     public List<Vector2> computeNeighbours(){
-        //System.out.println("  computeNeighbours Call");
-        //System.out.println("Current node: " + currentNode);
-      /*  Set<DefaultEdge> edges = graph.edgesOf(currentNode);
-
-        List<Vector2> connectedVertices = new ArrayList<>();
-
-        for(DefaultEdge e : edges){
-             if(graph.getEdgeSource(e) == currentNode){
-                 connectedVertices.add(graph.getEdgeTarget(e));
-             } else if (graph.getEdgeTarget(e) == currentNode){
-                 connectedVertices.add(graph.getEdgeSource(e));
-             }
-        }
-        //System.out.println("Neighbours of " + currentNode + ": " + connectedVertices.toString());
-        return connectedVertices;*/
       return index.neighborListOf(currentNode);
     }
 
     //computo il mio nodo di riferimento
     public Vector2 computeNearest(){
-       // System.out.println("  computeNearest Call");
         Vector2 nearest = currentNode;
         float minDistance = getPosition().dst2(new Vector2(nearest.x, nearest.y));
         List<Vector2> list = new ArrayList<>();
@@ -127,16 +109,13 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
         } else {
             list = computeNeighbours();
         }
-        //System.out.println("2 Neighbours of " + currentNode + ": " + list.toString());
         for(Vector2 v : list){
             float distance = (v.dst2(getPosition()));
-            //System.out.println("Distance between " + getPosition() + " and " + v.x + "," + v.y + " is " + distance);
             if(distance < minDistance){
                 nearest = v;
                 minDistance = distance;
             }
         }
-        //System.out.println("Nearest is " + nearest);
         if(currentNode != nearest){
             discoverNewVertex(nearest);
         }
@@ -149,7 +128,6 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
         float minDistance = Float.MAX_VALUE;
         for(Vector2 v : graph.vertexSet()){
             float distance = (v.dst2(getPosition()));
-            //System.out.println("Distance between " + getPosition() + " and " + v.x + "," + v.y + " is " + distance);
             if(distance < minDistance){
                 nearest = v;
                 minDistance = distance;
@@ -160,8 +138,6 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
     }
 
     private void discoverNewVertex(Vector2 nearest){
-        //System.out.println("New vertex discovered: " + nearest);
         visited.add(nearest);
-        //System.out.println("Visited: " + visited);
     }
 }
