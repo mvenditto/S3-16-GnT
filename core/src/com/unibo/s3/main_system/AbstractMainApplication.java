@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.unibo.s3.InputProcessorAdapter;
 
-import static com.unibo.s3.main_system.rendering.ScaleUtils.getPixelsPerMeter;
+import static com.unibo.s3.main_system.util.ScaleUtils.getPixelsPerMeter;
 
 public abstract class AbstractMainApplication extends ApplicationAdapter implements InputProcessorAdapter {
 
