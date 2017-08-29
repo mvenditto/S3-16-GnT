@@ -1,16 +1,15 @@
 package com.unibo.s3.main_system.characters;
 
 import akka.actor.ActorRef;
-import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.characters.steer.BaseMovableEntity;
 import org.jgrapht.UndirectedGraph;
+import org.jgrapht.alg.NeighborIndex;
 import org.jgrapht.graph.DefaultEdge;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class BaseCharacter extends BaseMovableEntity implements Character {
 
@@ -23,6 +22,7 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
     private ArrayList<ActorRef> neighbours;
     private List<Vector2> visited = new ArrayList<>();
     private Vector2 defaultVertex = new Vector2(-1000, -1000); //start utility vertex
+    private NeighborIndex index;
 
     public BaseCharacter(Vector2 position, int id) {
         super(position);
@@ -47,8 +47,10 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
 
     public void setGraph(UndirectedGraph<Vector2, DefaultEdge> g){
         this.graph = g;
-        graph.addVertex(defaultVertex);
-        currentNode = defaultVertex;
+        //graph.addVertex(defaultVertex);
+        //currentNode = defaultVertex;
+        currentNode = computeInitialNearestNode();
+        index = new NeighborIndex(graph);
     }
 
     public Vector2 getCurrentNode() {
@@ -98,7 +100,7 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
     public List<Vector2> computeNeighbours(){
         //System.out.println("  computeNeighbours Call");
         //System.out.println("Current node: " + currentNode);
-        Set<DefaultEdge> edges = graph.edgesOf(currentNode);
+      /*  Set<DefaultEdge> edges = graph.edgesOf(currentNode);
 
         List<Vector2> connectedVertices = new ArrayList<>();
 
@@ -110,7 +112,8 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
              }
         }
         //System.out.println("Neighbours of " + currentNode + ": " + connectedVertices.toString());
-        return connectedVertices;
+        return connectedVertices;*/
+      return index.neighborListOf(currentNode);
     }
 
     //computo il mio nodo di riferimento
@@ -118,7 +121,7 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
        // System.out.println("  computeNearest Call");
         Vector2 nearest = currentNode;
         float minDistance = getPosition().dst2(new Vector2(nearest.x, nearest.y));
-        List<Vector2> list = computeNeighbours();
+        List<Vector2> list = new ArrayList<>();
         if(currentNode.equals(defaultVertex)){
             list.addAll(graph.vertexSet());
         } else {
@@ -135,13 +138,28 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
         }
         //System.out.println("Nearest is " + nearest);
         if(currentNode != nearest){
-            newVertexDiscovered(nearest);
+            discoverNewVertex(nearest);
         }
         currentNode = nearest;
         return nearest;
     }
 
-    private void newVertexDiscovered(Vector2 nearest){
+    private Vector2 computeInitialNearestNode(){
+        Vector2 nearest = new Vector2();
+        float minDistance = Float.MAX_VALUE;
+        for(Vector2 v : graph.vertexSet()){
+            float distance = (v.dst2(getPosition()));
+            //System.out.println("Distance between " + getPosition() + " and " + v.x + "," + v.y + " is " + distance);
+            if(distance < minDistance){
+                nearest = v;
+                minDistance = distance;
+            }
+        }
+        discoverNewVertex(nearest);
+        return nearest;
+    }
+
+    private void discoverNewVertex(Vector2 nearest){
         //System.out.println("New vertex discovered: " + nearest);
         visited.add(nearest);
         //System.out.println("Visited: " + visited);
