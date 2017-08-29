@@ -1,9 +1,10 @@
-package com.unibo.s3.testbed.future.ui
+package com.unibo.s3.testbed.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.Texture.TextureFilter
 import com.kotcrab.vis.ui.widget.{VisImage, VisLabel, VisTable}
+
 
 class KeyHelpTable(
   defaults: Boolean,

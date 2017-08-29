@@ -1,9 +1,8 @@
-package com.unibo.s3.testbed.future
+package com.unibo.s3.testbed
 
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.kotcrab.vis.ui.widget.VisWindow
-import com.unibo.s3.testbed.Testbed
 
 trait Sample {
 

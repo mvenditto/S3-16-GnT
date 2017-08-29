@@ -1,4 +1,4 @@
-package com.unibo.s3.testbed.future.samples
+package com.unibo.s3.testbed.samples
 
 import akka.actor.{ActorRef, Props}
 import akka.pattern.Patterns
@@ -12,17 +12,18 @@ import com.badlogic.gdx.{Gdx, Input, InputMultiplexer}
 import com.kotcrab.vis.ui.widget.VisWindow
 import com.typesafe.config.ConfigFactory
 import com.unibo.s3.InputProcessorAdapter
-import com.unibo.s3.main_system.communication.Messages.ActMsg
+import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
 import com.unibo.s3.main_system.communication.SystemManager
+import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.util.ScaleUtils.{getMetersPerPixel, getPixelsPerMeter, metersToPixels, pixelsToMeters}
 import com.unibo.s3.main_system.world.actors._
-import com.unibo.s3.testbed.Testbed
-import com.unibo.s3.testbed.future.BaseSample
+import com.unibo.s3.testbed.{BaseSample, Testbed}
+import com.unibo.s3.testbed.BaseSample
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class ScalaBox2dModule extends BaseSample with InputProcessorAdapter {
+class Box2dModule extends BaseSample with InputProcessorAdapter {
 
   private var world: World = _
   private var worldActor: ActorRef = _
@@ -35,6 +36,10 @@ class ScalaBox2dModule extends BaseSample with InputProcessorAdapter {
 
   private var textBatch: SpriteBatch = _
   private var font: BitmapFont = _
+
+  def getWorld: World = world
+
+  def getWorldActorRef: ActorRef = worldActor
 
   override def update(dt: Float): Unit = {
     super.update(dt)
@@ -75,10 +80,29 @@ class ScalaBox2dModule extends BaseSample with InputProcessorAdapter {
 
   override def description: String = "Box2d world module."
 
-  private def resetWorld() = worldActor ! ResetWorld
+  def loadWorld(name: String): Unit = {
+    val w = Gdx.files.internal("maps/" + name)
+    w.readString().split("\n").foreach(l => worldActor ! MapElementMsg(l))
+  }
+
+  def saveWorld(name: String): Unit = {
+    val w = Gdx.files.local("maps/" + name)
+    val s = StringBuilder.newBuilder
+    getAllBodies().asScalaIterable.foreach(b => {
+      val c = b.getWorldCenter
+      s append c.x
+      s append ":"
+      s append c.y
+      s append ":"
+      s append b.getUserData.toString
+      s append "\n"
+    })
+    w.writeString(s.toString(), false)
+  }
+
+  def resetWorld() = worldActor ! ResetWorld
 
   override def keyUp(keycode: Int): Boolean = {
-
     if (keycode == Input.Keys.G) {
       bodyEditorEnabled = !bodyEditorEnabled
     }
@@ -123,19 +147,24 @@ class ScalaBox2dModule extends BaseSample with InputProcessorAdapter {
     false
   }
 
-  override def render(shapeRenderer: ShapeRenderer): Unit = {
-    super.render(shapeRenderer)
-
+  private def getAllBodies(): com.badlogic.gdx.utils.Array[Body] = {
     val timeout = new Timeout(Duration.create(5, "seconds"))
     val future = Patterns.ask(worldActor, GetAllBodies(), timeout)
     try {
-      val bodies = Await.result(future, timeout.duration).asInstanceOf[com.badlogic.gdx.utils.Array[Body]]
-      for (i <- 0 until bodies.size) {
-        renderBox(shapeRenderer, bodies.get(i), false)
-      }
+      Await.result(future, timeout.duration).asInstanceOf[com.badlogic.gdx.utils.Array[Body]]
     } catch {
       case e: Exception =>
         e.printStackTrace()
+        new com.badlogic.gdx.utils.Array[Body]()
+    }
+  }
+
+  override def render(shapeRenderer: ShapeRenderer): Unit = {
+    super.render(shapeRenderer)
+
+    val bodies = getAllBodies()
+    for (i <- 0 until bodies.size) {
+      renderBox(shapeRenderer, bodies.get(i), false)
     }
 
     if (bodyEditorEnabled && topLeft.isDefined && delta.isDefined) {

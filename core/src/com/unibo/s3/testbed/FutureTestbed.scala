@@ -1,7 +1,8 @@
-package com.unibo.s3.testbed.future
+package com.unibo.s3.testbed
 
 import com.badlogic.gdx.Input.Keys
-import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Tree.Node
@@ -15,12 +16,23 @@ import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.util.ToastManager
 import com.kotcrab.vis.ui.widget.toast.Toast
 import com.kotcrab.vis.ui.widget.{VisLabel, VisTree, _}
+import com.unibo.s3.InputProcessorAdapter
 import com.unibo.s3.main_system.AbstractMainApplication
-import com.unibo.s3.testbed.Testbed
-import com.unibo.s3.testbed.future.samples._
-import com.unibo.s3.testbed.future.ui.KeyHelpTable
+import com.unibo.s3.testbed.samples._
+import com.unibo.s3.testbed.ui.{Console, GraphicsUtil, KeyHelpTable, LogMessage}
 
-trait TestbedController {
+trait Testbed {
+
+  def screenToWorld(screenPosition: Vector2): Vector2
+
+  def worldToScreen(worldPosition: Vector2): Vector2
+
+  def getCamera: OrthographicCamera
+
+  def getLogger: (LogMessage => Unit)
+}
+
+trait TestbedListener extends InputProcessorAdapter {
 
   def onSampleSelection(name: String): Unit
 
@@ -28,8 +40,7 @@ trait TestbedController {
 
 }
 
-
-case class TestbedGui(controller: TestbedController) {
+case class TestbedView(listener: TestbedListener) {
 
   private var stage: Stage = _
   private var menuBar: MenuBar = _
@@ -38,19 +49,25 @@ case class TestbedGui(controller: TestbedController) {
   private var loadingBar: VisProgressBar = _
   private var loadingLog: VisLabel = _
   private var samplePane: VisWindow = _
-  private var console: VisTextArea = _
+  private var console: Console = _
+  private var consolePane: VisScrollPane = _
   private var toastManager: ToastManager = _
   private var currSampleShortcuts: Option[KeyHelpTable] = None
 
   private val defaultPaneSize = 200f
   private val currentSampleMenuWidth = 300f
+  private val consolePadding = 50f
+  private val consoleYOffset= 0f
   private var lastTransitionOut = false
-  private var customBlue = new Color(2/255f, 179/255f, 255/255f, 1f)
+  private val customBlue = new Color(0f, 0.7f, 1f, 1f)
+
 
   def resize(newWidth: Integer, newHeight: Integer): Unit = {
     stage.getViewport.update(newWidth, newHeight, true)
     viewport.width(Gdx.graphics.getWidth - (currentSampleMenuWidth + defaultPaneSize))
-    console.setSize(stage.getWidth, stage.getHeight / 4.5f)
+    consolePane.setSize(stage.getWidth - consolePadding * 2, stage.getHeight / 4.5f)
+    console.setSize(stage.getWidth - consolePadding * 2, stage.getHeight / 4.5f)
+    console.rebuild()
   }
 
   def init(): Unit = {
@@ -71,10 +88,11 @@ case class TestbedGui(controller: TestbedController) {
     val pauseCheckbox = new VisCheckBox("update")
     pauseCheckbox.addListener(new ChangeListener {
       override def changed(event: ChangeEvent, actor: Actor): Unit =
-        controller.onPause(!pauseCheckbox.isChecked)
+        listener.onPause(!pauseCheckbox.isChecked)
     })
 
     eastPane.add(pauseCheckbox).row()
+    pauseCheckbox.setChecked(true)
 
     val samplesLabel = new VisLabel("Samples")
     samplesLabel.setColor(Color.LIGHT_GRAY)
@@ -106,9 +124,18 @@ case class TestbedGui(controller: TestbedController) {
 
     /*root table*/
     centerPane = new VisTable()
-    console = new VisTextArea("")
 
-    //centerPane.add(new Toast("dark", new VisTable().add(new VisLabel("dasdasd")).getTable).getMainTable)
+    console = new Console()
+    consolePane = new VisScrollPane(console)
+    consolePane.setPosition(consolePadding, -consolePane.getHeight)
+
+    val tmp = Color.BLACK.cpy()
+    tmp.a = 0.5f
+
+    val bg = GraphicsUtil.drawableFromColor(stage.getWidth.toInt,
+      (stage.getHeight / 4.5f).toInt, tmp)
+
+    consolePane.getStyle.background = bg
 
     val root = new VisTable()
     root.setFillParent(true)
@@ -119,38 +146,34 @@ case class TestbedGui(controller: TestbedController) {
     root.add(eastPane).width(defaultPaneSize).fillY().expandY()
 
     stage.addActor(root)
+    stage.addActor(consolePane)
 
-    stage.addActor(console)
-    console.getColor.a = 0.50f
-    console.setPosition(0, -console.getHeight)
   }
 
-  def addSample(node: Node, sampleName: String): Unit = {
+  def addSampleEntry(node: Node, sampleName: String): Unit = {
     val lab2 = new VisLabel(sampleName)
     lab2.addListener(new ClickListener(){
       override def clicked(event: InputEvent, x: Float, y: Float): Unit = {
         super.clicked(event, x, y)
-        controller.onSampleSelection(lab2.getText.toString)
+        listener.onSampleSelection(lab2.getText.toString)
       }
     })
     node.add(new Node(lab2))
   }
 
-  def setProgress(value: Float): Unit = loadingBar.setValue(value)
+  def setProgressBarValue(value: Float): Unit = loadingBar.setValue(value)
 
   def setLoadingLogText(msg: String): Unit = loadingLog.setText(msg)
 
-  def resetLoadingBar(): Unit = {
+  def writeConsoleLog(log: LogMessage): Unit = console.addLog(log)
+
+  def resetProgressBar(): Unit = {
     loadingBar.setAnimateDuration(0)
     loadingBar.setValue(0)
     loadingBar.setAnimateDuration(0.2f)
   }
 
   def resetSamplePane(): Unit = samplePane.clear()
-
-  def test(s: String): Unit = {
-    stage.addActor(new Toast("dark", new VisTable()).fadeIn())
-  }
 
   def displayModuleLoadedToast(name: String): Unit = {
     val toast = new Toast("dark", new VisTable(true))
@@ -189,8 +212,11 @@ case class TestbedGui(controller: TestbedController) {
   }
 
   def toggleConsole(): Unit = {
-    console.addAction(
-      Actions.moveTo(0, if (console.getY < 0) 0f else -console.getHeight, 0.30f)
+    val targetY =
+      if (consolePane.getY < consoleYOffset) consoleYOffset
+      else -consolePane.getHeight
+    consolePane.addAction(
+      Actions.moveTo(consolePadding, targetY, 0.30f)
     )
   }
 
@@ -257,12 +283,13 @@ case class TestbedGui(controller: TestbedController) {
     core.setExpanded(true)
 
     /*add samples by name*/
-    addSample(dummy, "Dummy Circle")
-    addSample(dummy, "Dummy Circle 2")
-    addSample(core, "Entities Playground")
-    addSample(core, "Box2d World")
-    addSample(actors, "Actor System")
-    addSample(tests, "Graph/Map Test")
+    addSampleEntry(dummy, "Dummy Circle")
+    addSampleEntry(dummy, "Dummy Circle 2")
+    addSampleEntry(core, "Entities Playground")
+    addSampleEntry(core, "Box2d World")
+    addSampleEntry(actors, "Actor System")
+    addSampleEntry(tests, "Graph/Map Test")
+    addSampleEntry(tests, "Lighting Test")
 
     tree.add(core)
     tree.add(dummy)
@@ -281,66 +308,76 @@ case class FutureTestbed() extends AbstractMainApplication with Testbed {
   private[this] var loadingFinished = true
   private[this] var currSampleName: String = _
 
-  private[this] val gui = TestbedGui(new TestbedController {
-
+  private[this] val gui = TestbedView(new TestbedListener {
     override def onSampleSelection(name: String): Unit = {
+      println(name)
       currSampleName = name
-      nextSample = matchSample(currSampleName)
+      matchSample(name).foreach(s => setSample(s))
     }
 
-    override def onPause(flag: Boolean): Unit = pause = flag
-
+    override def onPause(flag: Boolean): Unit = {
+      pause = flag
+    }
   })
 
   private def matchSample(sampleName: String): Option[Sample] = sampleName match {
     case "Dummy Circle" => Option(DummyCircleSample())
-    case "Entities Playground" => Option(new ScalaEntitySystemModule())
-    case "Box2d World" => Option(new ScalaBox2dModule())
+    case "Entities Playground" => Option(new EntitySystemModule())
+    case "Box2d World" => Option(new Box2dModule())
     case "Actor System" => Option(new ActorSystemModule())
     case "Graph/Map Test" => Option(new GraphMapTest())
+    case "Lighting Test" => Option(new LightingSystemTest())
     case _ => None
   }
 
   private def resetInputProcessor(sample: Sample): Unit = {
-    inputMultiplexer.clear()
-    sample.attachInputProcessors(inputMultiplexer)
-    inputMultiplexer.addProcessor(this)
-    gui.attachInputProcessor(inputMultiplexer)
-    Gdx.input.setInputProcessor(inputMultiplexer)
+    val this_ = this
+    Gdx.app.postRunnable(new Runnable {
+      override def run(): Unit = {
+        inputMultiplexer.clear()
+        sample.attachInputProcessors(inputMultiplexer)
+        inputMultiplexer.addProcessor(this_)
+        gui.attachInputProcessor(inputMultiplexer)
+        Gdx.input.setInputProcessor(inputMultiplexer)
+      }
+    })
   }
 
   private def setSample(sample: Sample): Unit = {
     if (loadingFinished) {
       loadingFinished = false
 
-      gui.resetLoadingBar()
+      gui.resetProgressBar()
       gui.resetSamplePane()
       sample.init(this)
-      gui.setProgress(15)
+      gui.setProgressBarValue(15)
 
       resetInputProcessor(sample)
-      gui.setProgress(25)
+      gui.setProgressBarValue(25)
 
       sample.getKeyShortcuts.foreach(sc =>
         gui.setCurrentSampleShortcuts(sc))
-      gui.setProgress(45)
+      gui.setProgressBarValue(45)
 
       currentSample.foreach(old => old.cleanup())
       currentSample = Some(sample)
       nextSample = None
-      gui.setProgress(65)
+      gui.setProgressBarValue(65)
 
       new Thread(new Runnable {
         override def run(): Unit = {
-          sample.setup((msg: String) => gui.setLoadingLogText(msg))
-          loadingFinished = true
-          gui.setProgress(85)
+          sample.setup((msg: String) => {
+            gui.setLoadingLogText(msg)
+            gui.writeConsoleLog(LogMessage(currSampleName, msg, Color.GOLD))
+          })
+          gui.setProgressBarValue(85)
 
           sample.initGui(gui.getSamplePane)
-          gui.setProgress(100)
+          gui.setProgressBarValue(100)
 
           gui.displayModuleLoadedToast(currSampleName)
           gui.setLoadingLogText("")
+          loadingFinished = true
         }
       }).start()
     }
@@ -360,6 +397,7 @@ case class FutureTestbed() extends AbstractMainApplication with Testbed {
     })
 
     Gdx.input.setInputProcessor(inputMultiplexer)
+    pause = false
   }
 
   override def doRender(): Unit = {
@@ -385,16 +423,16 @@ case class FutureTestbed() extends AbstractMainApplication with Testbed {
   }
 
   override def keyUp(keycode: Int): Boolean = {
-    super.keyUp(keycode)
-
-    if (keycode == Keys.H) {
-      gui.toggleSamplePane()
+    keycode match {
+      case Keys.V => gui.toggleConsole()
+      case Keys.H => gui.toggleSamplePane()
+      case _ => ()
     }
-
-    if (keycode == Keys.V) {
-      gui.toggleConsole()
-    }
-
     false
   }
+
+  override def getCamera: OrthographicCamera = cam
+
+  override def getLogger: (LogMessage) => Unit = gui.writeConsoleLog
+
 }

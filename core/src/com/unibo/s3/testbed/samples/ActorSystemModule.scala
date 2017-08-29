@@ -1,18 +1,19 @@
-package com.unibo.s3.testbed.future.samples
+package com.unibo.s3.testbed.samples
 
-import akka.actor.{Actor, ActorRef, Props, UntypedAbstractActor}
+import java.io.File
+
+import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.main_system.communication.{GraphActor, MapActor, QuadTreeActor, SystemManager}
-import com.unibo.s3.main_system.world.actors.{GetAllBodies, WorldActor}
-import com.unibo.s3.testbed.future.BaseSample
+import com.unibo.s3.main_system.world.actors.WorldActor
+import com.unibo.s3.testbed.BaseSample
 
 import scala.reflect.runtime.currentMirror
 import scala.tools.reflect.ToolBox
-import java.io.File
 
 object Eval {
 

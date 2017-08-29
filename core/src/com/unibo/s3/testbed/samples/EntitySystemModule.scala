@@ -1,4 +1,4 @@
-package com.unibo.s3.testbed.future.samples
+package com.unibo.s3.testbed.samples
 
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector
 import com.badlogic.gdx.graphics.Color
@@ -10,17 +10,15 @@ import com.badlogic.gdx.{Input, InputMultiplexer}
 import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.InputProcessorAdapter
 import com.unibo.s3.main_system.characters.steer.{BaseMovableEntity, MovableEntity}
-import com.unibo.s3.main_system.util.ScaleUtils.{getMetersPerPixel, getPixelsPerMeter}
 import com.unibo.s3.main_system.rendering.{GeometryRenderer, GeometryRendererImpl}
+import com.unibo.s3.main_system.util.ScaleUtils.{getMetersPerPixel, getPixelsPerMeter}
 import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
-import com.unibo.s3.testbed.Testbed
-import com.unibo.s3.testbed.future.BaseSample
-import com.unibo.s3.testbed.testbed_modules.EntitiesSystem
+import com.unibo.s3.testbed.{BaseSample, Testbed}
+import com.unibo.s3.testbed.BaseSample
 
 import scala.collection.JavaConversions
 
-class ScalaEntitySystemModule extends BaseSample
-  with EntitiesSystem[Vector2]
+class EntitySystemModule extends BaseSample
   with InputProcessorAdapter {
 
   /*simulation*/
@@ -50,7 +48,6 @@ class ScalaEntitySystemModule extends BaseSample
 
   /*input*/
   private var isLeftCtrlPressed: Boolean = false
-
 
   override def getKeyShortcuts: Option[Map[String, String]] = {
     Option(Map("ctrl+mouse-left" -> "select an entity"))
@@ -188,8 +185,12 @@ class ScalaEntitySystemModule extends BaseSample
           val ax = MathUtils.random(-2f, 2f)
           val ay = MathUtils.random(-2f, 2f)
           val newAgent = spawnEntityAt(new Vector2(p.x + ax, p.y + ay))
-          if (collisionDetector != null) newAgent.setCollisionDetector(collisionDetector)
-          newAgent.setComplexSteeringBehavior()/*.avoidCollisionsWithWorld*/.wander.buildPriority(true)
+          val sb = newAgent.setComplexSteeringBehavior()
+          if (collisionDetector != null) {
+            newAgent.setCollisionDetector(collisionDetector)
+            sb.avoidCollisionsWithWorld()
+          }
+          sb.wander.buildPriority(true)
         }
       }
     })
@@ -226,6 +227,7 @@ class ScalaEntitySystemModule extends BaseSample
   }
 
   override def render(shapeRenderer: ShapeRenderer): Unit = {
+    super.render(shapeRenderer)
     if (debugRender) entities.foreach(e => gr.renderCharacterDebugInfo(shapeRenderer, e))
     entities.foreach(e => gr.renderCharacter(shapeRenderer, e))
     renderSelectedAgentMarker(shapeRenderer)
@@ -244,9 +246,6 @@ class ScalaEntitySystemModule extends BaseSample
     entities.foreach((e: MovableEntity[Vector2]) => qtree.insert(e))
     entities.foreach((e: MovableEntity[Vector2]) => e.act(dt))
     if (selectedAgent != null) updateGui()
-  }
-
-  override def cleanup(): Unit = {
   }
 
   override def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit = {
