@@ -72,7 +72,7 @@ case class TestbedView(listener: TestbedListener) {
 
   def init(): Unit = {
     stage = new Stage(new ScreenViewport())
-    VisUI.load()
+    VisUI.load()//Gdx.files.internal("skins/testbed/tinted.json"))
     toastManager = new ToastManager(stage)
     toastManager.setAlignment(Align.bottomRight)
 
@@ -398,6 +398,8 @@ case class FutureTestbed() extends AbstractMainApplication with Testbed {
 
     Gdx.input.setInputProcessor(inputMultiplexer)
     pause = false
+    gui.writeConsoleLog(LogMessage("Testbed", "*** Welcome ***", Color.CYAN))
+    gui.writeConsoleLog(LogMessage("Testbed", "Version : 0.9fut", Color.CYAN))
   }
 
   override def doRender(): Unit = {
