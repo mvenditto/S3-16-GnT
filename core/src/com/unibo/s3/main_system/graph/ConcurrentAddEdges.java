@@ -11,23 +11,33 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 public class ConcurrentAddEdges implements Callable<Void> {
-    private List<Vector2> nodes;
+    private final List<Vector2> nodes;
     private UndirectedGraph<Vector2, DefaultEdge> graph;
     private RaycastCollisionDetector<Vector2> collisionDetector;
+    private int id;
 
     public ConcurrentAddEdges(List<Vector2> nodes, UndirectedGraph<Vector2, DefaultEdge> graph,
-                              RaycastCollisionDetector<Vector2> collisionDetector) {
+                              RaycastCollisionDetector<Vector2> collisionDetector, int id) {
         this.nodes = nodes;
         this.graph = graph;
         this.collisionDetector = collisionDetector;
+        this.id = id;
+        log("la lista che mi manda ha " + nodes.size() + " nodi");
+        log("la lista che salvo ha " + this.nodes.size() + " nodi");
+    }
+
+    private void log(String msg) {
+        System.out.println("[Thread " + id + "] " + msg);
     }
 
     @Override
     public Void call() throws Exception {
+        log("nel metodo call la lista ha  " + this.nodes.size() + " nodi");
         float maxDist = 7f;
         KShortestPaths<Vector2, DefaultEdge> ksp = new KShortestPaths<>(graph, 1);
 
         this.nodes.forEach(node -> {
+            log("controllo il nodo " + node.toString());
             for(float x = node.x - maxDist; x <= node.x + maxDist; x++) {
                 for(float y = node.y - maxDist; y <= node.y + maxDist; y++) {
                     Vector2 toCompare = new Vector2(x, y);
@@ -37,7 +47,7 @@ public class ConcurrentAddEdges implements Callable<Void> {
                             //log(node.toString() + " non arriva a " + toCompare.toString());
                             if(checkEdgeRayCast(collisionDetector, node, toCompare, 0.5f, 16)) {
                                 DefaultEdge edge = graph.addEdge(node, toCompare);
-                                //log("Secondi archi: aggiunto " + edge.toString());
+                                System.out.println("Secondi archi dal thread: aggiunto " + edge.toString());
                             }
                         }
 
@@ -45,6 +55,7 @@ public class ConcurrentAddEdges implements Callable<Void> {
                 }
             }
         });
+        log("Controllati tutti i nodi");
 
         return null;
     }

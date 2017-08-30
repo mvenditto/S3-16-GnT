@@ -63,12 +63,6 @@ public class GraphGenerator {
 
         log("A leggere la mappa ci ha messo: " + cron.getTime());
 
-        /*try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-
         //printGrid(grid);
 
         //UndirectedGraph<Vector2, DefaultEdge> graph = null;
@@ -81,6 +75,7 @@ public class GraphGenerator {
     private static UndirectedGraph<Vector2, DefaultEdge> create(Integer[][] grid, HashMap<Vector2, Vector2> walls, RaycastCollisionDetector<Vector2> collisionDetector) {
         UndirectedGraph<Vector2, DefaultEdge> graph = new SimpleGraph<>(DefaultEdge.class);
         addNodes(grid, graph, walls);
+        log("Finiti i nodi, sono " + graph.vertexSet().size());
         addEdges(graph, collisionDetector);
         return graph;
     }
@@ -92,53 +87,41 @@ public class GraphGenerator {
         cron.start();
 
         checkUnconnectedNodes(graph, collisionDetector);
-        //concurrentCheckUnconnectedNodesv2(graph, collisionDetector);
+        //concurrentCheckUnconnectedNodes(graph, collisionDetector);
         cron.stop();
 
         log("A controllare i nodi staccati ci ha messo: " + cron.getTime());
 
     }
 
-    private static void concurrentCheckUnconnectedNodesv2(UndirectedGraph<Vector2, DefaultEdge> graph,
+    private static void concurrentCheckUnconnectedNodes(UndirectedGraph<Vector2, DefaultEdge> graph,
                                                         RaycastCollisionDetector<Vector2> collisionDetector) {
         int nProc = Runtime.getRuntime().availableProcessors()+1;
         ExecutorService executor = Executors.newFixedThreadPool(nProc);
         Set<Future<Void>> resultSet = new HashSet<>();
-        int maxDist = 7;
         int nTask = 8;
         int vectToThread = graph.vertexSet().size() / nTask;
-        log("Do ad ogni task " + vectToThread + " nodi");
-        List<Vector2> nodesToCheck = new ArrayList<>();
+        HashMap<Integer, List<Vector2>> ntc = new HashMap<>();
+        int count = 0;
+        ntc.put(count, new ArrayList<>());
         for(Vector2 node : graph.vertexSet()) {
-            nodesToCheck.add(node);
-            if(nodesToCheck.size() == vectToThread) {
-                Future<Void> res = executor.submit(new ConcurrentAddEdges(nodesToCheck, graph, collisionDetector));
+            List<Vector2> nodesList = ntc.get(count);
+            nodesList.add(node);
+            if(nodesList.size() == vectToThread) {
+                Future<Void> res = executor.submit(new ConcurrentAddEdges(nodesList, graph, collisionDetector, (count+1)));
                 resultSet.add(res);
-                nodesToCheck.clear();
+                count++;
+                ntc.put(count, new ArrayList<>());
             }
         }
 
         executor.shutdown();
     }
 
-    private static void checkNode(Vector2 toCompare, Vector2 node,
-                                  UndirectedGraph<Vector2, DefaultEdge> graph,
-                                  RaycastCollisionDetector<Vector2> collisionDetector) {
-        KShortestPaths<Vector2, DefaultEdge> ksp = new KShortestPaths<>(graph, 1);
-        if (!toCompare.equals(node) && ksp.getPaths(node, toCompare).size() == 0) {
-            //log(node.toString() + " non arriva a " + toCompare.toString());
-            if(checkEdgeRayCast(collisionDetector, node, toCompare, 0.5f, 16)) {
-                DefaultEdge edge = graph.addEdge(node, toCompare);
-                //log("Secondi archi: aggiunto " + edge.toString());
-            }
-        }
-    }
-
     private static void checkUnconnectedNodes(UndirectedGraph<Vector2, DefaultEdge> graph,
                                               RaycastCollisionDetector<Vector2> collisionDetector) {
         KShortestPaths<Vector2, DefaultEdge> ksp = new KShortestPaths<>(graph, 1);
         float maxDist = 7f;
-        //System.out.println(ksp.getPaths(new MyNode(3f,11f, false), new MyNode(25f,30f, false)).toString());
         graph.vertexSet().forEach(node ->{
             for(float x = node.x - maxDist; x <= node.x + maxDist; x++) {
                 for(float y = node.y - maxDist; y <= node.y + maxDist; y++) {
@@ -149,7 +132,7 @@ public class GraphGenerator {
                             //log(node.toString() + " non arriva a " + toCompare.toString());
                             if(checkEdgeRayCast(collisionDetector, node, toCompare, 0.5f, 16)) {
                                 DefaultEdge edge = graph.addEdge(node, toCompare);
-                                //log("Secondi archi: aggiunto " + edge.toString());
+                                log("Secondi archi: aggiunto " + edge.toString());
                             }
                         }
 
@@ -157,38 +140,6 @@ public class GraphGenerator {
                 }
             }
         });
-        /*List<Vector2> nodes = new ArrayList<>(graph.vertexSet());
-        graph.vertexSet().forEach(vertex -> {
-            if(graph.degreeOf(vertex) <= 1) {
-                Vector2 nearest = null;
-                float xDist = 10, yDist = 10;
-                float xNode, yNode;
-                for(Vector2 node : nodes) {
-                    if(vertex != node && graph.getEdge(vertex, node) == null) {
-                        xNode = Math.abs(vertex.x - node.x);
-                        yNode = Math.abs(vertex.y - vertex.y);
-                        if((xNode + yNode) <= (xDist + yDist)) {
-                            List<GraphPath<Vector2, DefaultEdge>> paths = new ArrayList<>();
-                            try {
-                                paths = ksp.getPaths(vertex, node);
-                            } catch (Exception e){}
-                            if((paths.size() == 0 || paths.size() > 3) && checkEdgeRayCast(collisionDetector, vertex, node, 0.5f, 16)) {
-                                nearest = node;
-                                xDist = xNode;
-                                yDist = yNode;
-                            }
-                        }
-                    }
-
-                }
-                if(nearest != null) {
-                    DefaultEdge edge = graph.addEdge(vertex, nearest);
-                    log("Secondi archi: aggiunto " + edge);
-                }
-                nodes.remove(vertex);
-            }
-        });*/
-
         log("Finiti secondi archi");
     }
 
