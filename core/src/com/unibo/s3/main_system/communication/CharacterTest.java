@@ -42,7 +42,7 @@ public class CharacterTest {
         testGraph.addEdge(v2, v5);
 
         character.setGraph(testGraph);
-        character.computeNearest();
+        //character.computeNearest();
     }
 
     @Test

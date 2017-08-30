@@ -10,6 +10,7 @@ import org.jgrapht.alg.NeighborIndex;
 import org.jgrapht.graph.DefaultEdge;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class BaseCharacter extends BaseMovableEntity implements Character {
@@ -20,7 +21,7 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
     private UndirectedGraph<Vector2, DefaultEdge> graph;
     private int nNeighbours;
     private Vector2 currentNode;
-    private ArrayList<ActorRef> neighbours;
+    private List<ActorRef> neighbours = new ArrayList<>();
     private List<Vector2> visited = new ArrayList<>();
     private Vector2 defaultVertex = new Vector2(-1000, -1000); //start utility vertex
     private NeighborIndex index;
@@ -53,6 +54,19 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
 
     public Vector2 getCurrentNode() {
         return currentNode;
+    }
+
+    public List<ActorRef> getNeighbours() {
+        return neighbours;
+    }
+
+    public void setNeighboursList(List<ActorRef> neighbours){
+        this.neighbours = neighbours;
+    }
+
+
+    public void addNeighbour(ActorRef neighbour){
+        this.neighbours.add(neighbour);
     }
 
     public void chooseBehaviour(){

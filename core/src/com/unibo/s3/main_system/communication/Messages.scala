@@ -5,6 +5,8 @@ import java.util
 import akka.actor.ActorRef
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.BaseCharacter
+import org.jgrapht.UndirectedGraph
+import org.jgrapht.graph.DefaultEdge
 
 object Messages {
   //message for synchronize
@@ -19,8 +21,9 @@ object Messages {
 
   //message for CharacterActor
   case class AskNeighboursMsg()
-  case class SendNeighboursMsg(neighbours: List[ActorRef])
-  case class SendCopInfoMsg() //ci andranno le info che si devono scambiare i poliziotti
+  case class SendNeighboursMsg(neighbours: util.List[ActorRef])
+  case class SendCopInfoMsg(visitedVertices: util.List[Vector2]) //ci andranno le info che si devono scambiare i poliziotti
+  case class SetupGraphMsg(graph: UndirectedGraph[Vector2, DefaultEdge])
 
   //message for MasterActor
   case class RebuildQuadTreeMsg(characterList: Iterable[BaseCharacter])

@@ -8,6 +8,7 @@ import com.unibo.s3.main_system.world.spatial.QuadTreeNode
 import com.unibo.s3.main_system.communication.Messages.{AskNeighboursMsg, InitialSavingCharacter, SendNeighboursMsg}
 
 import scala.collection.mutable
+import scala.collection.JavaConverters._
 
 class QuadTreeActor extends UntypedAbstractActor {
 
@@ -24,7 +25,7 @@ class QuadTreeActor extends UntypedAbstractActor {
       //calcolo i vicini
       var neighbours = List[ActorRef]()
       agentsTable.values.foreach(cop => neighbours :+= cop)
-      getSender().tell(SendNeighboursMsg(neighbours), getSelf())
+      getSender().tell(SendNeighboursMsg(neighbours.asJava), getSelf())
     case _ => println("(quadTreeActor) message unknown:" + message)
   }
 }
