@@ -19,7 +19,7 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
     private final int id;
 
     private UndirectedGraph<Vector2, DefaultEdge> graph;
-    private int nNeighbours;
+    private int nNeighbours = 0;
     private Vector2 currentNode;
     private List<ActorRef> neighbours = new ArrayList<>();
     private List<Vector2> visited = new ArrayList<>();
@@ -67,10 +67,12 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
 
     public void addNeighbour(ActorRef neighbour){
         this.neighbours.add(neighbour);
+        this.nNeighbours++;
     }
 
     public void chooseBehaviour(){
 
+        System.out.println("Agent " + id + ": it's time to choose behaviour");
         //mi servono i miei vicini
         //guardo il grafo e ci penso
         //aggiorno la destinazione
@@ -84,7 +86,7 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
         return this.visited;
     }
 
-    public void updateGraph(ArrayList<Vector2> colleagueList){
+    public void updateGraph(List<Vector2> colleagueList){
         this.nNeighbours--;
         //update lista
         for(Vector2 v : colleagueList){

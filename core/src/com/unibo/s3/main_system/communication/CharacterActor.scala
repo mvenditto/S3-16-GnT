@@ -18,11 +18,13 @@ class CharacterActor(val character: BaseCharacter) extends UntypedAbstractActor 
       SystemManager.getInstance().getLocalActor("quadTreeActor").tell(AskNeighboursMsg(), getSelf())
     case msg: SendNeighboursMsg =>
       msg.neighbours.foreach(neighbour => neighbour.tell(SendCopInfoMsg(character.getInformations), getSelf()))
-      msg.neighbours.foreach(neighbour => character.addNeighbour(neighbour))
+      //msg.neighbours.foreach(neighbour => character.addNeighbour(neighbour))
       msg.neighbours.filter(neighbour => !character.getNeighbours.contains(neighbour)).foreach(neighbour => character.addNeighbour(neighbour))
-      //dico sotto i vicini
+      println("cop: " + getSelf() + "| I have " + msg.neighbours.size() + " neighbours: " + character.getNeighbours)
     case msg: SendCopInfoMsg =>
       println("cop: " + getSelf() + "| info from: " + getSender() + ", visited vertices: " + msg.visitedVertices)
+      character.updateGraph(msg.visitedVertices)
+      println("cop: " + getSelf() + " known vertices: " + character.getInformations)
       //qui ho le info dell'altro poliziotto quindi poi posso fare quello che devo
     case msg: SetupGraphMsg =>
       println("cop: " + getSelf() + "| received graph")
