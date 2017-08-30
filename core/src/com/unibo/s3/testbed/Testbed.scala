@@ -18,8 +18,9 @@ import com.kotcrab.vis.ui.widget.toast.Toast
 import com.kotcrab.vis.ui.widget.{VisLabel, VisTree, _}
 import com.unibo.s3.InputProcessorAdapter
 import com.unibo.s3.main_system.AbstractMainApplication
+import com.unibo.s3.main_system.util.GraphicsUtil
 import com.unibo.s3.testbed.samples._
-import com.unibo.s3.testbed.ui.{Console, GraphicsUtil, KeyHelpTable, LogMessage}
+import com.unibo.s3.testbed.ui.{Console, KeyHelpTable, LogMessage}
 
 trait Testbed {
 

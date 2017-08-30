@@ -77,7 +77,7 @@ class EntitySystemModule extends BaseSample
     numAgentsL.setText(entities.size + "")
   }
 
-  private def createNode(lbl: VisLabel, slid: VisSlider, label: String): VisTable = {
+  protected def createNode(lbl: VisLabel, slid: VisSlider, label: String): VisTable = {
     val t = new VisTable(true)
     t.add(label).width(200).row()
     t.add(slid).width(100).expandX()
@@ -215,7 +215,7 @@ class EntitySystemModule extends BaseSample
     window.add(createNode(maxAngularSpeedL, maxAngularSpeedS, "maxAngularSpeed"))
     window.row
 
-    window.add().expandY()
+    //window.add().expandY()
   }
 
   override def init(owner: Testbed): Unit = {

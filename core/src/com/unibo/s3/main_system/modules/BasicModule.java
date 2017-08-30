@@ -21,4 +21,6 @@ public interface BasicModule extends InputProcessorAdapter {
     void update(float dt);
 
     void resize(int newWidth, int newHeight);
+
+    void cleanup();
 }

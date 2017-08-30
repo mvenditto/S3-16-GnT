@@ -5,7 +5,11 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
 import com.badlogic.gdx.math.{MathUtils, Vector2}
+import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.{Gdx, InputMultiplexer}
+import com.kotcrab.vis.ui.widget.color.ColorPicker
+import com.kotcrab.vis.ui.widget.{VisLabel, VisSlider, VisTable, VisWindow}
 import com.unibo.s3.main_system.characters.steer.MovableEntity
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory
 import com.unibo.s3.main_system.util.ScaleUtils
@@ -23,7 +27,7 @@ class LightingSystemTest extends EntitySystemModule {
   private var lights = List[PointLight]()
 
   private val LIGHT_WHITE = new Color(1.0f, 1.0f, 1.0f, 0.5f)
-  private var lightEditorEnabled = true
+  private var lightEditorEnabled = false
   private var renderLightsAfterBodies = true
 
   private val b2d = new Box2dModule()
@@ -43,7 +47,7 @@ class LightingSystemTest extends EntitySystemModule {
 
   private def testCreateTorches(characters: List[MovableEntity[Vector2]]) = {
     characters.foreach(c => {
-      val t = new ConeLight(rayHandler, 65, LIGHT_WHITE, 15f,
+      val t = new ConeLight(rayHandler, 65, c.getColor, 15f,
         c.getPosition.x, c.getPosition.y,
         (c.getOrientation * MathUtils.radiansToDegrees) + 90, 25f)
       //t.setSoft(false)
@@ -119,6 +123,31 @@ class LightingSystemTest extends EntitySystemModule {
         .foreach(p =>
           new PointLight(rayHandler, 64, LIGHT_WHITE, 20, p(0), p(1)))
     }
+  }
+
+  override def initGui(window: VisWindow): Unit = {
+    super.initGui(window)
+    val l = new VisLabel("Lighting System")
+    l.setColor(window.getTitleLabel.getColor)
+    window.add[VisLabel](l).fillX().expandX()
+    window.row
+
+    val ambientLightIntensityS = new VisSlider(0.0f, 1.0f, 0.1f, false)
+    val ambientLightIntensityL = new VisLabel("0.1")
+
+    ambientLightIntensityS.addListener(new ChangeListener {
+      override def changed(event: ChangeListener.ChangeEvent, actor: Actor): Unit = {
+        val i = ambientLightIntensityS.getValue
+        ambientLightIntensityL.setText(i.toString)
+        rayHandler.setAmbientLight(i,i,i,i)
+      }
+    })
+
+    window.add[VisTable](createNode(ambientLightIntensityL,
+      ambientLightIntensityS, "Ambient light intensity"))
+    window.row
+
+    window.add().expandY()
   }
 
   override def cleanup(): Unit = {

@@ -28,7 +28,7 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
     private float cameraZoomSpeed = 0.1f;
     private float cameraViewportWidthMeters = 30f;
 
-    protected boolean pause = true;
+    protected boolean pause = false;
 
     protected abstract void doRender();
 

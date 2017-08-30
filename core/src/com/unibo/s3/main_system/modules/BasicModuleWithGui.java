@@ -7,10 +7,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.unibo.s3.InputProcessorAdapter;
 import com.unibo.s3.Main;
 
-public class BasicModuleWithGui implements BasicModule, InputProcessorAdapter {
+public abstract class BasicModuleWithGui implements BasicModule, InputProcessorAdapter {
     protected Main owner;
     protected Stage gui;
-    private boolean guiEnabled = true;
     private boolean enabled = true;
 
     @Override
@@ -41,16 +40,21 @@ public class BasicModuleWithGui implements BasicModule, InputProcessorAdapter {
 
     @Override
     public void enable(boolean enabled) {
-
+        this.enabled = enabled;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return enabled;
     }
 
     @Override
     public void render(ShapeRenderer shapeRenderer) {
 
+    }
+
+    @Override
+    public void cleanup() {
+        gui.dispose();
     }
 }
