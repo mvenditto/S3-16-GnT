@@ -21,52 +21,41 @@ public class CommunicationTest extends ApplicationAdapter {
 
     @Override
     public void create() {
-        batch = new SpriteBatch();
-        img = new Texture("badlogic.jpg");
+        this.batch = new SpriteBatch();
+        this.img = new Texture("badlogic.jpg");
 
         SystemManager.getInstance().createSystem("System", null);
+        SystemManager.getInstance().createActor(MasterActor.props(), "masterActor");
         SystemManager.getInstance().createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor");
-        SystemManager.getInstance().createActor(GraphActor.props(), "graphActor");
-        ActorRef mapActor = SystemManager.getInstance().createActor(MapActor.props(), "mapActor");
-
         SystemManager.getInstance().createActor(QuadTreeActor.props(), "quadTreeActor");
+        SystemManager.getInstance().createActor(MapActor.props(), "mapActor");
+        SystemManager.getInstance().createActor(GraphActor.props(), "graphActor");
 
-        ActorRef masterActor = SystemManager.getInstance().createActor(MasterActor.props(), "masterActor");
+        ActorRef masterActor = SystemManager.getInstance().getLocalActor("masterActor");
+        ActorRef mapActor = SystemManager.getInstance().getLocalActor("mapActor");
+
+        mapActor.tell(new GenerateMapMsg(), ActorRef.noSender());
 
         masterActor.tell(new CreateCharacterMsg(new Vector2(1,1)), ActorRef.noSender());
         masterActor.tell(new CreateCharacterMsg(new Vector2(2,2)), ActorRef.noSender());
         masterActor.tell(new CreateCharacterMsg(new Vector2(3,3)), ActorRef.noSender());
         masterActor.tell(new CreateCharacterMsg(new Vector2(24,34)), ActorRef.noSender());
 
-        //mapActor.tell(new GenerateMapMsg(), ActorRef.noSender());
-
         masterActor.tell(new ActMsg(0.016f), ActorRef.noSender());
-
-        /*
-        ActorRef copOne = SystemManager.getInstance().createActor
-                (CharacterActor.props(new BaseCharacter(new Vector2(1,1),1)), "cop1");
-        ActorRef copTwo = SystemManager.getInstance()
-                .createActor(CharacterActor.props(new BaseCharacter(new Vector2(2,2),2)), "cop2");
-        ActorRef copThree = SystemManager.getInstance()
-                .createActor(CharacterActor.props(new BaseCharacter(new Vector2(3,3),3)), "cop3");
-
-        quadTree.tell(new Messages.AskNeighboursMsg(), copOne);
-        quadTree.tell(new Messages.AskNeighboursMsg(), copTwo);
-        quadTree.tell(new Messages.AskNeighboursMsg(), copThree);*/
     }
 
     @Override
     public void render () {
         Gdx.gl.glClearColor(1, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        batch.begin();
-        batch.draw(img, 0, 0);
-        batch.end();
+        this.batch.begin();
+        this.batch.draw(img, 0, 0);
+        this.batch.end();
     }
 
     @Override
     public void dispose () {
-        batch.dispose();
-        img.dispose();
+        this.batch.dispose();
+        this.img.dispose();
     }
 }
