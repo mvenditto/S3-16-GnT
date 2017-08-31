@@ -6,9 +6,9 @@ import com.unibo.s3.main_system.communication.Messages.{ActMsg, CreateCharacterM
 
 class MasterActor extends UntypedAbstractActor {
 
-  var charactersList = List[ActorRef]()
-  val entitiesSystem = new EntitiesSystemImpl()
-  var copID = 0
+  private[this] var charactersList = List[ActorRef]()
+  private[this] val entitiesSystem = new EntitiesSystemImpl()
+  private[this] var copID = 0
 
   override def onReceive(message: Any): Unit = message match {
     case msg: ActMsg =>

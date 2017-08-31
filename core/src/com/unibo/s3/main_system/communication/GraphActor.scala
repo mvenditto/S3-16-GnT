@@ -9,9 +9,9 @@ import com.unibo.s3.main_system.graph.GraphGenerator
 
 class GraphActor extends  UntypedAbstractActor {
 
-  val FILEPATH = "maps/outputGraphActor.txt" //ci va il percorso del file dove salvare la mappa(Sara)
+  private[this] val FILEPATH = "maps/outputGraphActor.txt" //ci va il percorso del file dove salvare la mappa(Sara)
 
-  val file: FileHandle = Gdx.files.local(FILEPATH)
+  private[this] val file: FileHandle = Gdx.files.local(FILEPATH)
   file.writeString("", false)
 
   override def onReceive(message: Any): Unit = message match {

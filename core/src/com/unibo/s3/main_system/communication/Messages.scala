@@ -1,7 +1,5 @@
 package com.unibo.s3.main_system.communication
 
-import java.util
-
 import akka.actor.ActorRef
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.BaseCharacter

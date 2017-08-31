@@ -10,7 +10,7 @@ import com.unibo.s3.main_system.map.{MapGenerator, MazeMapGenerator}
 class MapActor extends UntypedAbstractActor {
 
    // val FILEPATH = "maps/mapFile.txt" uncomment if file is required
-  val mapGenerator: MapGenerator = new MazeMapGenerator
+   private[this] val mapGenerator: MapGenerator = new MazeMapGenerator
 
   override def onReceive(message: Any): Unit = message match {
     case _: GenerateMapMsg =>
