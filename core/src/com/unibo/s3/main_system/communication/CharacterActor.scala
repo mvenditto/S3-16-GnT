@@ -4,15 +4,14 @@ import akka.actor.{Props, UntypedAbstractActor}
 import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, AskNeighboursMsg, SendCopInfoMsg, SendNeighboursMsg}
 
-class CharacterActor(val character: BaseCharacter) extends UntypedAbstractActor {
+class CharacterActor(private[this] val character: BaseCharacter) extends UntypedAbstractActor {
 
   //grafo in qualche struttura
 
-  //BaseCharacter incapsulato
 
   override def onReceive(message: Any): Unit = message match {
     case _: ActMsg =>
-      SystemManager.getInstance().getLocalActor("quadTreeActor").tell(AskNeighboursMsg(), getSelf())
+      SystemManager.getInstance().getLocalActor("quadTreeActor").tell(AskNeighboursMsg(this.character), getSelf())
     case msg: SendNeighboursMsg =>
       msg.neighbours.foreach(neighbour => neighbour.tell(SendCopInfoMsg(), getSelf()))
       //dico sotto i vicini

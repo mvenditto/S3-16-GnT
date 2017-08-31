@@ -16,7 +16,7 @@ object Messages {
   case class GenerateGraphMsg()
 
   //message for CharacterActor
-  case class AskNeighboursMsg()
+  case class AskNeighboursMsg(character: BaseCharacter)
   case class SendNeighboursMsg(neighbours: List[ActorRef])
   case class SendCopInfoMsg() //ci andranno le info che si devono scambiare i poliziotti
 
