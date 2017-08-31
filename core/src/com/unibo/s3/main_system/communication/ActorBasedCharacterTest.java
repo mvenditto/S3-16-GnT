@@ -92,6 +92,14 @@ public class ActorBasedCharacterTest extends ApplicationAdapter {
         img.dispose();
     }
 
+    private void testDestination(){
+        copOne.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
+        copTwo.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
+        copThree.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
+
+    }
+
+
     private void testInteraction(){
         copOne.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
         copTwo.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());

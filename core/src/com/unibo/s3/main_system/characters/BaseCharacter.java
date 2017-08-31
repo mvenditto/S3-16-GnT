@@ -24,7 +24,6 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
     private Vector2 currentNode;
     private List<ActorRef> neighbours = new ArrayList<>();
     private List<Vector2> visited = new ArrayList<>();
-   // private Vector2 defaultVertex = new Vector2(-1000, -1000); //start utility vertex
     private NeighborIndex index;
     private Vector2 currentDestination;
 
@@ -79,18 +78,18 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
 
         this.currentNode = computeNearest();
         if (currentNode.equals(currentDestination)) {
-            System.out.println(log() + "Destination achieved! Choose the next one");
-        } else {
-            System.out.println(log() + "My destination is still " + currentDestination);
+            System.out.println(log() + "Destination " + currentDestination + " = " + currentNode + " achieved! Choose the next one");
+            currentDestination = selectRandomDestination();
         }
-
-        //mi servono i miei vicini
-        //guardo il grafo e ci penso
-        //aggiorno la destinazione
+        //ora scelgo destinazione casuale tra i vicini, potenzialmente torno indietro
     }
 
     public void setnNeighbours(int n){
         this.nNeighbours = n;
+    }
+
+    public Vector2 getCurrentDestination() {
+        return currentDestination;
     }
 
     public List<Vector2> getInformations(){
@@ -142,6 +141,9 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
             discoverNewVertex(nearest);
         }
         currentNode = nearest;
+        if(!computeNeighbours().contains(getCurrentDestination())){ //se ho cambiato nodo di riferimento e questo non è collegato alla destinazione la ricalcolo
+            currentDestination = selectRandomDestination();
+        }
         return nearest;
     }
 
