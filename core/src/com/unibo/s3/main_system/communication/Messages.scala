@@ -23,5 +23,5 @@ object Messages {
   //message for MasterActor
   case class RebuildQuadTreeMsg(characterList: Iterable[BaseCharacter])
   case class CreateCharacterMsg(position: Vector2)
-  case class InitialSavingCharacter(newCharacter: BaseCharacter, characterRef: ActorRef)
+  case class InitialSavingCharacterMsg(newCharacter: BaseCharacter, characterRef: ActorRef)
 }

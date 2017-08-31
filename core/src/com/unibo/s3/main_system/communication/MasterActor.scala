@@ -2,7 +2,7 @@ package com.unibo.s3.main_system.communication
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import com.unibo.s3.main_system.characters.EntitiesSystemImpl
-import com.unibo.s3.main_system.communication.Messages.{ActMsg, CreateCharacterMsg, InitialSavingCharacter, RebuildQuadTreeMsg}
+import com.unibo.s3.main_system.communication.Messages.{ActMsg, CreateCharacterMsg, InitialSavingCharacterMsg, RebuildQuadTreeMsg}
 
 class MasterActor extends UntypedAbstractActor {
 
@@ -22,7 +22,7 @@ class MasterActor extends UntypedAbstractActor {
       val characterRef = SystemManager.getInstance().createActor(CharacterActor.props(newCharacter), "cop"+copID)
       charactersList :+= characterRef
       SystemManager.getInstance().getLocalActor("quadTreeActor")
-        .tell(InitialSavingCharacter(newCharacter, characterRef), getSelf())
+        .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
     case _ => println("(worldActor) message unknown: " + message)
   }
 }
