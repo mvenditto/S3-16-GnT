@@ -36,6 +36,12 @@ public class CommunicationTest extends ApplicationAdapter {
 
         mapActor.tell(new GenerateMapMsg(), ActorRef.noSender());
 
+        try {
+            Thread.sleep(3500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         masterActor.tell(new CreateCharacterMsg(new Vector2(1,1)), ActorRef.noSender());
         masterActor.tell(new CreateCharacterMsg(new Vector2(2,2)), ActorRef.noSender());
         masterActor.tell(new CreateCharacterMsg(new Vector2(3,3)), ActorRef.noSender());

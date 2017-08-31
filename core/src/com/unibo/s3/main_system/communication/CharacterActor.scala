@@ -1,12 +1,15 @@
 package com.unibo.s3.main_system.communication
 
 import akka.actor.{Props, UntypedAbstractActor}
+import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.BaseCharacter
-import com.unibo.s3.main_system.communication.Messages.{ActMsg, AskNeighboursMsg, SendCopInfoMsg, SendNeighboursMsg}
+import com.unibo.s3.main_system.communication.Messages._
+import org.jgrapht.UndirectedGraph
+import org.jgrapht.graph.DefaultEdge
 
 class CharacterActor(private[this] val character: BaseCharacter) extends UntypedAbstractActor {
 
-  //grafo in qualche struttura
+  private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _
 
 
   override def onReceive(message: Any): Unit = message match {
@@ -21,6 +24,8 @@ class CharacterActor(private[this] val character: BaseCharacter) extends Untyped
 
     //case ricevo grafo iniziale => salvo grafo iniziale
     //case
+    case msg: SendGraphMsg=>
+      this.graph = msg.graph
     case _ => println("(characterActor) message unknown:" + message)
   }
 }

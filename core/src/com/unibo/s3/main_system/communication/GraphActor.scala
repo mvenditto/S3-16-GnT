@@ -3,13 +3,17 @@ package com.unibo.s3.main_system.communication
 import akka.actor.{Props, UntypedAbstractActor}
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
-import com.unibo.s3.main_system.communication.Messages.{GenerateGraphMsg, MapElementMsg}
+import com.badlogic.gdx.math.Vector2
+import com.unibo.s3.main_system.communication.Messages.{GenerateGraphMsg, InitialSavingCharacterMsg, MapElementMsg, SendGraphMsg}
 import com.unibo.s3.main_system.graph.GraphGenerator
+import org.jgrapht.UndirectedGraph
+import org.jgrapht.graph.DefaultEdge
 
 
 class GraphActor extends  UntypedAbstractActor {
 
   private[this] val FILEPATH = "maps/outputGraphActor.txt" //ci va il percorso del file dove salvare la mappa(Sara)
+  private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _
 
   private[this] val file: FileHandle = Gdx.files.local(FILEPATH)
   file.writeString("", false)
@@ -24,10 +28,13 @@ class GraphActor extends  UntypedAbstractActor {
       }
       writeFunction(verifyClose)
     case _: GenerateGraphMsg =>
+      this.graph = GraphGenerator.createGraph(FILEPATH)
       //GraphGenerator.createGraph("C:\\Users\\Sara\\Maps\\test.txt");
-      sender ! GraphGenerator.createGraph(FILEPATH);
+      sender ! graph
       //qui ho il file con la mappa, bisogna generare il grafo(Sara)
       //println("graph created!")
+    case msg: InitialSavingCharacterMsg =>
+      msg.characterRef.tell(SendGraphMsg(graph), getSelf())
     case _ => println("(graph actor) message unknown: " + message)
   }
 }

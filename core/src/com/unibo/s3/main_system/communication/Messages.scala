@@ -3,6 +3,8 @@ package com.unibo.s3.main_system.communication
 import akka.actor.ActorRef
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.BaseCharacter
+import org.jgrapht.UndirectedGraph
+import org.jgrapht.graph.DefaultEdge
 
 object Messages {
   //message for synchronize
@@ -14,6 +16,7 @@ object Messages {
   //message for GraphActor
   case class MapElementMsg(line: String)
   case class GenerateGraphMsg()
+  case class SendGraphMsg(graph: UndirectedGraph[Vector2, DefaultEdge])
 
   //message for CharacterActor
   case class AskNeighboursMsg(character: BaseCharacter)

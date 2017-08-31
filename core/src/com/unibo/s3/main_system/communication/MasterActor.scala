@@ -23,6 +23,8 @@ class MasterActor extends UntypedAbstractActor {
       charactersList :+= characterRef
       SystemManager.getInstance().getLocalActor("quadTreeActor")
         .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
+      SystemManager.getInstance().getLocalActor("graphActor")
+        .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
     case _ => println("(worldActor) message unknown: " + message)
   }
 }
