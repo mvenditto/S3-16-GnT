@@ -66,11 +66,11 @@ public class GraphTest {
         SystemManager.getInstance().createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor");
 
         UndirectedGraph<Vector2, DefaultEdge> objectGraph = null;
-        try {
+        //try {
             objectGraph = GraphGenerator.createGraph("C:\\Users\\Sara\\Maps\\test");
-        } catch (Exception e) {
+        /*} catch (Exception e) {
             fail("EXCEPTION!!! " + e.getMessage());
-        }
+        }*/
     }
 
     /*@Test

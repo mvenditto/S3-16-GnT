@@ -9,39 +9,21 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Align;
 import com.unibo.s3.Main;
-import com.unibo.s3.main_system.util.ScaleUtils;
-import com.unibo.s3.main_system.world.actors.GetAllBodies;
-import scala.concurrent.Await;
-import scala.concurrent.Future;
-import scala.concurrent.duration.Duration;
-
-import javax.xml.soap.Text;
-
-import static com.unibo.s3.main_system.util.ScaleUtils.getPixelsPerMeter;
-import static com.unibo.s3.main_system.util.ScaleUtils.metersToPixels;
-import static com.unibo.s3.main_system.util.ScaleUtils.pixelsToMeters;
 
 public class MenuModule extends BasicModuleWithGui {
     private SpriteBatch textBatch;
     private World world;
     private BitmapFont font;
     private boolean enabled = true;
-    private boolean enableGrid = false;
-    private boolean bodyEditorEnabled = false;
-    private Vector2 topLeft = null;
-    private Vector2 delta = null;
 
     private int guardsNum = 5;
     private int thiefsNum = 1;
@@ -55,12 +37,11 @@ public class MenuModule extends BasicModuleWithGui {
         font = new BitmapFont();
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         font.getData().setScale(1.5f);
-        initGUI();
-
-        //ATTORI
+        initMenuGUI();
+        initSettingsGUI();
     }
 
-    private void initGUI() {
+    private void initSettingsGUI() {
         Table table = new Table();
 
         Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
@@ -102,6 +83,62 @@ public class MenuModule extends BasicModuleWithGui {
         });
 
         table.row();
+        String sim = "Simulated";
+        String pil = "Piloted";
+        TextButton buttonSimulation = new TextButton(sim, skin);
+        table.add(buttonSimulation);
+        buttonSimulation.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if(simulation)
+                    buttonSimulation.setText(sim);
+                else
+                    buttonSimulation.setText(pil);
+                simulation = !simulation;
+            }
+        });
+
+        table.row();
+        SelectBox<String> mapDimension = new SelectBox<String>(skin);
+        mapDimension.setItems("Ciao", "come", "va");
+        mapDimension.setSelected("come");
+        table.add(mapDimension);
+        mapDimension.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                System.out.println(mapDimension.getSelected());
+            }
+        });
+
+        table.row();
+        Button okButton = new TextButton("Ok", skin);
+        table.add(okButton);
+        okButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+            }
+        });
+
+        initialGUI.addActor(table);
+
+        table.setFillParent(false);
+        table.setPosition(100, Gdx.graphics.getHeight() - 120);
+    }
+
+    private void initMenuGUI() {
+        Table table = new Table();
+
+        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+
+        Label l = new Label("Menu",skin);
+        l.setColor(Color.GREEN);
+        table.add(l);
+
+        table.row();
+
+
+        table.row();
         String pauseString = "Pause";
         String startString = "Start";
         TextButton buttonPause = new TextButton(pauseString, skin);
@@ -122,31 +159,13 @@ public class MenuModule extends BasicModuleWithGui {
         table.add(buttonStop);
 
         table.row();
-        String sim = "Simulated";
-        String pil = "Piloted";
-        TextButton buttonSimulation = new TextButton(sim, skin);
-        table.add(buttonSimulation);
-        buttonSimulation.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if(simulation)
-                    buttonSimulation.setText(sim);
-                else
-                    buttonSimulation.setText(pil);
-                simulation = !simulation;
-            }
-        });
-
-        table.row();
         CheckBox debugView = new CheckBox(" View debug", skin);
         table.add(debugView);
 
-        gui.addActor(table);
+        menuGUI.addActor(table);
 
         table.setFillParent(false);
         table.setPosition(100, Gdx.graphics.getHeight() - 120);
-
-        //TODO add right buttons and widget
     }
 
     @Override
