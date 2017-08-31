@@ -21,7 +21,7 @@ object Messages {
 
   //message for CharacterActor
   case class AskNeighboursMsg()
-  case class SendNeighboursMsg(neighbours: util.List[ActorRef])
+  case class SendNeighboursMsg(neighbours: util.List[ActorRef])//rimettere liste scala non java
   case class SendCopInfoMsg(visitedVertices: util.List[Vector2]) //ci andranno le info che si devono scambiare i poliziotti
   case class SetupGraphMsg(graph: UndirectedGraph[Vector2, DefaultEdge])
 

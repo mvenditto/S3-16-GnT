@@ -32,6 +32,9 @@ public class ActorBasedCharacterTest extends ApplicationAdapter {
     private Vector2 v5 = new Vector2(7f,7f);
     private Vector2 currentVertex = v1;
 
+    private ActorRef copOne;
+    private ActorRef copTwo;
+    private ActorRef copThree;
 
     @Override
     public void create() {
@@ -62,39 +65,16 @@ public class ActorBasedCharacterTest extends ApplicationAdapter {
 
         ActorRef masterActor = SystemManager.getInstance().createActor(MasterActor.props(), "masterActor");
 
-        ActorRef copOne = SystemManager.getInstance().createActor
+        copOne = SystemManager.getInstance().createActor
                 (CharacterActor.props(new BaseCharacter(new Vector2(1,1),1)), "cop1");
-        ActorRef copTwo = SystemManager.getInstance()
+        copTwo = SystemManager.getInstance()
                 .createActor(CharacterActor.props(new BaseCharacter(new Vector2(7,7),2)), "cop2");
-        ActorRef copThree = SystemManager.getInstance()
+        copThree = SystemManager.getInstance()
                 .createActor(CharacterActor.props(new BaseCharacter(new Vector2(4,4),3)), "cop3");
 
         masterActor.tell(new Messages.ActMsg(0.016f), ActorRef.noSender());
 
-        copOne.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
-        copTwo.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
-        copThree.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
-
-        java.util.List<ActorRef> list = Arrays.asList(copTwo, copThree);
-        java.util.List<ActorRef> list2 = Arrays.asList(copOne);
-        java.util.List<ActorRef> list3 = Arrays.asList(copOne);
-
-        copOne.tell(new Messages.SendNeighboursMsg(list), ActorRef.noSender());
-        copTwo.tell(new Messages.SendNeighboursMsg(list2), ActorRef.noSender());
-        copThree.tell(new Messages.SendNeighboursMsg(list3), ActorRef.noSender());
-        //mapActor.tell(new GenerateMapMsg(), ActorRef.noSender());
-
-        /*
-        ActorRef copOne = SystemManager.getInstance().createActor
-                (CharacterActor.props(new BaseCharacter(new Vector2(1,1),1)), "cop1");
-        ActorRef copTwo = SystemManager.getInstance()
-                .createActor(CharacterActor.props(new BaseCharacter(new Vector2(2,2),2)), "cop2");
-        ActorRef copThree = SystemManager.getInstance()
-                .createActor(CharacterActor.props(new BaseCharacter(new Vector2(3,3),3)), "cop3");
-
-        quadTree.tell(new Messages.AskNeighboursMsg(), copOne);
-        quadTree.tell(new Messages.AskNeighboursMsg(), copTwo);
-        quadTree.tell(new Messages.AskNeighboursMsg(), copThree);*/
+        testInteraction();
     }
 
     @Override
@@ -110,5 +90,19 @@ public class ActorBasedCharacterTest extends ApplicationAdapter {
     public void dispose () {
         batch.dispose();
         img.dispose();
+    }
+
+    private void testInteraction(){
+        copOne.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
+        copTwo.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
+        copThree.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
+
+        java.util.List<ActorRef> list = Arrays.asList(copTwo, copThree);
+        java.util.List<ActorRef> list2 = Arrays.asList(copOne);
+        java.util.List<ActorRef> list3 = Arrays.asList(copOne);
+
+        copOne.tell(new Messages.SendNeighboursMsg(list), ActorRef.noSender());
+        copTwo.tell(new Messages.SendNeighboursMsg(list2), ActorRef.noSender());
+        copThree.tell(new Messages.SendNeighboursMsg(list3), ActorRef.noSender());
     }
 }

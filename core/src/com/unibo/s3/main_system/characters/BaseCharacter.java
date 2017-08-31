@@ -12,6 +12,7 @@ import org.jgrapht.graph.DefaultEdge;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 public class BaseCharacter extends BaseMovableEntity implements Character {
 
@@ -23,8 +24,9 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
     private Vector2 currentNode;
     private List<ActorRef> neighbours = new ArrayList<>();
     private List<Vector2> visited = new ArrayList<>();
-    private Vector2 defaultVertex = new Vector2(-1000, -1000); //start utility vertex
+   // private Vector2 defaultVertex = new Vector2(-1000, -1000); //start utility vertex
     private NeighborIndex index;
+    private Vector2 currentDestination;
 
     public BaseCharacter(Vector2 position, int id) {
         super(position);
@@ -50,6 +52,9 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
         this.graph = g;
         currentNode = computeInitialNearestNode();
         index = new NeighborIndex(graph);
+        currentDestination = selectRandomDestination();
+        System.out.println(log() + "my destination is " + currentDestination);
+        setNewDestination(currentDestination);
     }
 
     public Vector2 getCurrentNode() {
@@ -72,7 +77,13 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
 
     public void chooseBehaviour(){
 
-        System.out.println("Agent " + id + ": it's time to choose behaviour");
+        this.currentNode = computeNearest();
+        if (currentNode.equals(currentDestination)) {
+            System.out.println(log() + "Destination achieved! Choose the next one");
+        } else {
+            System.out.println(log() + "My destination is still " + currentDestination);
+        }
+
         //mi servono i miei vicini
         //guardo il grafo e ci penso
         //aggiorno la destinazione
@@ -119,12 +130,7 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
     public Vector2 computeNearest(){
         Vector2 nearest = currentNode;
         float minDistance = getPosition().dst2(new Vector2(nearest.x, nearest.y));
-        List<Vector2> list = new ArrayList<>();
-        if(currentNode.equals(defaultVertex)){
-            list.addAll(graph.vertexSet());
-        } else {
-            list = computeNeighbours();
-        }
+        List<Vector2> list = computeNeighbours();
         for(Vector2 v : list){
             float distance = (v.dst2(getPosition()));
             if(distance < minDistance){
@@ -153,7 +159,15 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
         return nearest;
     }
 
+    private Vector2 selectRandomDestination(){
+        return (Vector2) index.neighborListOf(currentNode).get(new Random().nextInt(index.neighborListOf(currentNode).size()));
+    }
+
     private void discoverNewVertex(Vector2 nearest){
         visited.add(nearest);
+    }
+
+    private String log(){
+        return "Agent " + id + ": ";
     }
 }
