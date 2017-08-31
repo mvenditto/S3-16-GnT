@@ -1,10 +1,9 @@
 package com.unibo.s3.main_system.modules
-import akka.actor.ActorRef
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.World
-import com.badlogic.gdx.scenes.scene2d.{Actor, InputEvent}
-import com.badlogic.gdx.scenes.scene2d.utils.{ChangeListener, ClickListener}
+import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.Main
@@ -58,6 +57,7 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
   private def createGui(): Unit = {
     VisUI.load()
     val w = new VisWindow(loadingDialogTitle)
+    w.setModal(true)
 
     startBtn = new VisTextButton("Start!", "blue")
     startBtn.setDisabled(true)

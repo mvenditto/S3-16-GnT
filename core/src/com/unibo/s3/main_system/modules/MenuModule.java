@@ -1,8 +1,5 @@
 package com.unibo.s3.main_system.modules;
 
-import akka.actor.ActorRef;
-import akka.util.Timeout;
-import akka.pattern.Patterns;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
@@ -16,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
 import com.unibo.s3.Main;
 
 public class MenuModule extends BasicModuleWithGui {
@@ -120,7 +116,7 @@ public class MenuModule extends BasicModuleWithGui {
             }
         });
 
-        initialGUI.addActor(table);
+        gui.addActor(table);
 
         table.setFillParent(false);
         table.setPosition(100, Gdx.graphics.getHeight() - 120);
