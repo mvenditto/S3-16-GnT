@@ -4,7 +4,7 @@ public class RoomMapGenerator extends AbstractMapGenerator {
 
     @Override
     public void generate(int n, int width, int height, int startX, int startY){
-        System.out.println(n + " Matrice " + width + "x" + height + " starting from " + startX + "," + startY);
+        //System.out.println(n + " Matrice " + width + "x" + height + " starting from " + startX + "," + startY);
         int lowerX = (width/2);
         int upperX = (width/2);
         int lowerY = (height/2);

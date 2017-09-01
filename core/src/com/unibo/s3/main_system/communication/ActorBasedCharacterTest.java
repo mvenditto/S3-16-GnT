@@ -93,15 +93,14 @@ public class ActorBasedCharacterTest extends ApplicationAdapter {
     }
 
     private void testDestination(){
-        copOne.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
-        copTwo.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
-        copThree.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
-
+        copOne.tell(new Messages.SendGraphMsg(testGraph), ActorRef.noSender());
+        copTwo.tell(new Messages.SendGraphMsg(testGraph), ActorRef.noSender());
+        copThree.tell(new Messages.SendGraphMsg(testGraph), ActorRef.noSender());
     }
 
 
     private void testInteraction(){
-        copOne.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
+    /*    copOne.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
         copTwo.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
         copThree.tell(new Messages.SetupGraphMsg(testGraph), ActorRef.noSender());
 
@@ -111,6 +110,6 @@ public class ActorBasedCharacterTest extends ApplicationAdapter {
 
         copOne.tell(new Messages.SendNeighboursMsg(list), ActorRef.noSender());
         copTwo.tell(new Messages.SendNeighboursMsg(list2), ActorRef.noSender());
-        copThree.tell(new Messages.SendNeighboursMsg(list3), ActorRef.noSender());
+        copThree.tell(new Messages.SendNeighboursMsg(list3), ActorRef.noSender());*/
     }
 }
