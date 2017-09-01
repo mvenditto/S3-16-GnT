@@ -1,11 +1,8 @@
 package com.unibo.s3.main_system.map;
 
-import com.badlogic.gdx.math.Vector2;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Stream;
 
 public abstract class AbstractMapGenerator implements MapGenerator{
 
@@ -25,7 +22,6 @@ public abstract class AbstractMapGenerator implements MapGenerator{
         for(int i = 0; i < WIDTH_SPLITS; i++){
             for (int j = 0; j < HEIGHT_SPLITS; j++){
                 if(maze[i][j] == 1){
-                    //System.out.println((i * BASE_UNIT + HALF_BASE_UNIT) + ":" + (j * BASE_UNIT + HALF_BASE_UNIT) + ":" + BASE_UNIT + ":" + BASE_UNIT);
                     map.add(((i * BASE_UNIT + HALF_BASE_UNIT) + BASE_UNIT) + SEPARATOR + ((j * BASE_UNIT + HALF_BASE_UNIT) + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + BASE_UNIT);
                 }
             }
@@ -37,11 +33,6 @@ public abstract class AbstractMapGenerator implements MapGenerator{
 
     private ArrayList<String> generatePerimeterWalls(){
         ArrayList<String> perimeter = new ArrayList<>();
-       // perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((HEIGHT_SPLITS * BASE_UNIT)/2 + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + BASE_UNIT);
-       // perimeter.add(((WIDTH_SPLITS * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + ((HEIGHT_SPLITS * BASE_UNIT)/2 + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + BASE_UNIT);
-       // perimeter.add(((WIDTH_SPLITS * BASE_UNIT)/2 + HALF_BASE_UNIT) + SEPARATOR + HALF_BASE_UNIT + SEPARATOR + BASE_UNIT + SEPARATOR + BASE_UNIT);
-       // perimeter.add(((WIDTH_SPLITS * BASE_UNIT)/2 + HALF_BASE_UNIT) + SEPARATOR + (HEIGHT_SPLITS * BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + BASE_UNIT);
-
         perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((HEIGHT_SPLITS * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * HEIGHT_SPLITS + BASE_UNIT));
         perimeter.add(((WIDTH_SPLITS * BASE_UNIT) + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + ((HEIGHT_SPLITS * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + (BASE_UNIT * HEIGHT_SPLITS + BASE_UNIT));
         perimeter.add(((WIDTH_SPLITS * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + HALF_BASE_UNIT + SEPARATOR + (BASE_UNIT * WIDTH_SPLITS + BASE_UNIT) + SEPARATOR + BASE_UNIT);
@@ -52,12 +43,10 @@ public abstract class AbstractMapGenerator implements MapGenerator{
 
     protected void buildWall(boolean orientation, int coord){
         if(orientation){ //vertical wall
-            //System.out.println("Build vertical wall in " + coord);
             for(int i = 0; i < WIDTH_SPLITS; i++){
                 this.maze[coord - 1][i] = 1;
             }
         } else{
-            //System.out.println("Build horizontal wall in " + coord);
             for(int i = 0; i < HEIGHT_SPLITS; i++){
                 this.maze[i][coord - 1] = 1;
             }
@@ -70,7 +59,6 @@ public abstract class AbstractMapGenerator implements MapGenerator{
             if (stop > HEIGHT_SPLITS){
                 stop = HEIGHT_SPLITS;
             }
-            //System.out.println("Build vertical wall in " + coord + " from " + start + " to " + stop);
             for(int i = start; i < stop; i++){
                 this.maze[coordinate][i] = 1;
             }
@@ -78,17 +66,13 @@ public abstract class AbstractMapGenerator implements MapGenerator{
             if (stop > WIDTH_SPLITS){
                 stop = WIDTH_SPLITS;
             }
-          //  System.out.println("Build horizontal wall in " + coord + " from " + start + " to " + stop);
             for(int i = start; i < stop; i++){
                 this.maze[i][coordinate] = 1;
             }
         }
     }
 
-    protected void buildDoor(int x, int y){
-        //System.out.println("Building hole in " + x + "," + y);
-        maze[x][y] = 0;
-    }
+    protected void buildDoor(int x, int y){ maze[x][y] = 0; }
 
     /**true vertical, false horizontal**/
     protected boolean getVerticalOrHorizontal(){

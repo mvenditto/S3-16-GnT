@@ -4,13 +4,10 @@ public class RoomMapGenerator extends AbstractMapGenerator {
 
     @Override
     public void generate(int n, int width, int height, int startX, int startY){
-        //System.out.println(n + " Matrice " + width + "x" + height + " starting from " + startX + "," + startY);
         int lowerX = (width/2);
         int upperX = (width/2);
         int lowerY = (height/2);
         int upperY = (height/2);
-        //System.out.println("V  range is " + width + " good value between " + lowerX + " and " + upperX);
-        //System.out.println("H  range is " + height + " good value between " + lowerY + " and " + upperY);
         width--;
         height--;
         /**relative position, not absolute*/
@@ -24,9 +21,6 @@ public class RoomMapGenerator extends AbstractMapGenerator {
         }
         int door3Coord = generateInRange(startY + 1, startY + wallH - 1);
         door2Coord = generateInRange(startX + wallV + 1, startX + width);
-       // System.out.println("First door " + (startX + wallV) + "," + door1Coord);
-       // System.out.println("Second door " + door2Coord + "," + (startY + wallH));
-       // System.out.println("Third door " + (startX + wallV) + "," + door3Coord);
 
         if(isHorizontalWallDenied(startY + wallH, startX, startX+width+1)){
             buildWallWithRange(false, startY + wallH, startX + 1, startX+width);

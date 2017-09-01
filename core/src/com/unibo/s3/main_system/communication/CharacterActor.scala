@@ -23,6 +23,7 @@ class CharacterActor(private[this] val character: BaseCharacter) extends Untyped
       msg.neighbours.foreach(neighbour => neighbour.tell(SendCopInfoMsg(character.getInformations.toList), getSelf()))
       //msg.neighbours.foreach(neighbour => character.addNeighbour(neighbour))
       msg.neighbours.filter(neighbour => !character.getNeighbours.contains(neighbour)).foreach(neighbour => character.addNeighbour(neighbour))
+      println("cop: " + getSelf() + "| I have " + msg.neighbours.size + " neighbours: " + character.getNeighbours)
 
     case msg: SendCopInfoMsg =>
       println("cop: " + getSelf() + "| info from: " + getSender() + ", visited vertices: " + msg.visitedVertices)
