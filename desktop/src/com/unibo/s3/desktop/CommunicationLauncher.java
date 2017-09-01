@@ -2,6 +2,7 @@ package com.unibo.s3.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.unibo.s3.main_system.communication.AgentsTest;
 import com.unibo.s3.main_system.communication.CommunicationTest;
 
 
@@ -13,5 +14,6 @@ public class CommunicationLauncher {
         config.samples = 4;
         config.vSyncEnabled = true;
         new LwjglApplication(new CommunicationTest(), config);
+        //new LwjglApplication(new AgentTest(), config); test sugli agenti
     }
 }
