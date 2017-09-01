@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.kotcrab.vis.ui.widget.{VisSelectBox, VisTextButton, VisWindow}
-import com.unibo.s3.main_system.communication.Messages.{ActMsg, GenerateGraphMsg, GenerateMapMsg}
+import com.unibo.s3.main_system.communication.Messages.{ActMsg, GenerateGraphMsg, GenerateMapMsg, MapSettingsMsg}
 import com.unibo.s3.main_system.communication.SystemManager
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig}
@@ -82,6 +82,7 @@ class GraphMapTest extends BaseSample {
     initBtn.addListener(new ClickListener {
       override def clicked(event: InputEvent, x: Float, y: Float): Unit = {
         super.clicked(event, x, y)
+        mapActor ! MapSettingsMsg(20, 20)
         mapActor ! GenerateMapMsg()
       }
     })

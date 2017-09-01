@@ -45,7 +45,7 @@ public abstract class AbstractMapGenerator implements MapGenerator{
 
         /**todo verificare se sono corretti i nuovi bordi*/
         perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((HEIGHT_SPLITS * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * HEIGHT_SPLITS + BASE_UNIT));
-        perimeter.add(((WIDTH_SPLITS * BASE_UNIT) + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + ((HEIGHT_SPLITS * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + BASE_UNIT * HEIGHT_SPLITS + BASE_UNIT);
+        perimeter.add(((WIDTH_SPLITS * BASE_UNIT) + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + ((HEIGHT_SPLITS * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + (BASE_UNIT * HEIGHT_SPLITS + BASE_UNIT));
         perimeter.add(((WIDTH_SPLITS * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + HALF_BASE_UNIT + SEPARATOR + (BASE_UNIT * WIDTH_SPLITS + BASE_UNIT) + SEPARATOR + BASE_UNIT);
         perimeter.add(((WIDTH_SPLITS * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + (HEIGHT_SPLITS * BASE_UNIT + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + (BASE_UNIT * WIDTH_SPLITS + BASE_UNIT + SEPARATOR + BASE_UNIT));
 
@@ -100,6 +100,7 @@ public abstract class AbstractMapGenerator implements MapGenerator{
     protected int generateInRange(int lowerBound, int upperbound){
         int out = -1;
         while(out < lowerBound){
+            //System.out.println("bound: " + lowerBound);
             out = new Random().nextInt(upperbound+1);
         }
         return out;

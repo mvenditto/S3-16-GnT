@@ -35,7 +35,7 @@ public class CommunicationTest extends ApplicationAdapter {
         ActorRef mapActor = SystemManager.getInstance().getLocalActor("mapActor");
         ActorRef graphActor = SystemManager.getInstance().getLocalActor("graphActor");
         ActorRef quadTreeActor = SystemManager.getInstance().getLocalActor("quadTreeActor");
-
+/*todo correggi dimensioni mappa*/
         mapActor.tell(new Messages.MapSettingsMsg(20, 20), ActorRef.noSender());
         graphActor.tell(new Messages.MapSettingsMsg(60, 60), ActorRef.noSender());
         quadTreeActor.tell(new Messages.MapSettingsMsg(60, 60), ActorRef.noSender());
