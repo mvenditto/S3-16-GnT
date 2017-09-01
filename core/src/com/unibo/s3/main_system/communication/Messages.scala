@@ -25,7 +25,7 @@ object Messages {
   case class SendCopInfoMsg() //ci andranno le info che si devono scambiare i poliziotti
 
   //message for MasterActor
-  case class RebuildQuadTreeMsg(characterList: Iterable[BaseCharacter])
+  case class RebuildQuadTreeMsg()
   case class CreateCharacterMsg(position: Vector2)
   case class InitialSavingCharacterMsg(newCharacter: BaseCharacter, characterRef: ActorRef)
 }
