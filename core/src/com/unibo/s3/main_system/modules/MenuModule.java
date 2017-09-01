@@ -13,7 +13,12 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
+import com.kotcrab.vis.ui.VisUI;
+import com.kotcrab.vis.ui.widget.*;
 import com.unibo.s3.Main;
+
+import java.util.HashMap;
 
 public class MenuModule extends BasicModuleWithGui {
     private SpriteBatch textBatch;
@@ -33,27 +38,39 @@ public class MenuModule extends BasicModuleWithGui {
         font = new BitmapFont();
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         font.getData().setScale(1.5f);
-        initMenuGUI();
+        VisUI.load();
+        //initMenuGUI();
         initSettingsGUI();
     }
 
     private void initSettingsGUI() {
-        Table table = new Table();
+        VisWindow table = new VisWindow("Settings");
+        //table.setDebug(true);
+        table.setMovable(false);
+        Label title = table.getTitleLabel();
+        title.setColor(Color.GREEN);
+        System.out.println("align = " + title.getLabelAlign());
+        title.setAlignment(Align.center);
+        /*table.setWidth(Gdx.graphics.getWidth());
+        table.setHeight(Gdx.graphics.getHeight());*/
+        /*table.setKeepWithinParent(false);
+        table.setKeepWithinStage(false);*/
 
-        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-        Label l = new Label("Menu",skin);
+        /*VisLabel l = new VisLabel("Menu");
         l.setColor(Color.GREEN);
-        table.add(l);
+        table.add(l);*/
 
         table.row();
-        Slider guardsNumS = new Slider(2f, 20f, 1f, false, skin);
+        VisSlider guardsNumS = new VisSlider(2f, 20f, 1f, false);
         guardsNumS.setValue(this.guardsNum);
-        Label labGuardsNum = new Label(" " + String.format("%02d", (int) guardsNumS.getValue()), skin);
-        table.add(new Label("Guards number: ", skin));
+        VisLabel labGuardsNum = new VisLabel(" " + String.format("%02d", (int) guardsNumS.getValue()));
+        table.add(new VisLabel("Guards number: "));
         table.row();
-        table.add(guardsNumS);
-        table.add(labGuardsNum);
+        VisTable tableGuardum = new VisTable();
+        tableGuardum.add(guardsNumS).padLeft(10);
+        tableGuardum.add(labGuardsNum).padRight(10).padLeft(5);
+        table.add(tableGuardum);
         guardsNumS.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -63,13 +80,15 @@ public class MenuModule extends BasicModuleWithGui {
         });
 
         table.row();
-        Slider thiefsNumS = new Slider(1f, 20f, 1f, false, skin);
+        VisSlider thiefsNumS = new VisSlider(1f, 20f, 1f, false);
         thiefsNumS.setValue(this.thiefsNum);
-        Label labThiefsNum = new Label(" " + String.format("%02d", (int) thiefsNumS.getValue()), skin);
-        table.add(new Label("Thiefs number: ", skin));
+        VisLabel labThiefsNum = new VisLabel(" " + String.format("%02d", (int) thiefsNumS.getValue()));
+        table.add(new VisLabel("Thiefs number: ")).padTop(10);
         table.row();
-        table.add(thiefsNumS);
-        table.add(labThiefsNum);
+        VisTable tableThiefsNum = new VisTable();
+        tableThiefsNum.add(thiefsNumS);
+        tableThiefsNum.add(labThiefsNum);
+        table.add(tableThiefsNum);
         thiefsNumS.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -79,66 +98,92 @@ public class MenuModule extends BasicModuleWithGui {
         });
 
         table.row();
-        String sim = "Simulated";
-        String pil = "Piloted";
-        TextButton buttonSimulation = new TextButton(sim, skin);
-        table.add(buttonSimulation);
-        buttonSimulation.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if(simulation)
-                    buttonSimulation.setText(sim);
-                else
-                    buttonSimulation.setText(pil);
-                simulation = !simulation;
-            }
-        });
+        /*table.add(new VisLabel("Map tipe: "));
+        table.row();*/
+        VisTable tableThiefType = new VisTable();
+        ButtonGroup<VisRadioButton> group = new ButtonGroup<>();
+        VisRadioButton simThief = new VisRadioButton("Simulated");
+        group.add(simThief);
+        VisRadioButton pilThief = new VisRadioButton("Piloted");
+        group.add(pilThief);
+        tableThiefType.add(new VisLabel("Thief type: "));
+        tableThiefType.add(simThief).padRight(5);
+        tableThiefType.add(pilThief).padLeft(5);
+        table.add(tableThiefType).padTop(10).padLeft(5).padRight(5);
 
+        //60x60, 80x60
         table.row();
-        SelectBox<String> mapDimension = new SelectBox<String>(skin);
-        mapDimension.setItems("Ciao", "come", "va");
-        mapDimension.setSelected("come");
-        table.add(mapDimension);
+        VisTable tableMapDimension = new VisTable();
+
+        int numDimension = 2;
+        String[] dimensionS = new String[numDimension];
+        Integer[][] dimensionI = new Integer[numDimension][2];
+        dimensionS[0] = "60x60";
+        dimensionI[0][0] = 60;
+        dimensionI[0][1] = 60;
+
+        dimensionS[1] = "80x60";
+        dimensionI[1][0] = 80;
+        dimensionI[1][1] = 60;
+
+        VisSelectBox<String> mapDimension = new VisSelectBox<>();
+        mapDimension.setItems(dimensionS);
+        tableMapDimension.add(new VisLabel("Map dimensions: "));
+        tableMapDimension.add(mapDimension);
+        table.add(tableMapDimension).padTop(10);
         mapDimension.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                System.out.println(mapDimension.getSelected());
+                int indexSelected = mapDimension.getSelectedIndex();
+                System.out.println(dimensionI[indexSelected][0] + "x" + dimensionI[indexSelected][1]);
             }
         });
 
+        //labirinto: maze - stanze: rooms
         table.row();
-        Button okButton = new TextButton("Ok", skin);
-        table.add(okButton);
+        /*table.add(new VisLabel("Map tipe: "));
+        table.row();*/
+        VisTable tableMapType = new VisTable();
+        ButtonGroup<VisRadioButton> groupMaps = new ButtonGroup<>();
+        VisRadioButton mazeCheck = new VisRadioButton("Maze");
+        groupMaps.add(mazeCheck);
+        VisRadioButton roomCheck = new VisRadioButton("Rooms");
+        groupMaps.add(roomCheck);
+        tableMapType.add(new VisLabel("Map type: "));
+        tableMapType.add(mazeCheck).padRight(5);
+        tableMapType.add(roomCheck).padLeft(5);
+        table.add(tableMapType).padTop(10);
+
+        table.row();
+        VisTextButton okButton = new VisTextButton("Start");
+        table.add(okButton).padTop(10).padBottom(10);
         okButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
             }
         });
+        table.pack();
 
-        gui.addActor(table);
+        GUI.addActor(table);
 
-        table.setFillParent(false);
-        table.setPosition(100, Gdx.graphics.getHeight() - 120);
+        table.centerWindow();
+        //table.setPosition((Gdx.graphics.getWidth()/2)-(table.getWidth()/2), (Gdx.graphics.getHeight()/2)-(table.getHeight()/2));
     }
 
     private void initMenuGUI() {
-        Table table = new Table();
-
-        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
-
-        Label l = new Label("Menu",skin);
-        l.setColor(Color.GREEN);
-        table.add(l);
-
-        table.row();
-
+        VisWindow table = new VisWindow("Menu");
+        //table.setDebug(true);
+        table.setMovable(false);
+        Label title = table.getTitleLabel();
+        title.setColor(Color.GREEN);
+        title.setAlignment(Align.center);
 
         table.row();
         String pauseString = "Pause";
         String startString = "Start";
-        TextButton buttonPause = new TextButton(pauseString, skin);
-        table.add(buttonPause);
+        VisTextButton buttonPause = new VisTextButton(pauseString);
+        table.add(buttonPause).padTop(10);
         buttonPause.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -151,17 +196,17 @@ public class MenuModule extends BasicModuleWithGui {
         });
 
         table.row();
-        Button buttonStop = new TextButton("STOP", skin);
-        table.add(buttonStop);
+        VisTextButton buttonStop = new VisTextButton("STOP");
+        table.add(buttonStop).padTop(10);
 
         table.row();
-        CheckBox debugView = new CheckBox(" View debug", skin);
-        table.add(debugView);
+        VisCheckBox debugView = new VisCheckBox(" View debug");
+        table.add(debugView).padTop(10).padBottom(10).padLeft(10).padRight(10);
 
-        menuGUI.addActor(table);
+        GUI.addActor(table);
 
-        table.setFillParent(false);
-        table.setPosition(100, Gdx.graphics.getHeight() - 120);
+        table.pack();
+        table.setPosition(50, Gdx.graphics.getHeight() - 200);
     }
 
     @Override

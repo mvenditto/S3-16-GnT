@@ -7,47 +7,46 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.unibo.s3.InputProcessorAdapter;
 import com.unibo.s3.Main;
 
-public abstract class BasicModuleWithGui implements BasicModule, InputProcessorAdapter {
+public class BasicModuleWithGui implements BasicModule, InputProcessorAdapter {
     protected Main owner;
-    protected Stage gui, menuGUI;
+    protected Stage GUI;
     private boolean guiEnabled = true;
     private boolean enabled = true;
 
     @Override
     public void init(Main owner) {
         this.owner = owner;
-        this.gui = new Stage(new ScreenViewport());
-        this.menuGUI = new Stage(new ScreenViewport());
+        this.GUI = new Stage(new ScreenViewport());
     }
 
     @Override
     public void renderGui() {
-        gui.draw();
+        GUI.draw();
     }
 
     @Override
     public void update(float dt) {
-        gui.act(dt);
+        GUI.act(dt);
     }
 
     @Override
     public void resize(int newWidth, int newHeight) {
-        gui.getViewport().update(newWidth, newHeight, true);
+        GUI.getViewport().update(newWidth, newHeight, true);
     }
 
     @Override
     public void attachInputProcessors(InputMultiplexer inputMultiplexer) {
-        inputMultiplexer.addProcessor(this.gui);
+        inputMultiplexer.addProcessor(this.GUI);
     }
 
     @Override
     public void enable(boolean enabled) {
-        this.enabled = enabled;
+
     }
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return false;
     }
 
     @Override
@@ -57,6 +56,6 @@ public abstract class BasicModuleWithGui implements BasicModule, InputProcessorA
 
     @Override
     public void cleanup() {
-        gui.dispose();
+        GUI.dispose();
     }
 }

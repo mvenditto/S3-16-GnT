@@ -46,14 +46,13 @@ public class GraphGenerator {
         return new Vector2(x, y);
     }
 
-    public static UndirectedGraph<Vector2, DefaultEdge> createGraph(String mapFilename) {
+    public static UndirectedGraph<Vector2, DefaultEdge> createGraph(int width, int height, String mapFilename) {
         ActorRef worldActor = SystemManager.getInstance().getLocalActor("worldActor");
         RaycastCollisionDetector<Vector2> collisionDetector = new Box2dProxyDetectorsFactory(worldActor).newRaycastCollisionDetector();
         HashMap<Vector2, Vector2> walls = new HashMap<>();
-        Integer[][] grid = new Integer[60][60];
+        Integer[][] grid = new Integer[width+6][height+6];
+        log("genero il grafo di dimensione: " + width + ", " + height);
         Cronometer cron = new Cronometer();
-
-
 
         cron.start();
 
@@ -86,8 +85,8 @@ public class GraphGenerator {
         Cronometer cron = new Cronometer();
         cron.start();
 
-        checkUnconnectedNodes(graph, collisionDetector);
-        //concurrentCheckUnconnectedNodes(graph, collisionDetector);
+        //checkUnconnectedNodes(graph, collisionDetector);
+        concurrentCheckUnconnectedNodes(graph, collisionDetector);
         cron.stop();
 
         log("A controllare i nodi staccati ci ha messo: " + cron.getTime());
@@ -115,6 +114,7 @@ public class GraphGenerator {
             }
         }
 
+        log("Finito");
         executor.shutdown();
     }
 
