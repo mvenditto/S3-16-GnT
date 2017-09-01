@@ -1,34 +1,31 @@
 package com.unibo.s3.main_system.communication
 
-import akka.actor.{ActorRef, Props, UntypedAbstractActor}
+import akka.actor.{Props, UntypedAbstractActor}
+import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.communication.Messages._
+import org.jgrapht.UndirectedGraph
+import org.jgrapht.graph.DefaultEdge
 
-import scala.collection.JavaConversions.asScalaBuffer
-import scala.collection.JavaConverters._
+class CharacterActor(private[this] val character: BaseCharacter) extends UntypedAbstractActor {
 
-class CharacterActor(val character: BaseCharacter) extends UntypedAbstractActor {
+  private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _
 
-  //grafo in qualche struttura
-
-  //BaseCharacter incapsulato
 
   override def onReceive(message: Any): Unit = message match {
     case _: ActMsg =>
-      SystemManager.getInstance().getLocalActor("quadTreeActor").tell(AskNeighboursMsg(), getSelf())
+      SystemManager.getInstance().getLocalActor("quadTreeActor").tell(AskNeighboursMsg(this.character), getSelf())
     case msg: SendNeighboursMsg =>
-      msg.neighbours.foreach(neighbour => neighbour.tell(SendCopInfoMsg(character.getInformations), getSelf()))
-      //msg.neighbours.foreach(neighbour => character.addNeighbour(neighbour))
-      msg.neighbours.filter(neighbour => !character.getNeighbours.contains(neighbour)).foreach(neighbour => character.addNeighbour(neighbour))
-      println("cop: " + getSelf() + "| I have " + msg.neighbours.size() + " neighbours: " + character.getNeighbours)
+      msg.neighbours.foreach(neighbour => neighbour.tell(SendCopInfoMsg(), getSelf()))
+      //dico sotto i vicini
     case msg: SendCopInfoMsg =>
-      println("cop: " + getSelf() + "| info from: " + getSender() + ", visited vertices: " + msg.visitedVertices)
-      character.updateGraph(msg.visitedVertices)
-      println("cop: " + getSelf() + " known vertices: " + character.getInformations)
+      println("cop: " + getSelf() + "| info from: " + getSender())
       //qui ho le info dell'altro poliziotto quindi poi posso fare quello che devo
-    case msg: SetupGraphMsg =>
-      println("cop: " + getSelf() + "| received graph")
-      character.setGraph(msg.graph)
+
+    //case ricevo grafo iniziale => salvo grafo iniziale
+    //case
+    case msg: SendGraphMsg=>
+      this.graph = msg.graph
     case _ => println("(characterActor) message unknown:" + message)
   }
 }

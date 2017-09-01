@@ -2,13 +2,13 @@ package com.unibo.s3.main_system.communication
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import com.unibo.s3.main_system.characters.EntitiesSystemImpl
-import com.unibo.s3.main_system.communication.Messages.{ActMsg, CreateCharacterMsg, InitialSavingCharacter, RebuildQuadTreeMsg}
+import com.unibo.s3.main_system.communication.Messages.{ActMsg, CreateCharacterMsg, InitialSavingCharacterMsg, RebuildQuadTreeMsg}
 
 class MasterActor extends UntypedAbstractActor {
 
-  var charactersList = List[ActorRef]()
-  val entitiesSystem = new EntitiesSystemImpl()
-  var copID = 0
+  private[this] var charactersList = List[ActorRef]()
+  private[this] val entitiesSystem = new EntitiesSystemImpl()
+  private[this] var copID = 0
 
   override def onReceive(message: Any): Unit = message match {
     case msg: ActMsg =>
@@ -22,7 +22,9 @@ class MasterActor extends UntypedAbstractActor {
       val characterRef = SystemManager.getInstance().createActor(CharacterActor.props(newCharacter), "cop"+copID)
       charactersList :+= characterRef
       SystemManager.getInstance().getLocalActor("quadTreeActor")
-        .tell(InitialSavingCharacter(newCharacter, characterRef), getSelf())
+        .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
+      SystemManager.getInstance().getLocalActor("graphActor")
+        .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
     case _ => println("(worldActor) message unknown: " + message)
   }
 }

@@ -1,7 +1,5 @@
 package com.unibo.s3.main_system.communication
 
-import java.util
-
 import akka.actor.ActorRef
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.BaseCharacter
@@ -13,20 +11,21 @@ object Messages {
   case class ActMsg(dt: Float)
 
   //message for MapActor
-  case class GenerateMapMsg() //ci andranno le info per generare la mappa(width: int, height: int, campo per decidere il tipo di grafo)
+  case class MapSettingsMsg(width: Int, height: Int)
+  case class GenerateMapMsg() //ci va un flag con la tipologia di grafo
 
   //message for GraphActor
   case class MapElementMsg(line: String)
   case class GenerateGraphMsg()
+  case class SendGraphMsg(graph: UndirectedGraph[Vector2, DefaultEdge])
 
   //message for CharacterActor
-  case class AskNeighboursMsg()
-  case class SendNeighboursMsg(neighbours: util.List[ActorRef])//rimettere liste scala non java
-  case class SendCopInfoMsg(visitedVertices: util.List[Vector2]) //ci andranno le info che si devono scambiare i poliziotti
-  case class SetupGraphMsg(graph: UndirectedGraph[Vector2, DefaultEdge])
+  case class AskNeighboursMsg(character: BaseCharacter)
+  case class SendNeighboursMsg(neighbours: List[ActorRef])
+  case class SendCopInfoMsg() //ci andranno le info che si devono scambiare i poliziotti
 
   //message for MasterActor
   case class RebuildQuadTreeMsg(characterList: Iterable[BaseCharacter])
   case class CreateCharacterMsg(position: Vector2)
-  case class InitialSavingCharacter(newCharacter: BaseCharacter, characterRef: ActorRef)
+  case class InitialSavingCharacterMsg(newCharacter: BaseCharacter, characterRef: ActorRef)
 }
