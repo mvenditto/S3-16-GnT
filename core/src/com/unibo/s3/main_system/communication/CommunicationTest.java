@@ -37,8 +37,8 @@ public class CommunicationTest extends ApplicationAdapter {
         ActorRef quadTreeActor = SystemManager.getInstance().getLocalActor("quadTreeActor");
 
         mapActor.tell(new Messages.MapSettingsMsg(20, 20), ActorRef.noSender());
-        graphActor.tell(new Messages.MapSettingsMsg(20, 20), ActorRef.noSender());
-        quadTreeActor.tell(new Messages.MapSettingsMsg(20, 20), ActorRef.noSender());
+        graphActor.tell(new Messages.MapSettingsMsg(60, 60), ActorRef.noSender());
+        quadTreeActor.tell(new Messages.MapSettingsMsg(60, 60), ActorRef.noSender());
 
         try {
             Thread.sleep(500);

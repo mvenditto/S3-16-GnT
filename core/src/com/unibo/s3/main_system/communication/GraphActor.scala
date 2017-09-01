@@ -15,13 +15,15 @@ class GraphActor extends  UntypedAbstractActor {
   private[this] val FILEPATH = "maps/map.txt" //ci va il percorso del file dove salvare la mappa(Sara)
   private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _
   private[this] val graphManager = new GraphManagerImpl()
+  private[this] var width, height: Int = _
 
   private[this] val file: FileHandle = Gdx.files.local(FILEPATH)
   file.writeString("", false)
 
   override def onReceive(message: Any): Unit = message match {
     case msg: MapSettingsMsg =>
-      //memorizzare(nel graphActor o nella classe sotto) le dimensioni
+      this.width = msg.width
+      this.height = msg.height
     case msg: MapElementMsg =>
       val verifyClose = msg.line.split(":").map(_.toFloat)
       def writeFunction(verifyClose: Array[Float]): Unit = verifyClose match {
@@ -31,7 +33,7 @@ class GraphActor extends  UntypedAbstractActor {
       }
       writeFunction(verifyClose)
     case _: GenerateGraphMsg =>
-      this.graph = graphManager.createGraph(FILEPATH)
+      this.graph = graphManager.createGraph(this.width, this.height, FILEPATH)
       //GraphGenerator.createGraph("C:\\Users\\Sara\\Maps\\test.txt");
       sender ! graph
       //qui ho il file con la mappa, bisogna generare il grafo(Sara)
