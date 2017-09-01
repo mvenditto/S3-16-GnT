@@ -15,7 +15,7 @@ class GraphActor extends  UntypedAbstractActor {
   private[this] val FILEPATH = "maps/outputGraphActor.txt" //ci va il percorso del file dove salvare la mappa(Sara)
   private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _
 
-  private[this] val file: FileHandle = Gdx.files.local(FILEPATH)
+  val file: FileHandle = Gdx.files.local(FILEPATH)
   file.writeString("", false)
 
   override def onReceive(message: Any): Unit = message match {
