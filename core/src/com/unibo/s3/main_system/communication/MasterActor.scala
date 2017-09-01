@@ -13,7 +13,7 @@ class MasterActor extends UntypedAbstractActor {
   override def onReceive(message: Any): Unit = message match {
     case msg: ActMsg =>
       SystemManager.getInstance().getLocalActor("worldActor").tell(msg, getSelf())
-      //SystemManager.getInstance().getLocalActor("quadTreeActor").tell(RebuildQuadTreeMsg(), getSelf())
+      SystemManager.getInstance().getLocalActor("quadTreeActor").tell(RebuildQuadTreeMsg(), getSelf())
       charactersList.foreach(cop => cop.tell(msg, getSelf()))
       //manca il ladro o i ladri
     case msg: CreateCharacterMsg =>
