@@ -26,11 +26,11 @@ public abstract class AbstractMapGenerator implements MapGenerator{
             for (int j = 0; j < HEIGHT_SPLITS; j++){
                 if(maze[i][j] == 1){
                     //System.out.println((i * BASE_UNIT + HALF_BASE_UNIT) + ":" + (j * BASE_UNIT + HALF_BASE_UNIT) + ":" + BASE_UNIT + ":" + BASE_UNIT);
-                    map.add((i * BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + (j * BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + BASE_UNIT);
+                    map.add(((i * BASE_UNIT + HALF_BASE_UNIT) + BASE_UNIT) + SEPARATOR + ((j * BASE_UNIT + HALF_BASE_UNIT) + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + BASE_UNIT);
                 }
             }
         }
-       // map.addAll(generatePerimeterWalls());
+        map.addAll(generatePerimeterWalls());
         map.add(END_OF_FILE);
         return map;
     }
