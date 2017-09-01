@@ -3,8 +3,6 @@ package com.unibo.s3.main_system.modules
 import java.util
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
-import akka.pattern.ask
-import akka.util.Timeout
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.{Rectangle, Vector2}
@@ -17,10 +15,6 @@ import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingC
 import com.unibo.s3.main_system.util.ScaleUtils
 import org.jgrapht.alg.NeighborIndex
 import org.jgrapht.graph.DefaultEdge
-
-import scala.concurrent.Await
-import scala.concurrent.duration._
-
 
 class MasterModule extends BasicModuleWithGui {
 
@@ -37,7 +31,6 @@ class MasterModule extends BasicModuleWithGui {
         characters = Option(_characters)
 
       case SendGraphMsg(g) =>
-        println("receive graph!")
         graph = Option(new GraphAdapter[Vector2] {
           override def getNeighbors(vertex: Vector2): util.Iterator[Vector2] = {
             new NeighborIndex[Vector2, DefaultEdge](g)
@@ -92,6 +85,7 @@ class MasterModule extends BasicModuleWithGui {
 
     List(graphActor, quadTreeActor).foreach(a =>
       a ! MapSettingsMsg(60, 60))
+
     mapActor ! MapSettingsMsg(20, 20)
 
     mapActor ! GenerateMapMsg()
