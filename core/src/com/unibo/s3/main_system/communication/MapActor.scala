@@ -15,9 +15,10 @@ class MapActor extends UntypedAbstractActor {
   private[this] var mapHeight: Int = _
 
   override def onReceive(message: Any): Unit = message match {
-    case msg: MapSettingsMsg =>
-      this.mapWidth = msg.width
-      this.mapHeight = msg.height
+    case MapSettingsMsg(w, h) =>
+      this.mapWidth = w
+      this.mapHeight = h
+
     case _: GenerateMapMsg =>
       this.mapGenerator.generate(8, this.mapWidth, this.mapHeight, 0, 0) //valori da decidere una volta decise le dimensioni possibili per la mappa
       this.mapGenerator.getMap.foreach(line => SystemManager.getInstance().getLocalActor("graphActor").tell(MapElementMsg(line), getSelf()))

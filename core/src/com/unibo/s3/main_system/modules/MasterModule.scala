@@ -1,24 +1,24 @@
 package com.unibo.s3.main_system.modules
+
 import java.util
 
-import akka.actor.{Actor, ActorRef, Props, UntypedAbstractActor}
+import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import akka.pattern.ask
 import akka.util.Timeout
-import com.badlogic.gdx.{Gdx, InputMultiplexer}
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.{Rectangle, Vector2}
+import com.badlogic.gdx.{Gdx, InputMultiplexer}
 import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.communication.Messages._
-import com.unibo.s3.main_system.communication.{Messages, QuadTreeActor, SystemManager}
+import com.unibo.s3.main_system.communication.SystemManager
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig}
 import com.unibo.s3.main_system.util.ScaleUtils
-import org.jgrapht.UndirectedGraph
 import org.jgrapht.alg.NeighborIndex
 import org.jgrapht.graph.DefaultEdge
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 import scala.concurrent.duration._
 
 
@@ -29,7 +29,11 @@ class MasterModule extends BasicModuleWithGui {
   class GraphReceiverActor extends UntypedAbstractActor {
 
     override def onReceive(message: Any): Unit = message match {
-      case g: UndirectedGraph[Vector2, DefaultEdge] =>
+
+      case i: Int => println(i)
+
+      case SendGraphMsg(g) =>
+        println("receive graph!")
         graph = Option(new GraphAdapter[Vector2] {
           override def getNeighbors(vertex: Vector2): util.Iterator[Vector2] = {
             new NeighborIndex[Vector2, DefaultEdge](g)
@@ -37,11 +41,12 @@ class MasterModule extends BasicModuleWithGui {
           }
           override def getVertices: util.Iterator[Vector2] = g.vertexSet.iterator
         })
+        cacheMap()
     }
   }
 
   object GraphReceiverActor {
-    def props(): Props = Props(new GraphReceiverActor())
+    def props() : Props = Props(new GraphReceiverActor())
   }
 
   private[this] var masterActor: ActorRef = _
@@ -49,7 +54,7 @@ class MasterModule extends BasicModuleWithGui {
   private[this] var mapActor: ActorRef = _
   private[this] var graphActor: ActorRef = _
   private[this] var quadTreeActor: ActorRef = _
-  private[this] var dummyActor: ActorRef = _
+  private[this] var graphReceiverActor: ActorRef = _
 
   private[this] val renderer = new GeometryRendererImpl()
   private[this] val graphRenderingConfig = GraphRenderingConfig(Color.GREEN, Color.YELLOW, 0.5f)
@@ -78,20 +83,15 @@ class MasterModule extends BasicModuleWithGui {
     worldActor = getActor(GameActors.World)
     quadTreeActor = getActor(GameActors.QuadTree)
     graphActor = getActor(GameActors.Graph)
-    dummyActor = SystemManager.getInstance()
+    graphReceiverActor = SystemManager.getInstance()
       .createActor(GraphReceiverActor.props(), "dummy")
 
-    List(mapActor, graphActor, quadTreeActor).foreach(a =>
-      a ! Messages.MapSettingsMsg(20, 20))
+    List(graphActor, quadTreeActor).foreach(a =>
+      a ! MapSettingsMsg(60, 60))
+    mapActor ! MapSettingsMsg(20, 20)
 
     mapActor ! GenerateMapMsg()
-
-    graphActor tell(GenerateGraphMsg(), dummyActor)
-    /*
-    implicit val timeout = Timeout(60 seconds)
-    val future: Future[String] =
-      ask(graphActor, GenerateGraphMsg()).mapTo[String]
-    val result = Await.result(future, 120 seconds)*/
+    graphActor tell(AskForGraphMsg, graphReceiverActor)
   }
 
   override def update(dt: Float): Unit = {
@@ -128,7 +128,7 @@ class MasterModule extends BasicModuleWithGui {
 
     new Thread(new Runnable {
       override def run(): Unit = {
-        val future = quadTreeActor ? AskAllCharacters
+        val future = quadTreeActor ? AskAllCharactersMsg
         val result = Await.result(future, timeout.duration)
           .asInstanceOf[Iterable[BaseCharacter]]
         characters = Option(result)

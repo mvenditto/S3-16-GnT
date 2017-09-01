@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
+import com.kotcrab.vis.ui.VisUI
 import com.unibo.s3.main_system.AbstractMainApplication
 import com.unibo.s3.main_system.modules._
 import com.unibo.s3.main_system.util.ScaleUtils._
@@ -16,6 +17,8 @@ class Main extends AbstractMainApplication {
   override def create(): Unit = {
     super.create()
     inputMultiplexer = new InputMultiplexer
+    VisUI.load()
+
     addModules()
 
     modules.foreach(m => {
@@ -29,15 +32,25 @@ class Main extends AbstractMainApplication {
 
   private def addModules() = {
 
+    val master = new MasterModule()
+    master.enable(false)
+
+    var actorsMap: Option[Map[GameActors.Value, String]] = None
     val b = new BootstrapModule({
-      case BootstrapOk(actors) => println(actors)
+      case BootstrapOk(actors) =>
+        actorsMap = Option(actors)
       case BootstrapFailed(err) => println(err)
+      case UserAck() if actorsMap.isDefined =>
+        master.dummyInit(actorsMap.get)
+        master.enable(true)
+
     })
-    b.enable(false)
+
     modules :+= b
+    modules :+= master
 
     val cm = new MenuModule
-    cm.enable(true)
+    cm.enable(false)
     modules :+= cm
   }
 

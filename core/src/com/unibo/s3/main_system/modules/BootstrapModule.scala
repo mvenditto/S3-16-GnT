@@ -1,4 +1,5 @@
 package com.unibo.s3.main_system.modules
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.World
@@ -7,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.Main
-import com.unibo.s3.main_system.communication.{GraphActor, MapActor, QuadTreeActor, SystemManager}
+import com.unibo.s3.main_system.communication._
 import com.unibo.s3.main_system.world.actors.WorldActor
 
 
@@ -18,6 +19,7 @@ object GameActors extends Enumeration {
 sealed trait BootstrapEvent
 case class BootstrapOk(actorsMap: Map[GameActors.Value, String]) extends BootstrapEvent
 case class BootstrapFailed(error: String) extends BootstrapEvent
+case class UserAck() extends BootstrapEvent
 
 
 class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithGui {
@@ -29,6 +31,7 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
     GameActors.World -> "worldActor",
     GameActors.Graph -> "graphActor",
     GameActors.Map -> "mapActor",
+    GameActors.Master -> "masterActor",
     GameActors.QuadTree -> "quadTreeActor")
 
   private[this] val loadingDialogTitle = "System Initialization"
@@ -55,7 +58,6 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
   }
 
   private def createGui(): Unit = {
-    VisUI.load()
     val w = new VisWindow(loadingDialogTitle)
     w.setModal(true)
 
@@ -71,6 +73,7 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
     startBtn.addListener(new ClickListener(){
       override def clicked(event: InputEvent, x: Float, y: Float): Unit = {
         w.fadeOut(1.5f)
+        listener(UserAck())
       }
     })
 
@@ -92,23 +95,26 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
     val world = new World(new Vector2(0, 0), true)
     setProgress(20)
 
+    SystemManager.getInstance().createActor(
+      MasterActor.props(), gameActorsNames(GameActors.Master))
+    setProgress(30)
+
     SystemManager.getInstance.createActor(
       WorldActor.props(world), gameActorsNames(GameActors.World))
     setProgress(40)
 
     SystemManager.getInstance.createActor(
-      MapActor.props(), gameActorsNames(GameActors.Map))
+      QuadTreeActor.props(), gameActorsNames(GameActors.QuadTree))
     setProgress(60)
 
     SystemManager.getInstance.createActor(
-      GraphActor.props(), gameActorsNames(GameActors.Graph))
+      MapActor.props(), gameActorsNames(GameActors.Map))
     setProgress(80)
 
     SystemManager.getInstance.createActor(
-      QuadTreeActor.props(), gameActorsNames(GameActors.QuadTree))
-    setProgress(90)
-
+      GraphActor.props(), gameActorsNames(GameActors.Graph))
     setProgress(100)
+
     loadingFinished = true
   }
 

@@ -18,11 +18,9 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.*;
 import com.unibo.s3.Main;
 
-import java.util.HashMap;
-
 public class MenuModule extends BasicModuleWithGui {
-    private SpriteBatch textBatch;
-    private World world;
+    //private SpriteBatch textBatch;
+    //private World world;
     private BitmapFont font;
     private boolean enabled = true;
 
@@ -34,11 +32,10 @@ public class MenuModule extends BasicModuleWithGui {
     @Override
     public void init(Main owner) {
         super.init(owner);
-        this.world = new World(new Vector2(0,0), true);
+        //this.world = new World(new Vector2(0,0), true);
         font = new BitmapFont();
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         font.getData().setScale(1.5f);
-        VisUI.load();
         //initMenuGUI();
         initSettingsGUI();
     }
@@ -165,7 +162,7 @@ public class MenuModule extends BasicModuleWithGui {
         });
         table.pack();
 
-        GUI.addActor(table);
+        gui.addActor(table);
 
         table.centerWindow();
         //table.setPosition((Gdx.graphics.getWidth()/2)-(table.getWidth()/2), (Gdx.graphics.getHeight()/2)-(table.getHeight()/2));
@@ -203,7 +200,7 @@ public class MenuModule extends BasicModuleWithGui {
         VisCheckBox debugView = new VisCheckBox(" View debug");
         table.add(debugView).padTop(10).padBottom(10).padLeft(10).padRight(10);
 
-        GUI.addActor(table);
+        gui.addActor(table);
 
         table.pack();
         table.setPosition(50, Gdx.graphics.getHeight() - 200);
@@ -225,8 +222,4 @@ public class MenuModule extends BasicModuleWithGui {
         return this.enabled;
     }
 
-
-    public void setTextRenderer(SpriteBatch b) {
-        textBatch = b;
-    }
 }
