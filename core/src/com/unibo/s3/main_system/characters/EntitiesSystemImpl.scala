@@ -4,15 +4,15 @@ import com.badlogic.gdx.math.Vector2
 
 class EntitiesSystemImpl extends EntitiesSystem {
 
-  var charactersList = List[BaseCharacter]()
+  private[this] var charactersList = List[BaseCharacter]()
 
-  override def spawnEntityAt(position: Vector2, ID: Int) = {
+  override def spawnEntityAt(position: Vector2, ID: Int): BaseCharacter = {
     val newEntity = new BaseCharacter(position, ID)
     charactersList :+= newEntity
     newEntity
   }
 
-  override def getEntities = {
+  override def getEntities(): Iterable[BaseCharacter] = {
     charactersList
   }
 }
