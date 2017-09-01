@@ -5,17 +5,18 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.communication.Messages.{GenerateGraphMsg, InitialSavingCharacterMsg, MapElementMsg, SendGraphMsg}
-import com.unibo.s3.main_system.graph.GraphGenerator
+import com.unibo.s3.main_system.graph.GraphManagerImpl
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
 
 class GraphActor extends  UntypedAbstractActor {
 
-  private[this] val FILEPATH = "maps/outputGraphActor.txt" //ci va il percorso del file dove salvare la mappa(Sara)
+  private[this] val FILEPATH = "maps/map.txt" //ci va il percorso del file dove salvare la mappa(Sara)
   private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _
+  private[this] val graphManager = new GraphManagerImpl()
 
-  val file: FileHandle = Gdx.files.local(FILEPATH)
+  private[this] val file: FileHandle = Gdx.files.local(FILEPATH)
   file.writeString("", false)
 
   override def onReceive(message: Any): Unit = message match {
@@ -28,7 +29,7 @@ class GraphActor extends  UntypedAbstractActor {
       }
       writeFunction(verifyClose)
     case _: GenerateGraphMsg =>
-      this.graph = GraphGenerator.createGraph(FILEPATH)
+      this.graph = graphManager.createGraph(FILEPATH)
       //GraphGenerator.createGraph("C:\\Users\\Sara\\Maps\\test.txt");
       sender ! graph
       //qui ho il file con la mappa, bisogna generare il grafo(Sara)
