@@ -17,11 +17,14 @@ object Messages {
   //message for GraphActor
   case class MapElementMsg(line: String)
   case class GenerateGraphMsg()
+  case class AskForGraphMsg()
   case class SendGraphMsg(graph: UndirectedGraph[Vector2, DefaultEdge])
 
   //message for CharacterActor
   case class AskNeighboursMsg(character: BaseCharacter)
   case class SendNeighboursMsg(neighbours: List[ActorRef])
+  case class AskAllCharactersMsg()
+  case class SendAllCharactersMsg(characters: Iterable[BaseCharacter])
   case class SendCopInfoMsg() //ci andranno le info che si devono scambiare i poliziotti
 
   //message for MasterActor
