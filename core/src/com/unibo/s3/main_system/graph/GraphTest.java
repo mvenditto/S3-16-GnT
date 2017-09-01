@@ -67,7 +67,7 @@ public class GraphTest {
 
         UndirectedGraph<Vector2, DefaultEdge> objectGraph = null;
         //try {
-            objectGraph = GraphGenerator.createGraph("C:\\Users\\Sara\\Maps\\test");
+            objectGraph = GraphGenerator.createGraph(20,20,"C:\\Users\\Sara\\Maps\\test");
         /*} catch (Exception e) {
             fail("EXCEPTION!!! " + e.getMessage());
         }*/

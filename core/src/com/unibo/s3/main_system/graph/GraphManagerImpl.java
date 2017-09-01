@@ -30,8 +30,8 @@ public class GraphManagerImpl implements GraphAdapter<Vector2>, GraphManager{
     }
 
     @Override
-    public UndirectedGraph<Vector2, DefaultEdge> createGraph(String map) {
-        this.graph = GraphGenerator.createGraph(map);
+    public UndirectedGraph<Vector2, DefaultEdge> createGraph(int width, int height, String map) {
+        this.graph = GraphGenerator.createGraph(width, height, map);
         return this.graph;
     }
 }

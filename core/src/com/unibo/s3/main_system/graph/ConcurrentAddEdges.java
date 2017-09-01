@@ -22,8 +22,6 @@ public class ConcurrentAddEdges implements Callable<Void> {
         this.graph = graph;
         this.collisionDetector = collisionDetector;
         this.id = id;
-        log("la lista che mi manda ha " + nodes.size() + " nodi");
-        log("la lista che salvo ha " + this.nodes.size() + " nodi");
     }
 
     private void log(String msg) {
@@ -32,12 +30,11 @@ public class ConcurrentAddEdges implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        log("nel metodo call la lista ha  " + this.nodes.size() + " nodi");
+
         float maxDist = 7f;
         KShortestPaths<Vector2, DefaultEdge> ksp = new KShortestPaths<>(graph, 1);
 
         this.nodes.forEach(node -> {
-            log("controllo il nodo " + node.toString());
             for(float x = node.x - maxDist; x <= node.x + maxDist; x++) {
                 for(float y = node.y - maxDist; y <= node.y + maxDist; y++) {
                     Vector2 toCompare = new Vector2(x, y);
