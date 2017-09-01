@@ -33,11 +33,23 @@ public class CommunicationTest extends ApplicationAdapter {
 
         ActorRef masterActor = SystemManager.getInstance().getLocalActor("masterActor");
         ActorRef mapActor = SystemManager.getInstance().getLocalActor("mapActor");
+        ActorRef graphActor = SystemManager.getInstance().getLocalActor("graphActor");
+        ActorRef quadTreeActor = SystemManager.getInstance().getLocalActor("quadTreeActor");
+
+        mapActor.tell(new Messages.MapSettingsMsg(20, 20), ActorRef.noSender());
+        graphActor.tell(new Messages.MapSettingsMsg(20, 20), ActorRef.noSender());
+        quadTreeActor.tell(new Messages.MapSettingsMsg(20, 20), ActorRef.noSender());
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         mapActor.tell(new GenerateMapMsg(), ActorRef.noSender());
 
         try {
-            Thread.sleep(3500);
+            Thread.sleep(6000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

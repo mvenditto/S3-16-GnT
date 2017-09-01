@@ -4,7 +4,7 @@ import akka.actor.{Props, UntypedAbstractActor}
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.Vector2
-import com.unibo.s3.main_system.communication.Messages.{GenerateGraphMsg, InitialSavingCharacterMsg, MapElementMsg, SendGraphMsg}
+import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.graph.GraphManagerImpl
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
@@ -20,6 +20,8 @@ class GraphActor extends  UntypedAbstractActor {
   file.writeString("", false)
 
   override def onReceive(message: Any): Unit = message match {
+    case msg: MapSettingsMsg =>
+      //memorizzare(nel graphActor o nella classe sotto) le dimensioni
     case msg: MapElementMsg =>
       val verifyClose = msg.line.split(":").map(_.toFloat)
       def writeFunction(verifyClose: Array[Float]): Unit = verifyClose match {

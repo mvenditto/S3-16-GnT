@@ -11,7 +11,8 @@ object Messages {
   case class ActMsg(dt: Float)
 
   //message for MapActor
-  case class GenerateMapMsg() //ci andranno le info per generare la mappa(width: int, height: int, campo per decidere il tipo di grafo)
+  case class MapSettingsMsg(width: Int, height: Int)
+  case class GenerateMapMsg() //ci va un flag con la tipologia di grafo
 
   //message for GraphActor
   case class MapElementMsg(line: String)
