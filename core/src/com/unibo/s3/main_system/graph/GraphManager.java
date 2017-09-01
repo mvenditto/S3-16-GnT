@@ -7,5 +7,5 @@ import org.jgrapht.graph.DefaultEdge;
 public interface GraphManager {
     UndirectedGraph<Vector2, DefaultEdge> getGraph();
 
-    UndirectedGraph<Vector2, DefaultEdge> createGraph(String pathMap);
+    UndirectedGraph<Vector2, DefaultEdge> createGraph(int width, int height, String pathMap);
 }

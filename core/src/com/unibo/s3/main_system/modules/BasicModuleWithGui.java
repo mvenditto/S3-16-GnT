@@ -9,35 +9,34 @@ import com.unibo.s3.Main;
 
 public class BasicModuleWithGui implements BasicModule, InputProcessorAdapter {
     protected Main owner;
-    protected Stage initialGUI, menuGUI;
+    protected Stage GUI;
     private boolean guiEnabled = true;
     private boolean enabled = true;
 
     @Override
     public void init(Main owner) {
         this.owner = owner;
-        this.initialGUI = new Stage(new ScreenViewport());
-        this.menuGUI = new Stage(new ScreenViewport());
+        this.GUI = new Stage(new ScreenViewport());
     }
 
     @Override
     public void renderGui() {
-        initialGUI.draw();
+        GUI.draw();
     }
 
     @Override
     public void update(float dt) {
-        initialGUI.act(dt);
+        GUI.act(dt);
     }
 
     @Override
     public void resize(int newWidth, int newHeight) {
-        initialGUI.getViewport().update(newWidth, newHeight, true);
+        GUI.getViewport().update(newWidth, newHeight, true);
     }
 
     @Override
     public void attachInputProcessors(InputMultiplexer inputMultiplexer) {
-        inputMultiplexer.addProcessor(this.initialGUI);
+        inputMultiplexer.addProcessor(this.GUI);
     }
 
     @Override
@@ -53,5 +52,10 @@ public class BasicModuleWithGui implements BasicModule, InputProcessorAdapter {
     @Override
     public void render(ShapeRenderer shapeRenderer) {
 
+    }
+
+    @Override
+    public void cleanup() {
+        GUI.dispose();
     }
 }
