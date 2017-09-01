@@ -11,12 +11,13 @@ class CharacterActor(private[this] val character: BaseCharacter) extends Untyped
 
   private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _
 
-
   override def onReceive(message: Any): Unit = message match {
-    case _: ActMsg =>
+    case ActMsg(dt) =>
+      character.act(dt)
       SystemManager.getInstance().getLocalActor("quadTreeActor").tell(AskNeighboursMsg(this.character), getSelf())
+
     case msg: SendNeighboursMsg =>
-      msg.neighbours.foreach(neighbour => neighbour.tell(SendCopInfoMsg(), getSelf()))
+      //msg.neighbours.foreach(neighbour => neighbour.tell(SendCopInfoMsg(), getSelf()))
       //dico sotto i vicini
     case msg: SendCopInfoMsg =>
       println("cop: " + getSelf() + "| info from: " + getSender())

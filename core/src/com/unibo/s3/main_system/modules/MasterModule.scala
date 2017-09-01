@@ -25,12 +25,16 @@ import scala.concurrent.duration._
 class MasterModule extends BasicModuleWithGui {
 
   private[this] var graph: Option[GraphAdapter[Vector2]] = None
+  private[this] var characters: Option[Iterable[BaseCharacter]] = None
 
-  class GraphReceiverActor extends UntypedAbstractActor {
+  class DummyReceiverActor extends UntypedAbstractActor {
 
     override def onReceive(message: Any): Unit = message match {
 
       case i: Int => println(i)
+
+      case SendAllCharactersMsg(_characters) =>
+        characters = Option(_characters)
 
       case SendGraphMsg(g) =>
         println("receive graph!")
@@ -45,8 +49,8 @@ class MasterModule extends BasicModuleWithGui {
     }
   }
 
-  object GraphReceiverActor {
-    def props() : Props = Props(new GraphReceiverActor())
+  object DummyReceiverActor {
+    def props() : Props = Props(new DummyReceiverActor())
   }
 
   private[this] var masterActor: ActorRef = _
@@ -54,7 +58,7 @@ class MasterModule extends BasicModuleWithGui {
   private[this] var mapActor: ActorRef = _
   private[this] var graphActor: ActorRef = _
   private[this] var quadTreeActor: ActorRef = _
-  private[this] var graphReceiverActor: ActorRef = _
+  private[this] var dummyReceiverActor: ActorRef = _
 
   private[this] val renderer = new GeometryRendererImpl()
   private[this] val graphRenderingConfig = GraphRenderingConfig(Color.GREEN, Color.YELLOW, 0.5f)
@@ -62,7 +66,6 @@ class MasterModule extends BasicModuleWithGui {
   private[this] var worldMap = List[Rectangle]()
 
   private[this] var actorsMap: Option[Map[GameActors.Value, String]] = None
-  private[this] var characters: Option[Iterable[BaseCharacter]] = None
 
   private def getActor(actor: GameActors.Value): ActorRef =
     SystemManager.getInstance.getLocalActor(actorsMap.get(actor))
@@ -75,6 +78,7 @@ class MasterModule extends BasicModuleWithGui {
       .map(b => new Rectangle(b(0),b(1),b(2),b(3))).toList
   }
 
+  /*must be replaced with settings taken from init gui.*/
   def dummyInit(actorsMap: Map[GameActors.Value, String]): Unit = {
     this.actorsMap = Option(actorsMap)
 
@@ -83,15 +87,15 @@ class MasterModule extends BasicModuleWithGui {
     worldActor = getActor(GameActors.World)
     quadTreeActor = getActor(GameActors.QuadTree)
     graphActor = getActor(GameActors.Graph)
-    graphReceiverActor = SystemManager.getInstance()
-      .createActor(GraphReceiverActor.props(), "dummy")
+    dummyReceiverActor = SystemManager.getInstance()
+      .createActor(DummyReceiverActor.props(), "graphReceiver")
 
     List(graphActor, quadTreeActor).foreach(a =>
       a ! MapSettingsMsg(60, 60))
     mapActor ! MapSettingsMsg(20, 20)
 
     mapActor ! GenerateMapMsg()
-    graphActor tell(AskForGraphMsg, graphReceiverActor)
+    graphActor tell(AskForGraphMsg, dummyReceiverActor)
   }
 
   override def update(dt: Float): Unit = {
@@ -100,8 +104,8 @@ class MasterModule extends BasicModuleWithGui {
   }
 
   override def cleanup(): Unit = {
-    SystemManager.getInstance().shutdownSystem()
     super.cleanup()
+    SystemManager.getInstance().shutdownSystem()
   }
 
   override def render(shapeRenderer: ShapeRenderer): Unit = {
@@ -118,23 +122,10 @@ class MasterModule extends BasicModuleWithGui {
   }
 
   override def touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
-    super.touchUp(screenX, screenY, pointer, button)
     val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
     mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
     masterActor ! CreateCharacterMsg(mouseWorldPos)
-
-
-    implicit val timeout = Timeout(120 seconds)
-
-    new Thread(new Runnable {
-      override def run(): Unit = {
-        val future = quadTreeActor ? AskAllCharactersMsg
-        val result = Await.result(future, timeout.duration)
-          .asInstanceOf[Iterable[BaseCharacter]]
-        characters = Option(result)
-      }
-    }).start()
-
+    quadTreeActor tell(AskAllCharactersMsg, dummyReceiverActor)
     false
   }
 
