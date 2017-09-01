@@ -26,7 +26,7 @@ class LightingSystemTest extends EntitySystemModule {
   private var torches = List[ConeLight]()
   private var lights = List[PointLight]()
 
-  private val LIGHT_WHITE = new Color(1.0f, 1.0f, 1.0f, 0.5f)
+  private val LIGHT_WHITE = new Color(1.0f, 1.0f, 1.0f, 1.0f)
   private var lightEditorEnabled = false
   private var renderLightsAfterBodies = true
 
@@ -72,18 +72,18 @@ class LightingSystemTest extends EntitySystemModule {
 
   override def setup(f: (String) => Unit): Unit = {
     super.setup(f)
-    b2d.loadWorld("world0.txt")
+    b2d.loadWorld("outputGraphActor.txt")
     rayHandler.setWorld(b2d.getWorld)
     collisionDetector = new Box2dProxyDetectorsFactory(b2d.getWorldActorRef)
       .newRaycastCollisionDetector()
-    RayHandler.setGammaCorrection(false)
+    RayHandler.setGammaCorrection(true)
     RayHandler.useDiffuseLight(true)
     this.rayHandler.setBlur(true)
-    this.rayHandler.setBlurNum(1)
+    this.rayHandler.setBlurNum(2)
     this.rayHandler.setShadows(true)
     this.rayHandler.setCulling(true)
     rayHandler.setAmbientLight(new Color(.1f, .1f, .1f, .1f))
-    loadLights("lights.txt")
+    //loadLights("lights.txt")
   }
 
   override def render(shapeRenderer: ShapeRenderer): Unit = {

@@ -53,6 +53,7 @@ case class TestbedView(listener: TestbedListener) {
   private var console: Console = _
   private var consolePane: VisScrollPane = _
   private var toastManager: ToastManager = _
+  private var fpsLabel: VisLabel = _
   private var currSampleShortcuts: Option[KeyHelpTable] = None
 
   private val defaultPaneSize = 200f
@@ -149,6 +150,27 @@ case class TestbedView(listener: TestbedListener) {
     stage.addActor(root)
     stage.addActor(consolePane)
 
+    val fpsCounter = new VisWindow("FPS")
+    stage.addActor(fpsCounter)
+    fpsCounter.setPosition(Gdx.graphics.getWidth - defaultPaneSize - 65,
+      Gdx.graphics.getHeight - 48 - menuBar.getTable.getPrefHeight)
+    fpsCounter.setSize(64, 48)
+    fpsCounter.clear()
+    fpsCounter.getTitleTable.clear()
+    fpsCounter.getTitleTable.add(new VisLabel("FPS")).expandX().fillX().padLeft(16)
+    fpsLabel = new VisLabel("60")
+    fpsCounter.add(fpsLabel).center()
+  }
+
+  private def updateFpsLabel() = {
+    val fpsNum = Gdx.graphics.getFramesPerSecond
+    val col = fpsNum match {
+      case fps if fps < 30 => Color.RED
+      case fps if fps >= 30 && 50 >= fps => Color.YELLOW
+      case fps if fps > 50 => Color.GREEN
+    }
+    fpsLabel.setText(fpsNum.toString)
+    fpsLabel.setColor(col)
   }
 
   def addSampleEntry(node: Node, sampleName: String): Unit = {
@@ -203,7 +225,10 @@ case class TestbedView(listener: TestbedListener) {
 
   def render(): Unit = stage.draw()
 
-  def update(dt: Float): Unit = stage.act(dt)
+  def update(dt: Float): Unit = {
+    stage.act(dt)
+    updateFpsLabel()
+  }
 
   def toggleSamplePane(): Unit = {
     samplePane.addAction(

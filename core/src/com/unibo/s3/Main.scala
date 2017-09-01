@@ -33,6 +33,7 @@ class Main extends AbstractMainApplication {
       case BootstrapOk(actors) => println(actors)
       case BootstrapFailed(err) => println(err)
     })
+    b.enable(false)
     modules :+= b
 
     val cm = new MenuModule
