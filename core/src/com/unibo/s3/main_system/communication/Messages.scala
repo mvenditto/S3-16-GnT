@@ -25,7 +25,7 @@ object Messages {
   case class SendNeighboursMsg(neighbours: List[ActorRef])
   case class AskAllCharactersMsg()
   case class SendAllCharactersMsg(characters: Iterable[BaseCharacter])
-  case class SendCopInfoMsg() //ci andranno le info che si devono scambiare i poliziotti
+  case class SendCopInfoMsg(visitedVertices: List[Vector2])
 
   //message for MasterActor
   case class RebuildQuadTreeMsg()

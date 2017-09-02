@@ -15,6 +15,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class CharacterTest {
     private BaseCharacter character = new BaseCharacter(new Vector2(1,1), 0);
@@ -42,7 +43,7 @@ public class CharacterTest {
         testGraph.addEdge(v2, v5);
 
         character.setGraph(testGraph);
-        character.computeNearest();
+        //character.computeNearest();
     }
 
     @Test
@@ -113,4 +114,30 @@ public class CharacterTest {
         NeighborIndex index = new NeighborIndex(testGraph);
         assertEquals(index.neighborListOf(v1), Arrays.asList(v2, v5));
     }
+
+    @Test
+    public void testDestination(){
+        Random random = new Random();
+        for(int i = 0; i < 20; i++) {
+            assertTrue(character.computeNeighbours().contains(character.getCurrentDestination()));
+            character.getPosition().add(random.nextInt(5) - 1, random.nextInt(5) - 1);
+            character.chooseBehaviour();
+            System.out.println("position: " + character.getPosition());
+            System.out.println("node: " + character.getCurrentNode() + " / neigh: " + character.computeNeighbours());
+            System.out.println("destination: " + character.getCurrentDestination());
+            System.out.println("");
+            assertTrue(character.computeNeighbours().contains(character.getCurrentDestination()));
+        }
+        for(int i = 0; i < 20; i++) {
+            assertTrue(character.computeNeighbours().contains(character.getCurrentDestination()));
+            character.getPosition().add(random.nextInt(2) - 4, random.nextInt(2) - 4);
+            character.chooseBehaviour();
+            System.out.println("position: " + character.getPosition());
+            System.out.println("node: " + character.getCurrentNode() + " / neigh: " + character.computeNeighbours());
+            System.out.println("destination: " + character.getCurrentDestination());
+            System.out.println("");
+            assertTrue(character.computeNeighbours().contains(character.getCurrentDestination()));
+        }
+    }
+
 }
