@@ -29,7 +29,7 @@ class MapActor extends UntypedAbstractActor {
           this.mapGenerator.setStrategy(new RoomMapGenerator)
       }
       //valori da decidere una volta decise le dimensioni possibili per la mappa
-      this.mapGenerator.generateMap(this.mapWidth/AbstractMapGenerator.BASE_UNIT, this.mapHeight/AbstractMapGenerator.BASE_UNIT)
+      this.mapGenerator.generateMap(this.mapWidth, this.mapHeight)
       this.mapGenerator.getMap.foreach(line => SystemManager.getInstance().getLocalActor("graphActor").tell(MapElementMsg(line), getSelf()))
       this.mapGenerator.getMap.foreach(line => SystemManager.getInstance().getLocalActor("worldActor").tell(MapElementMsg(line), getSelf()))
     // val file = Gdx.files.local(FILEPATH)

@@ -17,7 +17,7 @@ public class TestMapGeneration {
         generator.setStrategy(new RoomMapGenerator());
         for(int i = 0; i < 100; i++){
             try{
-                generator.generateMap(60/AbstractMapGenerator.BASE_UNIT, 60/AbstractMapGenerator.BASE_UNIT);
+                generator.generateMap(60, 60);
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -29,7 +29,7 @@ public class TestMapGeneration {
         generator.setStrategy(new MazeMapGenerator());
         for(int i = 0; i < 100; i++){
             try{
-                generator.generateMap(60/AbstractMapGenerator.BASE_UNIT, 60/AbstractMapGenerator.BASE_UNIT);
+                generator.generateMap(60, 60);
             }catch (Exception e){
                 e.printStackTrace();
             }
