@@ -13,8 +13,8 @@ import com.unibo.s3.main_system.communication.SystemManager
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig}
 import com.unibo.s3.main_system.util.ScaleUtils
-import org.jgrapht.alg.NeighborIndex
-import org.jgrapht.graph.DefaultEdge
+import com.unibo.s3.main_system.util.ImplicitConversions._
+
 
 class MasterModule extends BasicModuleWithGui {
 
@@ -31,13 +31,7 @@ class MasterModule extends BasicModuleWithGui {
         characters = Option(_characters)
 
       case SendGraphMsg(g) =>
-        graph = Option(new GraphAdapter[Vector2] {
-          override def getNeighbors(vertex: Vector2): util.Iterator[Vector2] = {
-            new NeighborIndex[Vector2, DefaultEdge](g)
-              .neighborsOf(vertex).iterator
-          }
-          override def getVertices: util.Iterator[Vector2] = g.vertexSet.iterator
-        })
+        graph = Option(g) //implicitly converted
         cacheMap()
     }
   }
@@ -86,7 +80,7 @@ class MasterModule extends BasicModuleWithGui {
     List(graphActor, quadTreeActor).foreach(a =>
       a ! MapSettingsMsg(60, 60))
 
-    mapActor ! MapSettingsMsg(20, 20)
+    mapActor ! MapSettingsMsg(60, 60)
 
     mapActor ! GenerateMapMsg()
     graphActor tell(AskForGraphMsg, dummyReceiverActor)
@@ -119,6 +113,8 @@ class MasterModule extends BasicModuleWithGui {
     val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
     mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
     masterActor ! CreateCharacterMsg(mouseWorldPos)
+
+    //need to be fixed, out of sync, new characters shows only after next added.
     quadTreeActor tell(AskAllCharactersMsg, dummyReceiverActor)
     false
   }

@@ -120,7 +120,7 @@ class GraphMapTest extends BaseSample {
     mapActor = SystemManager.getInstance().getLocalActor("mapActor")
     graphActor = SystemManager.getInstance().getLocalActor("graphActor")
 
-    mapActor ! MapSettingsMsg(20, 20)
+    mapActor ! MapSettingsMsg(60, 60)
     graphActor ! MapSettingsMsg(60, 60)
 
   }

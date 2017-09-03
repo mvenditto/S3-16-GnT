@@ -10,21 +10,22 @@ import scala.collection.immutable.HashMap
 class QuadTreeActor extends UntypedAbstractActor {
 
   private[this] var agentsTable = new HashMap[BaseCharacter, ActorRef]()
+  private[this] var bounds = Bounds(0, 0, 100, 100)
   private[this] var root = QuadTreeNode[BaseCharacter](Bounds(0, 0, 60, 60))
   private[this] val queryRadius = 5f
 
   override def onReceive(message: Any): Unit = message match {
-    case msg: MapSettingsMsg =>
+    case MapSettingsMsg(w, h) =>
+      bounds = Bounds(0, 0, w, h)
 
     case msg: InitialSavingCharacterMsg =>
-      agentsTable += msg.newCharacter -> msg.characterRef
+      agentsTable += (msg.newCharacter -> msg.characterRef)
 
     case RebuildQuadTreeMsg() =>
-      root = QuadTreeNode(Bounds(0, 0, 60, 60))
+      root = QuadTreeNode(bounds)
       agentsTable.keys.foreach(c => root.insert(c))
 
     case AskNeighboursMsg(character) =>
-      //calcolo i vicini
       val pos = character.getPosition.cpy().sub(queryRadius, queryRadius)
       val twiceQueryRadius= 2 * queryRadius
       val neighbours = root.rangeQuery(
