@@ -82,7 +82,7 @@ class GraphMapTest extends BaseSample {
     initBtn.addListener(new ClickListener {
       override def clicked(event: InputEvent, x: Float, y: Float): Unit = {
         super.clicked(event, x, y)
-        mapActor ! MapSettingsMsg(20, 20)
+        mapActor ! MapSettingsMsg(60, 60)
         mapActor ! GenerateMapMsg()
       }
     })

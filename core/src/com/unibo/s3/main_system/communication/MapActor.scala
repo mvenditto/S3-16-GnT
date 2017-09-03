@@ -3,7 +3,7 @@ package com.unibo.s3.main_system.communication
 import scala.collection.JavaConversions.asScalaBuffer
 import akka.actor.{Props, UntypedAbstractActor}
 import com.unibo.s3.main_system.communication.Messages.{GenerateMapMsg, MapElementMsg, MapSettingsMsg}
-import com.unibo.s3.main_system.map.{MapGenerator, MazeMapGenerator, RoomMapGenerator}
+import com.unibo.s3.main_system.map.{AbstractMapGenerator, MapGenerator, MazeMapGenerator, RoomMapGenerator}
 
 
 
@@ -17,6 +17,7 @@ class MapActor extends UntypedAbstractActor {
 //per ora di default true
   override def onReceive(message: Any): Unit = message match {
     case msg: MapSettingsMsg =>
+      println("ricevute: " + msg.width + " " + msg.height)
       this.mapWidth = msg.width
       this.mapHeight = msg.height
     case _: GenerateMapMsg =>
@@ -28,7 +29,7 @@ class MapActor extends UntypedAbstractActor {
           this.mapGenerator.setStrategy(new RoomMapGenerator)
       }
       //valori da decidere una volta decise le dimensioni possibili per la mappa
-      this.mapGenerator.generateMap(this.mapWidth/3, this.mapHeight/3)
+      this.mapGenerator.generateMap(this.mapWidth/AbstractMapGenerator.BASE_UNIT, this.mapHeight/AbstractMapGenerator.BASE_UNIT)
       this.mapGenerator.getMap.foreach(line => SystemManager.getInstance().getLocalActor("graphActor").tell(MapElementMsg(line), getSelf()))
       this.mapGenerator.getMap.foreach(line => SystemManager.getInstance().getLocalActor("worldActor").tell(MapElementMsg(line), getSelf()))
     // val file = Gdx.files.local(FILEPATH)

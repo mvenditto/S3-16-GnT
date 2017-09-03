@@ -5,13 +5,19 @@ import static org.junit.Assert.assertTrue;
 
 public class TestMapGeneration {
 
+    MapGenerator generator;
+
+    @Before
+    public void init(){
+        generator = new MapGenerator();
+    }
 
     @Test
     public void testRoomsGeneration(){
-        RoomMapGenerator generator = new RoomMapGenerator();
+        generator.setStrategy(new RoomMapGenerator());
         for(int i = 0; i < 100; i++){
             try{
-                generator.generate(4, 20, 20, 0, 0);
+                generator.generateMap(60/AbstractMapGenerator.BASE_UNIT, 60/AbstractMapGenerator.BASE_UNIT);
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -20,10 +26,10 @@ public class TestMapGeneration {
 
     @Test
     public void testMazeGeneration(){
-        MazeMapGenerator generator = new MazeMapGenerator();
+        generator.setStrategy(new MazeMapGenerator());
         for(int i = 0; i < 100; i++){
             try{
-                generator.generate(4, 20, 20, 0, 0);
+                generator.generateMap(60/AbstractMapGenerator.BASE_UNIT, 60/AbstractMapGenerator.BASE_UNIT);
             }catch (Exception e){
                 e.printStackTrace();
             }
