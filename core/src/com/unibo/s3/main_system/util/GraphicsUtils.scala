@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.{Color, Pixmap, Texture}
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 
-object GraphicsUtil {
+object GraphicsUtils {
 
   private def pixmapFromColor(
     width: Integer, height: Integer, color: Color) = {

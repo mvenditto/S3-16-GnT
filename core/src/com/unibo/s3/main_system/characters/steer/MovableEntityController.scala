@@ -1,7 +1,6 @@
 package com.unibo.s3.main_system.characters.steer
 
 import com.badlogic.gdx.Input.Keys
-import com.badlogic.gdx.ai.steer.behaviors.Seek
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.InputProcessorAdapter
 
@@ -25,9 +24,6 @@ class MovableEntityController (
   entity.setMaxAngularSpeed(10f)
   entity.setMaxLinearAcceleration(10f)
 
-  private def updateKeyState(key: Int, pressed: Boolean) =
-    if (controls.contains(key)) controls(key) = pressed
-
   def setDirectionSpeed(speed: Float): Unit = controlSpeed = speed
 
   def getTargetVector: Vector2 = keyboard
@@ -50,6 +46,9 @@ class MovableEntityController (
 
     csb.buildPriority(true)
   }
+
+  private def updateKeyState(key: Int, pressed: Boolean) =
+    if (controls.contains(key)) controls(key) = pressed
 
   override def keyDown(keycode: Int): Boolean = {
     updateKeyState(keycode, pressed = true)

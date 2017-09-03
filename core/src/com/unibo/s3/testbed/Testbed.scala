@@ -17,7 +17,7 @@ import com.kotcrab.vis.ui.widget.toast.Toast
 import com.kotcrab.vis.ui.widget.{VisLabel, VisTree, _}
 import com.unibo.s3.InputProcessorAdapter
 import com.unibo.s3.main_system.AbstractMainApplication
-import com.unibo.s3.main_system.util.GraphicsUtil
+import com.unibo.s3.main_system.util.GraphicsUtils
 import com.unibo.s3.testbed.samples._
 import com.unibo.s3.testbed.ui.{AdaptiveSizeActor, Anchorable, Console, KeyHelpTable, LogMessage, Toggleable, TopLeft, TransitionFunctions}
 
@@ -149,7 +149,7 @@ case class TestbedView(listener: TestbedListener) {
     val tmp = Color.BLACK.cpy()
     tmp.a = 0.5f
 
-    val bg = GraphicsUtil.drawableFromColor(stage.getWidth.toInt,
+    val bg = GraphicsUtils.drawableFromColor(stage.getWidth.toInt,
       (stage.getHeight / 4.5f).toInt, tmp)
 
     ss.getStyle.background = bg
