@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class AbstractMapGenerator implements MapGenerator{
+public abstract class AbstractMapGenerator implements GenerationStrategy{
 
     private static final float BASE_UNIT = 3;
     private static final float HALF_BASE_UNIT = BASE_UNIT/2;

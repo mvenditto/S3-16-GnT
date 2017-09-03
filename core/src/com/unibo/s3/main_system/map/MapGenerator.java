@@ -4,8 +4,7 @@ import java.util.List;
 
 public interface MapGenerator {
 
-    void generate(int n, int width, int height, int startX, int startY);
+    void generateMap(int width, int height);
 
     List<String> getMap();
-
 }
