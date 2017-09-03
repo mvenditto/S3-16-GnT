@@ -170,8 +170,8 @@ class LightingSystemTest extends EntitySystemModule {
     super.keyUp(keycode)
     if(keycode == Keys.Y) lightEditorEnabled = !lightEditorEnabled
     if(keycode == Keys.T) enable(!enabled)
-    if(keycode == Keys.D) RayHandler.useDiffuseLight(!RayHandler.isDiffuse)
-    if(keycode == Keys.R) renderLightsAfterBodies = !renderLightsAfterBodies
+    if(keycode == Keys.F) RayHandler.useDiffuseLight(!RayHandler.isDiffuse)
+    if(keycode == Keys.U) renderLightsAfterBodies = !renderLightsAfterBodies
     false
   }
 
@@ -183,7 +183,7 @@ class LightingSystemTest extends EntitySystemModule {
       "y" -> "enable adding lights.",
       "t" -> "toggle lighting system",
       "r" -> "switch pre/post lights rendering",
-      "d" -> "toggle diffuse lights",
+      "f" -> "toggle diffuse lights",
       "mouse-left" -> "add light"
     )
 

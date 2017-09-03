@@ -155,6 +155,7 @@ public class BaseSteeringEntity implements SteeringEntity<Vector2> {
 
     @Override
     public void act(float delta) {
+        System.out.println(linearVelocity + " - " + angularVelocity);
         if (steeringBehavior != null) {
             steeringBehavior.calculateSteering(steeringOutput);
             applySteering(steeringOutput, delta);
