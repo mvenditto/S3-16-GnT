@@ -21,8 +21,7 @@ public class RoomMapGenerator extends AbstractMapGenerator {
         }
         int door3Coord = generateInRange(startY + 1, startY + wallH - 1);
         door2Coord = generateInRange(startX + wallV + 1, startX + width);
-
-        if(isHorizontalWallDenied(startY + wallH, startX, startX+width+1)){
+         if(isHorizontalWallDenied(startY + wallH, startX, startX+width+1)){
             buildWallWithRange(false, startY + wallH, startX + 1, startX+width);
         }else{
             buildWallWithRange(false, startY + wallH, startX, startX+width+1);

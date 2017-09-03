@@ -3,23 +3,32 @@ package com.unibo.s3.main_system.communication
 import scala.collection.JavaConversions.asScalaBuffer
 import akka.actor.{Props, UntypedAbstractActor}
 import com.unibo.s3.main_system.communication.Messages.{GenerateMapMsg, MapElementMsg, MapSettingsMsg}
-import com.unibo.s3.main_system.map.{MapGenerator, MazeMapGenerator}
+import com.unibo.s3.main_system.map.{MapGenerator, MazeMapGenerator, RoomMapGenerator}
 
 
 
 class MapActor extends UntypedAbstractActor {
 
   // val FILEPATH = "maps/mapFile.txt" uncomment if file is required
-  private[this] val mapGenerator: MapGenerator = new MazeMapGenerator
+  private[this] val mapGenerator: MapGenerator = new MapGenerator
   private[this] var mapWidth: Int = _
   private[this] var mapHeight: Int = _
-
+  private[this] var mapType: Boolean = true
+//per ora di default true
   override def onReceive(message: Any): Unit = message match {
     case msg: MapSettingsMsg =>
       this.mapWidth = msg.width
       this.mapHeight = msg.height
     case _: GenerateMapMsg =>
-      this.mapGenerator.generate(8, this.mapWidth/3, this.mapHeight/3, 0, 0) //valori da decidere una volta decise le dimensioni possibili per la mappa
+      //this.mapGenerator.generate(8, this.mapWidth/3, this.mapHeight/3, 0, 0) //valori da decidere una volta decise le dimensioni possibili per la mappa
+      mapType match {
+        case true =>
+          this.mapGenerator.setStrategy(new MazeMapGenerator)
+        case false =>
+          this.mapGenerator.setStrategy(new RoomMapGenerator)
+      }
+      //valori da decidere una volta decise le dimensioni possibili per la mappa
+      this.mapGenerator.generateMap(this.mapWidth/3, this.mapHeight/3)
       this.mapGenerator.getMap.foreach(line => SystemManager.getInstance().getLocalActor("graphActor").tell(MapElementMsg(line), getSelf()))
       this.mapGenerator.getMap.foreach(line => SystemManager.getInstance().getLocalActor("worldActor").tell(MapElementMsg(line), getSelf()))
     // val file = Gdx.files.local(FILEPATH)
