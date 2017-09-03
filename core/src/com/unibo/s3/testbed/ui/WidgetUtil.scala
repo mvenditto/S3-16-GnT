@@ -1,7 +1,8 @@
 package com.unibo.s3.testbed.ui
 
-import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.{Action, Actor}
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.actions.Actions.{sequence, run}
 
 abstract class AdaptiveActor(val actor: Actor) {
 
@@ -49,7 +50,7 @@ trait Anchorable extends AdaptiveActor {
     super.resize(stageWidth, stageHeight)
     val a = actor
     anchor match {
-      case Some(TopLeft) => a.setPosition(0, stageHeight - a.getHeight)
+      case Some(TopLeft) => a.setPosition(a.getX, stageHeight - a.getHeight)
       case Some(TopRight) => a.setPosition(stageWidth - a.getWidth, stageHeight - a.getHeight)
       case Some(BottomLeft) => a.setPosition(0, 0)
       case Some(BottomRight) => a.setPosition(stageWidth - a.getWidth, 0)
@@ -60,30 +61,36 @@ trait Anchorable extends AdaptiveActor {
 
 object TransitionFunctions {
   
-  val slideLeft: (Actor, (Float, Float)) => Unit = (a: Actor, s: (Float, Float)) =>
-    a.addAction(Actions.moveTo(if (a.getX >= 0) -a.getWidth else 0, a.getY, 0.30f))
+  val slideLeft: (Actor, (Float, Float)) => Action = (a: Actor, s: (Float, Float)) =>
+    Actions.moveTo(if (a.getX >= 0) -a.getWidth else 0, a.getY, 0.30f)
 
-  val slideRight: (Actor, (Float, Float)) => Unit = (a: Actor, s: (Float, Float)) =>
-    a.addAction(Actions.moveTo(if (a.getX <= s._1) s._1 else s._1 - a.getWidth, a.getY, 0.30f))
+  val slideRight: (Actor, (Float, Float)) => Action = (a: Actor, s: (Float, Float)) =>
+    Actions.moveTo(if (a.getX <= s._1) s._1 else s._1 - a.getWidth, a.getY, 0.30f)
 
-  val slideDown: (Actor, (Float, Float)) => Unit = (a: Actor, s: (Float, Float)) =>
-    a.addAction(Actions.moveTo(a.getX, if (a.getY >= 0) -a.getHeight else 0, 0.30f))
+  val slideDown: (Actor, (Float, Float)) => Action = (a: Actor, s: (Float, Float)) =>
+    Actions.moveTo(a.getX, if (a.getY >= 0) -a.getHeight else 0, 0.30f)
 
-  val slideUp: (Actor, (Float, Float)) => Unit = (a: Actor, s: (Float, Float)) =>
-    a.addAction(Actions.moveTo(a.getX, if (a.getY <= s._2) a.getHeight + s._2 else s._2, 0.30f))
+  val slideUp: (Actor, (Float, Float)) => Action = (a: Actor, s: (Float, Float)) =>
+    Actions.moveTo(a.getX, if (a.getY <= s._2) a.getHeight + s._2 else s._2, 0.30f)
 }
 
 trait Toggleable extends AdaptiveActor {
 
-  var transition: (Actor, (Float, Float)) => Unit = TransitionFunctions.slideDown
+  var transition: (Actor, (Float, Float)) => Action = TransitionFunctions.slideDown
+  var isTransitionOngoing = false
 
-  def setTransitionFunc(t: (Actor, (Float, Float)) => Unit): Unit = {
+  def setTransitionFunc(t: (Actor, (Float, Float)) => Action): Unit = {
     transition = t
   }
 
-  def toggle(stageWidth: Float, stageHeight: Float): Unit = 
-    transition(actor, (stageWidth, stageHeight))
-
+  def toggle(stageWidth: Float, stageHeight: Float): Unit = {
+    isTransitionOngoing = true
+    val t = transition(actor, (stageWidth, stageHeight))
+    val onTransitionFinished = new Runnable {
+      override def run(): Unit = isTransitionOngoing = false
+    }
+    actor.addAction(sequence(t, run(onTransitionFinished)))
+  }
 }
 
 object AdaptiveActorTest extends App {

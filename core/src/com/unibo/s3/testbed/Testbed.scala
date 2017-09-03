@@ -43,7 +43,7 @@ trait TestbedListener extends InputProcessorAdapter {
 case class TestbedView(listener: TestbedListener) {
 
   type AnchorableToggleableActor =
-    AdaptiveSizeActor with Toggleable with Anchorable
+    AdaptiveSizeActor with Anchorable with Toggleable
 
   private var stage: Stage = _
   private var menuBar: MenuBar = _
