@@ -10,6 +10,7 @@ import com.badlogic.gdx.{Gdx, InputMultiplexer}
 import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.communication.SystemManager
+import com.unibo.s3.main_system.game.GameSettings
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig}
 import com.unibo.s3.main_system.util.ScaleUtils
@@ -64,6 +65,8 @@ class MasterModule extends BasicModuleWithGui {
       .map(b => b.split(":").map(f => f.toFloat))
       .map(b => new Rectangle(b(0),b(1),b(2),b(3))).toList
   }
+
+  def init(gameSettings: GameSettings): Unit = {}
 
   /*must be replaced with settings taken from init gui.*/
   def dummyInit(actorsMap: Map[GameActors.Value, String]): Unit = {

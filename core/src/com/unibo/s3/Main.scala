@@ -14,6 +14,8 @@ class Main extends AbstractMainApplication {
   private var modules = List[BasicModule]()
   private var inputMultiplexer: InputMultiplexer = _
 
+  private var bootstrapModule: BootstrapModule = _
+
   override def create(): Unit = {
     super.create()
     inputMultiplexer = new InputMultiplexer
@@ -32,25 +34,29 @@ class Main extends AbstractMainApplication {
 
   private def addModules() = {
 
+    val cm = new MenuModule
+    cm.enable(false)
+
     val master = new MasterModule()
     master.enable(false)
 
     var actorsMap: Option[Map[GameActors.Value, String]] = None
-    val b = new BootstrapModule({
+    bootstrapModule = new BootstrapModule({
       case BootstrapOk(actors) =>
         actorsMap = Option(actors)
-      case BootstrapFailed(err) => println(err)
+
+      case BootstrapFailed(err) =>
+        println(err)
+
       case UserAck() if actorsMap.isDefined =>
         master.dummyInit(actorsMap.get)
         master.enable(true)
-
+        removeModule(bootstrapModule)
+        //cm.enable(true)
     })
 
-    modules :+= b
+    modules :+= bootstrapModule
     modules :+= master
-
-    val cm = new MenuModule
-    cm.enable(false)
     modules :+= cm
   }
 
@@ -83,6 +89,17 @@ class Main extends AbstractMainApplication {
     font.setColor(Color.YELLOW)
     font.draw(textBatch, "world: " + mouseWorldPos, Gdx.graphics.getWidth / 2, 15f)
     textBatch.end()
+  }
+
+  private def removeModule(m: BasicModule) = {
+
+    Gdx.app.postRunnable(new Runnable {
+      override def run(): Unit = {
+        m.cleanup()
+        m.enable(false)
+        modules = modules.filter(mod => !mod.equals(m))
+      }
+    })
   }
 
   override protected def doRender(): Unit = {

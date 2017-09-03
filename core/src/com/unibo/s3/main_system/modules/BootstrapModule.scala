@@ -162,8 +162,6 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
 
   override def cleanup(): Unit = {
     super.cleanup()
-    VisUI.dispose()
-    SystemManager.getInstance.shutdownSystem()
   }
 
 }
