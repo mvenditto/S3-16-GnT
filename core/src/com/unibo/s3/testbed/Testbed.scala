@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Tree.Node
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent
 import com.badlogic.gdx.scenes.scene2d.utils.{ChangeListener, ClickListener}
-import com.badlogic.gdx.scenes.scene2d.{Actor, InputEvent, Stage}
+import com.badlogic.gdx.scenes.scene2d.{Actor, Group, InputEvent, Stage}
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.{Gdx, InputMultiplexer}
@@ -19,7 +19,7 @@ import com.unibo.s3.InputProcessorAdapter
 import com.unibo.s3.main_system.AbstractMainApplication
 import com.unibo.s3.main_system.util.GraphicsUtils
 import com.unibo.s3.testbed.samples._
-import com.unibo.s3.testbed.ui.{AdaptiveSizeActor, Anchorable, Console, FpsCounter, KeyHelpTable, LogMessage, Toggleable, TopLeft, TransitionFunctions}
+import com.unibo.s3.testbed.ui.{AdaptiveSizeActor, Anchorable, Console, FpsCounter, KeyHelpTable, LogMessage, Toggleable, TopLeft, TopRight, TransitionFunctions}
 
 trait Testbed {
 
@@ -52,11 +52,11 @@ case class TestbedView(listener: TestbedListener) {
   private var loadingBar: VisProgressBar = _
   private var loadingLog: VisLabel = _
   private var samplePane: AnchorableToggleableActor = _
+  private var eastPane: AnchorableToggleableActor = _
   private var console: Console = _
   private var consolePane: AdaptiveSizeActor with Toggleable = _
   private var toastManager: ToastManager = _
-  private var fpsLabel: VisLabel = _
-  private var fpsCounter: VisWindow = _
+  private var fpsCounter: AdaptiveSizeActor with Anchorable = _
   private var currSampleShortcuts: Option[KeyHelpTable] = None
 
   private val defaultPaneSize = 200f
@@ -69,16 +69,22 @@ case class TestbedView(listener: TestbedListener) {
 
   def resize(newWidth: Integer, newHeight: Integer): Unit = {
     stage.getViewport.update(newWidth, newHeight, true)
-    viewport.width(Gdx.graphics.getWidth - (currentSampleMenuWidth + defaultPaneSize))
+    //viewport.width(Gdx.graphics.getWidth - (currentSampleMenuWidth + defaultPaneSize))
 
     consolePane.setSize(100, 20)
     consolePane.resize(newWidth.toFloat, newHeight.toFloat)
 
+    eastPane.setSize(20, 100)
+    eastPane.resize(newWidth.toFloat, newHeight.toFloat)
+
+    samplePane.setSize(25, 100)
+    samplePane.resize(newWidth.toFloat, newHeight.toFloat)
+
+    fpsCounter.resize(newWidth.toFloat, newHeight.toFloat)
+
     console.setSize(stage.getWidth - consolePadding * 2, stage.getHeight / 4.5f)
     console.rebuild()
 
-    fpsCounter.setPosition(Gdx.graphics.getWidth - defaultPaneSize - 65,
-      Gdx.graphics.getHeight - 48 - menuBar.getTable.getPrefHeight)
   }
 
   def init(): Unit = {
@@ -87,14 +93,14 @@ case class TestbedView(listener: TestbedListener) {
     toastManager = new ToastManager(stage)
     toastManager.setAlignment(Align.bottomRight)
 
-    val eastPane = new VisWindow("")
+    val _eastPane = new VisWindow("")
 
-    eastPane.getTitleLabel.setText("Testbed menu")
-    eastPane.getTitleLabel.setColor(customBlue)
+    _eastPane.getTitleLabel.setText("Testbed menu")
+    _eastPane.getTitleLabel.setColor(customBlue)
 
     val simulationLabel = new VisLabel("Simulation")
     simulationLabel.setColor(Color.LIGHT_GRAY)
-    eastPane.add(simulationLabel).fillX().expandX().row()
+    _eastPane.add(simulationLabel).fillX().expandX().row()
 
     val pauseCheckbox = new VisCheckBox("update")
     pauseCheckbox.addListener(new ChangeListener {
@@ -102,25 +108,25 @@ case class TestbedView(listener: TestbedListener) {
         listener.onPause(!pauseCheckbox.isChecked)
     })
 
-    eastPane.add(pauseCheckbox).row()
+    _eastPane.add(pauseCheckbox).row()
     pauseCheckbox.setChecked(true)
 
     val samplesLabel = new VisLabel("Samples")
     samplesLabel.setColor(Color.LIGHT_GRAY)
 
     val tree = buildSamplesTree()
-    eastPane.add(samplesLabel).fillX().expandX().row()
-    eastPane.add(tree).expand().fill().row()
-    eastPane.setMovable(false)
+    _eastPane.add(samplesLabel).fillX().expandX().row()
+    _eastPane.add(tree).expand().fill().row()
+    _eastPane.setMovable(false)
 
     /*loading bar and log*/
     loadingLog = new VisLabel("")
     loadingLog.setColor(customBlue)
-    eastPane.add(loadingLog).fillX().expandX().row()
+    _eastPane.add(loadingLog).fillX().expandX().row()
 
     loadingBar = new VisProgressBar(0f, 100f, 1f, false)
     loadingBar.setAnimateDuration(2)
-    eastPane.add(loadingBar).fillX().expandX()
+    _eastPane.add(loadingBar).fillX().expandX()
 
     /*current sample panel (left panel)*/
     val sp =  new VisWindow("")
@@ -128,9 +134,8 @@ case class TestbedView(listener: TestbedListener) {
     sp.getTitleLabel.setColor(customBlue)
     sp.setKeepWithinParent(false)
     sp.setKeepWithinStage(false)
-    samplePane =
-      new AdaptiveSizeActor(sp) with Toggleable with Anchorable
 
+    samplePane = new AdaptiveSizeActor(sp) with Toggleable with Anchorable
     samplePane.setSize(20, 100)
     samplePane.setAnchor(TopLeft)
     samplePane.setTransitionFunc(TransitionFunctions.slideLeft)
@@ -158,20 +163,33 @@ case class TestbedView(listener: TestbedListener) {
 
     ss.getStyle.background = bg
 
-    fpsCounter = new FpsCounter()
-    fpsCounter.setSize(64, 48)
+    val _fps = new FpsCounter()
+    _fps.setSize(64, 48)
+    fpsCounter = new AdaptiveSizeActor(_fps) with Anchorable
+    fpsCounter.setAnchor(TopRight)
 
-    val root = new VisTable()
-    root.setFillParent(true)
-    root.add(menuBar.getTable).colspan(3).fillX().expandX().row()
-    root.add(sp).width(currentSampleMenuWidth).fillY().expandY()
-    viewport = root.add(centerPane).fillY()
+    eastPane = new AdaptiveSizeActor(_eastPane) with Anchorable with Toggleable
+    eastPane.setAnchor(TopRight)
+
+    //val root = new VisTable()
+    //root.setFillParent(true)
+    //root.add(menuBar.getTable).colspan(3).fillX().expandX().row()
+    //root.add(sp).width(currentSampleMenuWidth).fillY().expandY()
+    //viewport = root.add(centerPane).fillY()
     resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
-    root.add(eastPane).width(defaultPaneSize).fillY().expandY()
+    //root.add(_eastPane).width(defaultPaneSize).fillY().expandY()
 
-    stage.addActor(root)
+    //stage.addActor(root)
+    val hud = new Group()
+    hud.addActor(sp)
+    hud.addActor(_eastPane)
+    hud.addActor(_fps)
+
+    //stage.addActor(sp)
+    //stage.addActor(_eastPane)
+    stage.addActor(hud)
     stage.addActor(ss)
-    stage.addActor(fpsCounter)
+    //stage.addActor(fpsCounter)
   }
 
   def addSampleEntry(node: Node, sampleName: String): Unit = {
