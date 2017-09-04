@@ -56,6 +56,7 @@ case class TestbedView(listener: TestbedListener) {
   private var consolePane: AdaptiveSizeActor with Toggleable = _
   private var toastManager: ToastManager = _
   private var fpsLabel: VisLabel = _
+  private var fpsCounter: VisWindow = _
   private var currSampleShortcuts: Option[KeyHelpTable] = None
 
   private val defaultPaneSize = 200f
@@ -75,6 +76,9 @@ case class TestbedView(listener: TestbedListener) {
 
     console.setSize(stage.getWidth - consolePadding * 2, stage.getHeight / 4.5f)
     console.rebuild()
+
+    fpsCounter.setPosition(Gdx.graphics.getWidth - defaultPaneSize - 65,
+      Gdx.graphics.getHeight - 48 - menuBar.getTable.getPrefHeight)
   }
 
   def init(): Unit = {
@@ -154,6 +158,16 @@ case class TestbedView(listener: TestbedListener) {
 
     ss.getStyle.background = bg
 
+    fpsCounter = new VisWindow("FPS")
+    fpsCounter.setPosition(Gdx.graphics.getWidth - defaultPaneSize - 65,
+      Gdx.graphics.getHeight - 48 - menuBar.getTable.getPrefHeight)
+    fpsCounter.setSize(64, 48)
+    fpsCounter.clear()
+    fpsCounter.getTitleTable.clear()
+    fpsCounter.getTitleTable.add(new VisLabel("FPS")).expandX().fillX().padLeft(16)
+    fpsLabel = new VisLabel("60")
+    fpsCounter.add(fpsLabel).center()
+
     val root = new VisTable()
     root.setFillParent(true)
     root.add(menuBar.getTable).colspan(3).fillX().expandX().row()
@@ -164,17 +178,8 @@ case class TestbedView(listener: TestbedListener) {
 
     stage.addActor(root)
     stage.addActor(ss)
-
-    val fpsCounter = new VisWindow("FPS")
     stage.addActor(fpsCounter)
-    fpsCounter.setPosition(Gdx.graphics.getWidth - defaultPaneSize - 65,
-      Gdx.graphics.getHeight - 48 - menuBar.getTable.getPrefHeight)
-    fpsCounter.setSize(64, 48)
-    fpsCounter.clear()
-    fpsCounter.getTitleTable.clear()
-    fpsCounter.getTitleTable.add(new VisLabel("FPS")).expandX().fillX().padLeft(16)
-    fpsLabel = new VisLabel("60")
-    fpsCounter.add(fpsLabel).center()
+
   }
 
   private def updateFpsLabel() = {
