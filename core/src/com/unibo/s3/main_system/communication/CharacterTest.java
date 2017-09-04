@@ -25,7 +25,6 @@ public class CharacterTest {
     private Vector2 v3 = new Vector2(11f,3f);
     private Vector2 v4 = new Vector2(11f,7f);
     private Vector2 v5 = new Vector2(7f,7f);
-    private Vector2 currentVertex = v1;
 
     @Before
     public void init(){
@@ -55,9 +54,6 @@ public class CharacterTest {
         character.getPosition().add(5, 5);
         assertFalse(character.computeNearest() == v1);
         assertTrue(character.computeNearest() == v5);
-        //System.out.println("Nearest vertex is " + character.computeNearest());
-        currentVertex = character.computeNearest();
-        //System.out.println(character.getCurrentNode());
         character.computeNeighbours();
     }
 
