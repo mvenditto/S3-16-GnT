@@ -33,7 +33,6 @@ class LightingSystemTest extends EntitySystemModule {
   private val b2d = new Box2dModule()
   submodules :+= b2d
 
-
   private def testUpdateTorches(characters: List[MovableEntity[Vector2]]) = {
     for (i <- characters.indices) {
       if (torches.size == characters.size) {
