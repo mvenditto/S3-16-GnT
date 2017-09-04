@@ -19,7 +19,7 @@ import com.unibo.s3.InputProcessorAdapter
 import com.unibo.s3.main_system.AbstractMainApplication
 import com.unibo.s3.main_system.util.GraphicsUtils
 import com.unibo.s3.testbed.samples._
-import com.unibo.s3.testbed.ui.{AdaptiveSizeActor, Anchorable, Console, KeyHelpTable, LogMessage, Toggleable, TopLeft, TransitionFunctions}
+import com.unibo.s3.testbed.ui.{AdaptiveSizeActor, Anchorable, Console, FpsCounter, KeyHelpTable, LogMessage, Toggleable, TopLeft, TransitionFunctions}
 
 trait Testbed {
 
@@ -158,15 +158,8 @@ case class TestbedView(listener: TestbedListener) {
 
     ss.getStyle.background = bg
 
-    fpsCounter = new VisWindow("FPS")
-    fpsCounter.setPosition(Gdx.graphics.getWidth - defaultPaneSize - 65,
-      Gdx.graphics.getHeight - 48 - menuBar.getTable.getPrefHeight)
+    fpsCounter = new FpsCounter()
     fpsCounter.setSize(64, 48)
-    fpsCounter.clear()
-    fpsCounter.getTitleTable.clear()
-    fpsCounter.getTitleTable.add(new VisLabel("FPS")).expandX().fillX().padLeft(16)
-    fpsLabel = new VisLabel("60")
-    fpsCounter.add(fpsLabel).center()
 
     val root = new VisTable()
     root.setFillParent(true)
@@ -179,18 +172,6 @@ case class TestbedView(listener: TestbedListener) {
     stage.addActor(root)
     stage.addActor(ss)
     stage.addActor(fpsCounter)
-
-  }
-
-  private def updateFpsLabel() = {
-    val fpsNum = Gdx.graphics.getFramesPerSecond
-    val col = fpsNum match {
-      case fps if fps < 30 => Color.RED
-      case fps if fps >= 30 && 50 >= fps => Color.YELLOW
-      case fps if fps > 50 => Color.GREEN
-    }
-    fpsLabel.setText(fpsNum.toString)
-    fpsLabel.setColor(col)
   }
 
   def addSampleEntry(node: Node, sampleName: String): Unit = {
@@ -247,7 +228,6 @@ case class TestbedView(listener: TestbedListener) {
 
   def update(dt: Float): Unit = {
     stage.act(dt)
-    updateFpsLabel()
   }
 
   def toggleSamplePane(): Unit = {
