@@ -43,8 +43,15 @@ case object BottomRight extends Anchor
 trait Anchorable extends AdaptiveActor {
 
   var anchor: Option[Anchor] = None
+  var padX = 0
+  var padY = 0
 
   def setAnchor(anchor: Anchor): Unit = this.anchor = Option(anchor)
+
+  def setPadding(x: Int, y: Int): Unit = {
+    padX = x
+    padY = y
+  }
 
   abstract override def resize(stageWidth: Float, stageHeight: Float): Unit = {
     super.resize(stageWidth, stageHeight)
@@ -56,6 +63,7 @@ trait Anchorable extends AdaptiveActor {
       case Some(BottomRight) => a.setPosition(stageWidth - a.getWidth, 0)
       case None => ()
     }
+    a.setPosition(a.getX + padX, a.getY + padY)
   }
 }
 

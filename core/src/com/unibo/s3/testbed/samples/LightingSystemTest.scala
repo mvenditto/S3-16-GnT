@@ -3,13 +3,13 @@ package com.unibo.s3.testbed.samples
 import box2dLight.{ConeLight, PointLight, RayHandler}
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
+import com.badlogic.gdx.graphics.{Color, GL20, OrthographicCamera}
 import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.{Gdx, InputMultiplexer}
 import com.kotcrab.vis.ui.widget.color.ColorPicker
-import com.kotcrab.vis.ui.widget.{VisLabel, VisSlider, VisTable, VisWindow}
+import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.main_system.characters.steer.MovableEntity
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory
 import com.unibo.s3.main_system.util.ScaleUtils
@@ -71,7 +71,7 @@ class LightingSystemTest extends EntitySystemModule {
 
   override def setup(f: (String) => Unit): Unit = {
     super.setup(f)
-    b2d.loadWorld("outputGraphActor.txt")
+    b2d.loadWorld("map.txt")
     rayHandler.setWorld(b2d.getWorld)
     collisionDetector = new Box2dProxyDetectorsFactory(b2d.getWorldActorRef)
       .newRaycastCollisionDetector()
@@ -144,6 +144,25 @@ class LightingSystemTest extends EntitySystemModule {
 
     window.add[VisTable](createNode(ambientLightIntensityL,
       ambientLightIntensityS, "Ambient light intensity"))
+    window.row
+
+    val blendFunc = new VisSelectBox[String]()
+    blendFunc.setItems("Default", "1.2", "1.3")
+    blendFunc.addListener(new ChangeListener {
+      override def changed(event: ChangeListener.ChangeEvent, actor: Actor): Unit = {
+        blendFunc.getSelected match {
+          case "Default" => rayHandler.diffuseBlendFunc.reset()
+          case "1.2" =>
+            rayHandler.diffuseBlendFunc.set(GL20.GL_DST_COLOR, GL20.GL_SRC_COLOR);
+          case "1.3" =>
+            rayHandler.diffuseBlendFunc.set(GL20.GL_SRC_COLOR, GL20.GL_DST_COLOR);
+          case _ => ()
+        }
+      }
+    })
+    window.add[VisLabel](new VisLabel("Blending: ")).expandX().fillX().padLeft(4)
+    window.row
+    window.add[VisSelectBox[String]](blendFunc).expandX().fillX()
     window.row
 
     window.add().expandY()
