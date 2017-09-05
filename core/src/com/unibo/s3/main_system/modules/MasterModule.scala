@@ -89,6 +89,26 @@ class MasterModule extends BasicModuleWithGui {
     graphActor tell(AskForGraphMsg, dummyReceiverActor)
   }
 
+  def init(guardsNum: Int, thiefsNum: Int, simulation: Boolean, mapDimension: Vector2, mazeTypeMap: Boolean): Unit = {
+    List(graphActor, quadTreeActor, mapActor).foreach(a =>
+      a ! MapSettingsMsg(mapDimension.x.toInt, mapDimension.y.toInt))
+    //else println("è null"))
+    mapActor ! GenerateMapMsg
+    graphActor tell(AskForGraphMsg, dummyReceiverActor)
+  }
+
+  def setActors(actorsMap: Map[GameActors.Value, String]): Unit = {
+    this.actorsMap = Option(actorsMap)
+
+    masterActor = getActor(GameActors.Master)
+    mapActor = getActor(GameActors.Map)
+    worldActor = getActor(GameActors.World)
+    quadTreeActor = getActor(GameActors.QuadTree)
+    graphActor = getActor(GameActors.Graph)
+    dummyReceiverActor = SystemManager.getInstance()
+      .createActor(DummyReceiverActor.props(), "graphReceiver")
+  }
+
   override def update(dt: Float): Unit = {
     super.update(dt)
     masterActor ! ActMsg(dt)

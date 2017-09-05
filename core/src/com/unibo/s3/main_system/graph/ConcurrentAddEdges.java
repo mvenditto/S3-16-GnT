@@ -25,7 +25,7 @@ public class ConcurrentAddEdges implements Callable<Void> {
     }
 
     private void log(String msg) {
-        System.out.println("[Thread " + id + "] " + msg);
+        //System.out.println("[Thread " + id + "] " + msg);
     }
 
     @Override
@@ -46,8 +46,6 @@ public class ConcurrentAddEdges implements Callable<Void> {
                                 DefaultEdge edge = graph.addEdge(node, toCompare);
                                 if(edge != null)
                                     System.out.println("Secondi archi dal thread: aggiunto " + edge.toString());
-                                else
-                                    System.out.println("L'ho aggiunto ma è NULL");
                             }
                         }
 

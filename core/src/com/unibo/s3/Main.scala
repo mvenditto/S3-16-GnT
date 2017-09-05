@@ -15,6 +15,7 @@ class Main extends AbstractMainApplication {
   private var inputMultiplexer: InputMultiplexer = _
 
   private var bootstrapModule: BootstrapModule = _
+  private[this] var cm: MenuModule = _
 
   override def create(): Unit = {
     super.create()
@@ -34,11 +35,23 @@ class Main extends AbstractMainApplication {
 
   private def addModules() = {
 
-    val cm = new MenuModule
-    cm.enable(false)
-
     val master = new MasterModule()
     master.enable(false)
+
+    val cm = new MenuModule({
+      case Start(guardsNum, thiefsNum, simulation, mapDimension, mazeTypeMap) =>
+        //System.out.println("Dimensione mappa = " + mapDimension.toString)
+        master.enable(true)
+        master.init(guardsNum, thiefsNum, simulation, mapDimension, mazeTypeMap)
+      //master.dummyInit()
+      case Pause(pause) =>
+        println("Sistem pause: " + pause)
+      case Stop() =>
+        println("Stop system!!")
+      case ViewDebug(debug) =>
+        println("View debug activated: " + debug)
+    })
+    cm.enable(false)
 
     var actorsMap: Option[Map[GameActors.Value, String]] = None
     bootstrapModule = new BootstrapModule({
@@ -49,10 +62,11 @@ class Main extends AbstractMainApplication {
         println(err)
 
       case UserAck() if actorsMap.isDefined =>
-        master.dummyInit(actorsMap.get)
-        master.enable(true)
+        //master.dummyInit(actorsMap.get)
+        //master.enable(true)
+        master.setActors(actorsMap.get)
         removeModule(bootstrapModule)
-        //cm.enable(true)
+        cm.enable(true)
     })
 
     modules :+= bootstrapModule

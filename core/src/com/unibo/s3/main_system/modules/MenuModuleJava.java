@@ -18,7 +18,7 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.*;
 import com.unibo.s3.Main;
 
-public class MenuModule extends BasicModuleWithGui {
+public class MenuModuleJava extends BasicModuleWithGui {
     //private SpriteBatch textBatch;
     //private World world;
     private BitmapFont font;
