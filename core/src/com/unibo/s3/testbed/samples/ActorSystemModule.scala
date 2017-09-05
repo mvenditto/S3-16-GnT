@@ -91,8 +91,6 @@ class ActorSystemModule extends BaseSample {
     })
   }
 
-  override def description: String = "Actor System Module."
-
   override def setup(f: (String) => Unit): Unit = {
     super.setup(f)
     f("Init actor system")

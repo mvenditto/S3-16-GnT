@@ -1,6 +1,5 @@
 package com.unibo.s3.desktop;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.unibo.s3.Main;
@@ -17,7 +16,7 @@ public class DesktopLauncher {
 		config.width = width;
 		config.height = height;
 		config.samples = 4;
-		config.vSyncEnabled = true;
+		config.vSyncEnabled = false;
 		//config.fullscreen = true;
 		new LwjglApplication(new Main(), config);
 	}

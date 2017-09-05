@@ -28,7 +28,7 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
     private float cameraZoomSpeed = 0.1f;
     private float cameraViewportWidthMeters = 30f;
 
-    protected boolean pause = true;
+    protected boolean pause = false;
 
     protected abstract void doRender();
 
@@ -106,7 +106,7 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
     }
 
     private void handleCameraInput() {
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.R)) {
             cam.zoom += cameraZoomSpeed;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.Q)) {

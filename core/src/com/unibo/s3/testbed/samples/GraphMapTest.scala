@@ -13,13 +13,13 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.kotcrab.vis.ui.widget.{VisSelectBox, VisTextButton, VisWindow}
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, GenerateGraphMsg, GenerateMapMsg, MapSettingsMsg}
+import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.communication.SystemManager
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig}
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.world.actors.{CreateBox, ResetWorld}
 import com.unibo.s3.testbed.{BaseSample, Testbed}
-import org.jgrapht.UndirectedGraph
 import org.jgrapht.alg.NeighborIndex
 import org.jgrapht.graph.DefaultEdge
 
@@ -35,27 +35,31 @@ class GraphMapTest extends BaseSample {
   private[this] val renderer = new GeometryRendererImpl()
 
   private[this] val graphRenderingConfig = GraphRenderingConfig(Color.GREEN, Color.YELLOW, 1.0f)
-  private[this] val mapFilePath = "maps/outputGraphActor.txt"
+  private[this] val mapFilePath = "maps/map.txt"
 
   private[this] var worldMap = List[Rectangle]()
+
+  private def cacheMap() = {
+    val map = Gdx.files.internal(mapFilePath)
+    worldMap = map.readString().split("\n")
+      .map(b => b.split(":").map(f => f.toFloat))
+      .map(b => new Rectangle(b(0),b(1),b(2),b(3))).toList
+    worldMap.foreach(b => worldActor ! CreateBox(new Vector2(b.x, b.y), new Vector2(b.width, b.height)))
+  }
 
   private def askForGraph(): Unit = {
     implicit val timeout = Timeout(120 seconds)
 
     graph = None
-    val map = Gdx.files.internal(mapFilePath)
+
     worldActor ! ResetWorld
     worldActor ! ActMsg(1)
-    worldMap = map.readString().split("\n")
-      .map(b => b.split(":").map(f => f.toFloat))
-      .map(b => new Rectangle(b(0),b(1),b(2),b(3))).toList
-    worldMap.foreach(b => worldActor ! CreateBox(new Vector2(b.x, b.y), new Vector2(b.width, b.height)))
 
     new Thread(new Runnable {
       override def run(): Unit = {
-        val future = graphActor ? GenerateGraphMsg()
+        val future = graphActor ? AskForGraphMsg
         val result = Await.result(future, timeout.duration)
-          .asInstanceOf[UndirectedGraph [Vector2, DefaultEdge]]
+          .asInstanceOf[SendGraphMsg].graph
 
         graph = Option(new GraphAdapter[Vector2] {
           override def getNeighbors(vertex: Vector2): util.Iterator[Vector2] = {
@@ -65,6 +69,7 @@ class GraphMapTest extends BaseSample {
 
           override def getVertices: util.Iterator[Vector2] = result.vertexSet.iterator
         })
+        cacheMap()
       }
     }).start()
   }
@@ -82,7 +87,7 @@ class GraphMapTest extends BaseSample {
     initBtn.addListener(new ClickListener {
       override def clicked(event: InputEvent, x: Float, y: Float): Unit = {
         super.clicked(event, x, y)
-        mapActor ! MapSettingsMsg(20, 20)
+
         mapActor ! GenerateMapMsg()
       }
     })
@@ -98,7 +103,7 @@ class GraphMapTest extends BaseSample {
       override def clicked(event: InputEvent, x: Float, y: Float): Unit = {
         super.clicked(event, x, y)
         val f = Gdx.files.internal("maps/"+selectBox.getSelected)
-        if (!f.name().equals("outputGraphActor.txt")) f.copyTo(Gdx.files.local(mapFilePath))
+        if (!f.name().equals("map.txt")) f.copyTo(Gdx.files.local(mapFilePath))
         askForGraph()
       }
     })
@@ -115,6 +120,10 @@ class GraphMapTest extends BaseSample {
     worldActor = SystemManager.getInstance().getLocalActor("worldActor")
     mapActor = SystemManager.getInstance().getLocalActor("mapActor")
     graphActor = SystemManager.getInstance().getLocalActor("graphActor")
+
+    mapActor ! MapSettingsMsg(60, 60)
+    graphActor ! MapSettingsMsg(60, 60)
+
   }
 
   override def render(shapeRenderer: ShapeRenderer): Unit = {
@@ -127,12 +136,4 @@ class GraphMapTest extends BaseSample {
   }
 
   override def cleanup(): Unit = super.cleanup()
-
-  override def description: String =
-    """System init test:
-      |- Actors deployment
-      |- Map generation
-      |- Graph generation
-    """.stripMargin
-
 }

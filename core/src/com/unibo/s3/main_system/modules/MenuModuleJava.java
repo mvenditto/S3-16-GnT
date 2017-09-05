@@ -18,11 +18,9 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.*;
 import com.unibo.s3.Main;
 
-import java.util.HashMap;
-
-public class MenuModule extends BasicModuleWithGui {
-    private SpriteBatch textBatch;
-    private World world;
+public class MenuModuleJava extends BasicModuleWithGui {
+    //private SpriteBatch textBatch;
+    //private World world;
     private BitmapFont font;
     private boolean enabled = true;
 
@@ -30,15 +28,15 @@ public class MenuModule extends BasicModuleWithGui {
     private int thiefsNum = 1;
     private boolean pause = false;
     private boolean simulation = false;
+    private boolean mazeMap = true;
 
     @Override
     public void init(Main owner) {
         super.init(owner);
-        this.world = new World(new Vector2(0,0), true);
+        //this.world = new World(new Vector2(0,0), true);
         font = new BitmapFont();
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         font.getData().setScale(1.5f);
-        VisUI.load();
         //initMenuGUI();
         initSettingsGUI();
     }
@@ -51,15 +49,6 @@ public class MenuModule extends BasicModuleWithGui {
         title.setColor(Color.GREEN);
         System.out.println("align = " + title.getLabelAlign());
         title.setAlignment(Align.center);
-        /*table.setWidth(Gdx.graphics.getWidth());
-        table.setHeight(Gdx.graphics.getHeight());*/
-        /*table.setKeepWithinParent(false);
-        table.setKeepWithinStage(false);*/
-
-
-        /*VisLabel l = new VisLabel("Menu");
-        l.setColor(Color.GREEN);
-        table.add(l);*/
 
         table.row();
         VisSlider guardsNumS = new VisSlider(2f, 20f, 1f, false);
@@ -109,6 +98,15 @@ public class MenuModule extends BasicModuleWithGui {
         tableThiefType.add(new VisLabel("Thief type: "));
         tableThiefType.add(simThief).padRight(5);
         tableThiefType.add(pilThief).padLeft(5);
+        simThief.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if(simThief.isChecked())
+                    simulation = true;
+                else
+                    simulation = false;
+            }
+        });
         table.add(tableThiefType).padTop(10).padLeft(5).padRight(5);
 
         //60x60, 80x60
@@ -152,6 +150,15 @@ public class MenuModule extends BasicModuleWithGui {
         tableMapType.add(new VisLabel("Map type: "));
         tableMapType.add(mazeCheck).padRight(5);
         tableMapType.add(roomCheck).padLeft(5);
+        mazeCheck.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if(mazeCheck.isChecked())
+                    mazeMap = true;
+                else
+                    mazeMap = false;
+            }
+        });
         table.add(tableMapType).padTop(10);
 
         table.row();
@@ -165,7 +172,7 @@ public class MenuModule extends BasicModuleWithGui {
         });
         table.pack();
 
-        GUI.addActor(table);
+        gui.addActor(table);
 
         table.centerWindow();
         //table.setPosition((Gdx.graphics.getWidth()/2)-(table.getWidth()/2), (Gdx.graphics.getHeight()/2)-(table.getHeight()/2));
@@ -203,7 +210,7 @@ public class MenuModule extends BasicModuleWithGui {
         VisCheckBox debugView = new VisCheckBox(" View debug");
         table.add(debugView).padTop(10).padBottom(10).padLeft(10).padRight(10);
 
-        GUI.addActor(table);
+        gui.addActor(table);
 
         table.pack();
         table.setPosition(50, Gdx.graphics.getHeight() - 200);
@@ -225,8 +232,4 @@ public class MenuModule extends BasicModuleWithGui {
         return this.enabled;
     }
 
-
-    public void setTextRenderer(SpriteBatch b) {
-        textBatch = b;
-    }
 }

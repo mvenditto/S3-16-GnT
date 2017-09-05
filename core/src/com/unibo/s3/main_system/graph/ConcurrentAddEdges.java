@@ -25,7 +25,7 @@ public class ConcurrentAddEdges implements Callable<Void> {
     }
 
     private void log(String msg) {
-        System.out.println("[Thread " + id + "] " + msg);
+        //System.out.println("[Thread " + id + "] " + msg);
     }
 
     @Override
@@ -44,7 +44,8 @@ public class ConcurrentAddEdges implements Callable<Void> {
                             //log(node.toString() + " non arriva a " + toCompare.toString());
                             if(checkEdgeRayCast(collisionDetector, node, toCompare, 0.5f, 16)) {
                                 DefaultEdge edge = graph.addEdge(node, toCompare);
-                                System.out.println("Secondi archi dal thread: aggiunto " + edge.toString());
+                                if(edge != null)
+                                    System.out.println("Secondi archi dal thread: aggiunto " + edge.toString());
                             }
                         }
 

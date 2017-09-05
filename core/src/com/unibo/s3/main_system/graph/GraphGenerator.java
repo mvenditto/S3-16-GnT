@@ -98,19 +98,32 @@ public class GraphGenerator {
         int nProc = Runtime.getRuntime().availableProcessors()+1;
         ExecutorService executor = Executors.newFixedThreadPool(nProc);
         Set<Future<Void>> resultSet = new HashSet<>();
-        int nTask = 8;
+        int nTask = graph.vertexSet().size();
         int vectToThread = graph.vertexSet().size() / nTask;
+        /*if(graph.vertexSet().size() % (float) nTask > 60)
+            vectToThread++;*/
+        //log("Resto modulo = " + graph.vertexSet().size() % (float) nTask);
         HashMap<Integer, List<Vector2>> ntc = new HashMap<>();
         int count = 0;
         ntc.put(count, new ArrayList<>());
         for(Vector2 node : graph.vertexSet()) {
             List<Vector2> nodesList = ntc.get(count);
             nodesList.add(node);
-            if(nodesList.size() == vectToThread) {
+            if(nodesList.size() == vectToThread && count != (nTask-1)) {
                 Future<Void> res = executor.submit(new ConcurrentAddEdges(nodesList, graph, collisionDetector, (count+1)));
                 resultSet.add(res);
                 count++;
                 ntc.put(count, new ArrayList<>());
+            }
+        }
+        Future<Void> res = executor.submit(new ConcurrentAddEdges(ntc.get(count), graph, collisionDetector, (count+1)));
+        resultSet.add(res);
+
+        for (Future<Void> future : resultSet) {
+            try {
+                future.get();
+            } catch (Exception ex){
+                ex.printStackTrace();
             }
         }
 
