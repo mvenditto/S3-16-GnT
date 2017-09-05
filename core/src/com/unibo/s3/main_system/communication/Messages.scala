@@ -2,7 +2,7 @@ package com.unibo.s3.main_system.communication
 
 import akka.actor.ActorRef
 import com.badlogic.gdx.math.Vector2
-import com.unibo.s3.main_system.characters.BaseCharacter
+import com.unibo.s3.main_system.characters.{BaseCharacter}
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
 

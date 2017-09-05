@@ -99,8 +99,8 @@ public class CharacterTest {
         assertEquals(character.getInformations(), Arrays.asList(v1, v2));
 
         //information exchange
-        character.updateGraph((ArrayList<Vector2>) secondCharacter.getInformations());
-        secondCharacter.updateGraph((ArrayList<Vector2>) character.getInformations());
+        character.updateGraph(secondCharacter.getInformations());
+        secondCharacter.updateGraph(character.getInformations());
         assertEquals(character.getInformations(), Arrays.asList(v1, v2, v5));
         assertEquals(secondCharacter.getInformations(), Arrays.asList(v5, v2, v1));
     }
