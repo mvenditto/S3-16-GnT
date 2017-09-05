@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.kotcrab.vis.ui.widget.{VisSelectBox, VisTextButton, VisWindow}
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, GenerateGraphMsg, GenerateMapMsg, MapSettingsMsg}
 import com.unibo.s3.main_system.communication.Messages._
-import com.unibo.s3.main_system.communication.SystemManager
+import com.unibo.s3.main_system.communication.{Actors, SystemManager}
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig}
 import com.unibo.s3.main_system.util.GdxImplicits._
@@ -117,9 +117,9 @@ class GraphMapTest extends BaseSample {
   override def setup(log: (String) => Unit): Unit = {
     super.setup(log)
     log("Storing actor refs..")
-    worldActor = SystemManager.getInstance().getLocalActor("worldActor")
-    mapActor = SystemManager.getInstance().getLocalActor("mapActor")
-    graphActor = SystemManager.getInstance().getLocalActor("graphActor")
+    worldActor = SystemManager.getLocalActor(Actors.WORLD_ACTOR.name)
+    mapActor = SystemManager.getLocalActor(Actors.MAP_ACTOR.name)
+    graphActor = SystemManager.getLocalActor(Actors.GRAPH_ACTOR.name)
 
     mapActor ! MapSettingsMsg(60, 60)
     graphActor ! MapSettingsMsg(60, 60)

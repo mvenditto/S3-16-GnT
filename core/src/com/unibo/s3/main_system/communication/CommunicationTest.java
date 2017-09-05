@@ -24,17 +24,17 @@ public class CommunicationTest extends ApplicationAdapter {
         this.batch = new SpriteBatch();
         this.img = new Texture("badlogic.jpg");
 
-        SystemManager.getInstance().createSystem("System", null);
-        SystemManager.getInstance().createActor(MasterActor.props(), "masterActor");
-        SystemManager.getInstance().createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor");
-        SystemManager.getInstance().createActor(QuadTreeActor.props(), "quadTreeActor");
-        SystemManager.getInstance().createActor(MapActor.props(), "mapActor");
-        SystemManager.getInstance().createActor(GraphActor.props(), "graphActor");
+        SystemManager.createSystem("System", null);
+        SystemManager.createActor(MasterActor.props(), Actors.MASTER_ACTOR().name());
+        SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), Actors.WORLD_ACTOR().name());
+        SystemManager.createActor(QuadTreeActor.props(), Actors.QUAD_TREE_ACTOR().name());
+        SystemManager.createActor(MapActor.props(), Actors.MAP_ACTOR().name());
+        SystemManager.createActor(GraphActor.props(), Actors.GRAPH_ACTOR().name());
 
-        ActorRef masterActor = SystemManager.getInstance().getLocalActor("masterActor");
-        ActorRef mapActor = SystemManager.getInstance().getLocalActor("mapActor");
-        ActorRef graphActor = SystemManager.getInstance().getLocalActor("graphActor");
-        ActorRef quadTreeActor = SystemManager.getInstance().getLocalActor("quadTreeActor");
+        ActorRef masterActor = SystemManager.getLocalActor(Actors.MASTER_ACTOR().name());
+        ActorRef mapActor = SystemManager.getLocalActor(Actors.MAP_ACTOR().name());
+        ActorRef graphActor = SystemManager.getLocalActor(Actors.GRAPH_ACTOR().name());
+        ActorRef quadTreeActor = SystemManager.getLocalActor(Actors.QUAD_TREE_ACTOR().name());
 
         mapActor.tell(new Messages.MapSettingsMsg(60, 60), ActorRef.noSender());
         graphActor.tell(new Messages.MapSettingsMsg(60, 60), ActorRef.noSender());

@@ -17,7 +17,7 @@ class CharacterActor(private[this] val character: BaseCharacter) extends Untyped
   override def onReceive(message: Any): Unit = message match {
     case ActMsg(dt) =>
       character.act(dt)
-      SystemManager.getInstance().getLocalActor("quadTreeActor").tell(AskNeighboursMsg(this.character), getSelf())
+      SystemManager.getLocalActor(Actors.QUAD_TREE_ACTOR.name).tell(AskNeighboursMsg(this.character), getSelf())
 
     case msg: SendNeighboursMsg =>
       msg.neighbours.foreach(neighbour => neighbour.tell(SendCopInfoMsg(character.getInformations.toList), getSelf()))
