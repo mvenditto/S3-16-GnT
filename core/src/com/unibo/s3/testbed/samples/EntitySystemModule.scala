@@ -12,6 +12,7 @@ import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.InputProcessorAdapter
 import com.unibo.s3.main_system.characters.steer.{BaseMovableEntity, MovableEntity, MovableEntityController}
 import com.unibo.s3.main_system.rendering.{GeometryRenderer, GeometryRendererImpl}
+import com.unibo.s3.main_system.util.ScaleUtils
 import com.unibo.s3.main_system.util.ScaleUtils.{getMetersPerPixel, getPixelsPerMeter}
 import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
 import com.unibo.s3.testbed.{BaseSample, Testbed}
@@ -65,7 +66,9 @@ class EntitySystemModule extends BaseSample
       shapeRenderer.setAutoShapeType(true)
       shapeRenderer.set(ShapeType.Filled)
       val k = ctrl.get.getTargetVector.cpy().scl(getPixelsPerMeter.toFloat)
-      shapeRenderer.circle(k.x, k.y, getPixelsPerMeter.toFloat / 2)
+      val cr = ScaleUtils.getPixelsPerMeter / 2f
+      shapeRenderer.rectLine(k.cpy.add(-cr, 0), k.cpy().add(cr, 0), 2)
+      shapeRenderer.rectLine(k.cpy.add(0, -cr), k.cpy().add(0, cr), 2)
       shapeRenderer.set(t)
       shapeRenderer.setColor(backupColor)
     }

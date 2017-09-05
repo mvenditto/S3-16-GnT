@@ -30,17 +30,17 @@ class Console extends VisTable {
   }
 
   def addLog(log: LogMessage): Unit = {
-    if (!logLimitReached()) logs :+= log
-    rebuild()
+    safe(_ => {
+      if (!logLimitReached()) logs :+= log
+      rebuild()
+    })
   }
 
   def rebuild(): Unit = {
-    safe(_ => {
       clear()
       for (i <- logs.indices) {
         addLogWithIdx(logs(i), i)
       }
-    })
   }
 
   /* post on rendering thread, executed at next update.*/
