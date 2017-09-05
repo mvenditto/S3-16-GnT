@@ -12,10 +12,13 @@ import org.jgrapht.graph.DefaultEdge
 
 import scala.util.Random
 
-class Character(vector2: Vector2) extends BaseMovableEntity(vector2){
+trait CharacterTrait{
+
+}
+
+class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector2){
 
   private var color : Color = _
-  private val id : Int = 0
 
   private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _ //char
 
@@ -135,7 +138,7 @@ class Character(vector2: Vector2) extends BaseMovableEntity(vector2){
 
 }
 
-class BaseCharacter(vector : Vector2, id : Int) extends Character(vector){
+//class BaseCharacter(vector : Vector2, id : Int) extends Character(vector){
 
-}
+//}
 
