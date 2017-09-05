@@ -11,9 +11,9 @@ case object Maze extends MapType
 case object Rooms extends MapType
 
 case class GameSettings(
-  guardsNumber: Int,
-  thievesNumber: Int,
-  mapSize: Vector2,
-  gameMode: GameMode,
-  mapType: MapType
+   guardsNumber: Int = 5,
+   thievesNumber: Int = 5,
+   mapSize: Vector2 = new Vector2(60, 60),
+   gameMode: GameMode = Simulated,
+   mapType: MapType = Maze
 )

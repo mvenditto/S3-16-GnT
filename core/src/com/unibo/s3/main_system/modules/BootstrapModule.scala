@@ -25,7 +25,6 @@ case class UserAck() extends BootstrapEvent
 class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithGui {
 
   private[this] var loadingFinished = false
-
   private[this] val actorSystemName = "System"
   private[this] val gameActorsNames = Map(
     GameActors.World -> "worldActor",
