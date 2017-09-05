@@ -52,6 +52,7 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
     this.nNeighbours += 1
   }
 
+  def isNeighbour(possibleNeighbour : ActorRef) : Boolean = neighbours.contains(possibleNeighbour)
 
   def getInformations: scala.List[Vector2] = this.visited
 

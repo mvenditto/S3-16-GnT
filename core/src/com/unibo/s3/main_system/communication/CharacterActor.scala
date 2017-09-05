@@ -21,8 +21,9 @@ class CharacterActor(private[this] val character: BaseCharacter) extends Untyped
 
     case msg: SendNeighboursMsg =>
       msg.neighbours.foreach(neighbour => neighbour.tell(SendCopInfoMsg(character.getInformations.toList), getSelf()))
-      //msg.neighbours.foreach(neighbour => character.addNeighbour(neighbour))
-      msg.neighbours.filter(neighbour => !character.getNeighbours.contains(neighbour)).foreach(neighbour => character.addNeighbour(neighbour))
+      //msg.neighbours.filter(neighbour => !character.getNeighbours.contains(neighbour)).foreach(neighbour => character.addNeighbour(neighbour))
+      msg.neighbours.filter(neighbour => !character.isNeighbour(neighbour)).foreach(neighbour => character.addNeighbour(neighbour))
+      //verifica funzionamento
       println("cop: " + getSelf() + "| I have " + msg.neighbours.size + " neighbours: " + character.getNeighbours)
 
     case msg: SendCopInfoMsg =>
@@ -30,8 +31,6 @@ class CharacterActor(private[this] val character: BaseCharacter) extends Untyped
       character.updateGraph(msg.visitedVertices)
       println("cop: " + getSelf() + " known vertices: " + character.getInformations)
       //qui ho le info dell'altro poliziotto quindi poi posso fare quello che devo
-
-    //case ricevo grafo iniziale => salvo grafo iniziale
 
     case msg: SendGraphMsg=>
       println("cop: " + getSelf() + "| received graph")
