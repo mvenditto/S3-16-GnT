@@ -224,7 +224,7 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
         }
 
         @Override
-        public SteeringBehavior<Vector2> buildBlended(float[] weights, boolean setAsEntityBehavior) {
+        public SteeringBehavior<Vector2> buildBlended(float[] weights, boolean setAsOwnerBehavior) {
 
             if (weights.length < behaviorQueue.size()) {
                 throw new IllegalArgumentException("Too few weights");
@@ -236,7 +236,7 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
                 finalBehavior.add(behaviorQueue.get(i), weights[i]);
             }
 
-            if (setAsEntityBehavior) {
+            if (setAsOwnerBehavior) {
                 owner.setSteeringBehavior(finalBehavior);
             }
             behaviorQueue.clear();
@@ -244,11 +244,11 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
         }
         
         @Override
-        public SteeringBehavior<Vector2> buildPriority(boolean setAsEntityBehavior) {
+        public SteeringBehavior<Vector2> buildPriority(boolean setAsOwnerBehavior) {
             final PrioritySteering<Vector2> finalBehavior = new PrioritySteering<>(owner, 0.0001f);
             behaviorQueue.forEach(finalBehavior::add);
 
-            if (setAsEntityBehavior) {
+            if (setAsOwnerBehavior) {
                 owner.setSteeringBehavior(finalBehavior);
             }
 

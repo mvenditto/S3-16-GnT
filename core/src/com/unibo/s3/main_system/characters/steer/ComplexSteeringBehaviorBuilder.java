@@ -100,7 +100,7 @@ public interface ComplexSteeringBehaviorBuilder<T extends Vector<T>> {
      * See: {@link com.badlogic.gdx.ai.steer.behaviors.PrioritySteering}
      * @return The resulting {@link com.badlogic.gdx.ai.steer.SteeringBehavior}.
      */
-    SteeringBehavior<T> buildPriority(boolean setAsEntityBehavior);
+    SteeringBehavior<T> buildPriority(boolean setAsOwnerBehavior);
 
     /**
      * Build the resulting {@link com.badlogic.gdx.ai.steer.SteeringBehavior}, summing up all the single behaviors.
@@ -110,7 +110,7 @@ public interface ComplexSteeringBehaviorBuilder<T extends Vector<T>> {
      * See: {@link com.badlogic.gdx.ai.steer.behaviors.BlendedSteering}
      * @return The resulting {@link com.badlogic.gdx.ai.steer.SteeringBehavior}.
      */
-    SteeringBehavior<T> buildBlended(float[] weights, boolean setAsEntityBehavior);
+    SteeringBehavior<T> buildBlended(float[] weights, boolean setAsOwnerBehavior);
 
     int getBehaviorsNumber();
 

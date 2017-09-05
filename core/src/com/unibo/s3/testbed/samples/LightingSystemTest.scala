@@ -3,9 +3,13 @@ package com.unibo.s3.testbed.samples
 import box2dLight.{ConeLight, PointLight, RayHandler}
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
+import com.badlogic.gdx.graphics.{Color, GL20, OrthographicCamera}
 import com.badlogic.gdx.math.{MathUtils, Vector2}
+import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.{Gdx, InputMultiplexer}
+import com.kotcrab.vis.ui.widget.color.ColorPicker
+import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.main_system.characters.steer.MovableEntity
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory
 import com.unibo.s3.main_system.util.ScaleUtils
@@ -22,13 +26,12 @@ class LightingSystemTest extends EntitySystemModule {
   private var torches = List[ConeLight]()
   private var lights = List[PointLight]()
 
-  private val LIGHT_WHITE = new Color(1.0f, 1.0f, 1.0f, 0.5f)
-  private var lightEditorEnabled = true
+  private val LIGHT_WHITE = new Color(1.0f, 1.0f, 1.0f, 1.0f)
+  private var lightEditorEnabled = false
   private var renderLightsAfterBodies = true
 
   private val b2d = new Box2dModule()
   submodules :+= b2d
-
 
   private def testUpdateTorches(characters: List[MovableEntity[Vector2]]) = {
     for (i <- characters.indices) {
@@ -43,7 +46,7 @@ class LightingSystemTest extends EntitySystemModule {
 
   private def testCreateTorches(characters: List[MovableEntity[Vector2]]) = {
     characters.foreach(c => {
-      val t = new ConeLight(rayHandler, 65, LIGHT_WHITE, 15f,
+      val t = new ConeLight(rayHandler, 65, c.getColor, 15f,
         c.getPosition.x, c.getPosition.y,
         (c.getOrientation * MathUtils.radiansToDegrees) + 90, 25f)
       //t.setSoft(false)
@@ -68,18 +71,17 @@ class LightingSystemTest extends EntitySystemModule {
 
   override def setup(f: (String) => Unit): Unit = {
     super.setup(f)
-    b2d.loadWorld("world0.txt")
+    b2d.loadWorld("map.txt")
     rayHandler.setWorld(b2d.getWorld)
     collisionDetector = new Box2dProxyDetectorsFactory(b2d.getWorldActorRef)
       .newRaycastCollisionDetector()
     RayHandler.setGammaCorrection(false)
     RayHandler.useDiffuseLight(true)
     this.rayHandler.setBlur(true)
-    this.rayHandler.setBlurNum(1)
+    this.rayHandler.setBlurNum(2)
     this.rayHandler.setShadows(true)
     this.rayHandler.setCulling(true)
     rayHandler.setAmbientLight(new Color(.1f, .1f, .1f, .1f))
-    loadLights("lights.txt")
   }
 
   override def render(shapeRenderer: ShapeRenderer): Unit = {
@@ -121,6 +123,66 @@ class LightingSystemTest extends EntitySystemModule {
     }
   }
 
+  override def initGui(window: VisWindow): Unit = {
+    super.initGui(window)
+    val l = new VisLabel("Lighting System")
+    l.setColor(window.getTitleLabel.getColor)
+    window.add[VisLabel](l).fillX().expandX()
+    window.row
+
+    val ambientLightIntensityS = new VisSlider(0.0f, 1.0f, 0.1f, false)
+    val ambientLightIntensityL = new VisLabel("0.1")
+
+    ambientLightIntensityS.addListener(new ChangeListener {
+      override def changed(event: ChangeListener.ChangeEvent, actor: Actor): Unit = {
+        val i = ambientLightIntensityS.getValue
+        ambientLightIntensityL.setText(i.toString)
+        rayHandler.setAmbientLight(i,i,i,i)
+      }
+    })
+
+    val blurIntensityS = new VisSlider(0.0f, 5.0f, 1.0f, false)
+    val blurIntensityL = new VisLabel("2")
+    blurIntensityS.setValue(2)
+
+    blurIntensityS.addListener(new ChangeListener {
+      override def changed(event: ChangeListener.ChangeEvent, actor: Actor): Unit = {
+        val i = blurIntensityS.getValue
+        blurIntensityL.setText(i.toString)
+        rayHandler.setBlurNum(i.toInt)
+      }
+    })
+
+    window.add[VisTable](createNode(ambientLightIntensityL,
+      ambientLightIntensityS, "Ambient light intensity"))
+    window.row
+
+    window.add[VisTable](createNode(blurIntensityL,
+      blurIntensityS, "Blur level"))
+    window.row
+
+    val blendFunc = new VisSelectBox[String]()
+    blendFunc.setItems("Default", "1.2", "1.3")
+    blendFunc.addListener(new ChangeListener {
+      override def changed(event: ChangeListener.ChangeEvent, actor: Actor): Unit = {
+        blendFunc.getSelected match {
+          case "Default" => rayHandler.diffuseBlendFunc.reset()
+          case "1.2" =>
+            rayHandler.diffuseBlendFunc.set(GL20.GL_DST_COLOR, GL20.GL_SRC_COLOR);
+          case "1.3" =>
+            rayHandler.diffuseBlendFunc.set(GL20.GL_SRC_COLOR, GL20.GL_DST_COLOR);
+          case _ => ()
+        }
+      }
+    })
+    window.add[VisLabel](new VisLabel("Blending: ")).expandX().fillX().padLeft(4)
+    window.row
+    window.add[VisSelectBox[String]](blendFunc).expandX().fillX()
+    window.row
+
+    window.add().expandY()
+  }
+
   override def cleanup(): Unit = {
     super.cleanup()
   }
@@ -141,8 +203,8 @@ class LightingSystemTest extends EntitySystemModule {
     super.keyUp(keycode)
     if(keycode == Keys.Y) lightEditorEnabled = !lightEditorEnabled
     if(keycode == Keys.T) enable(!enabled)
-    if(keycode == Keys.D) RayHandler.useDiffuseLight(!RayHandler.isDiffuse)
-    if(keycode == Keys.R) renderLightsAfterBodies = !renderLightsAfterBodies
+    if(keycode == Keys.F) RayHandler.useDiffuseLight(!RayHandler.isDiffuse)
+    if(keycode == Keys.U) renderLightsAfterBodies = !renderLightsAfterBodies
     false
   }
 
@@ -154,7 +216,7 @@ class LightingSystemTest extends EntitySystemModule {
       "y" -> "enable adding lights.",
       "t" -> "toggle lighting system",
       "r" -> "switch pre/post lights rendering",
-      "d" -> "toggle diffuse lights",
+      "f" -> "toggle diffuse lights",
       "mouse-left" -> "add light"
     )
 

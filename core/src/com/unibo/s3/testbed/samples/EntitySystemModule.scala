@@ -3,14 +3,16 @@ package com.unibo.s3.testbed.samples
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.{InputEvent, InputListener}
-import com.badlogic.gdx.{Input, InputMultiplexer}
+import com.badlogic.gdx.{Gdx, Input, InputMultiplexer}
 import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.InputProcessorAdapter
-import com.unibo.s3.main_system.characters.steer.{BaseMovableEntity, MovableEntity}
+import com.unibo.s3.main_system.characters.steer.{BaseMovableEntity, MovableEntity, MovableEntityController}
 import com.unibo.s3.main_system.rendering.{GeometryRenderer, GeometryRendererImpl}
+import com.unibo.s3.main_system.util.ScaleUtils
 import com.unibo.s3.main_system.util.ScaleUtils.{getMetersPerPixel, getPixelsPerMeter}
 import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
 import com.unibo.s3.testbed.{BaseSample, Testbed}
@@ -48,6 +50,7 @@ class EntitySystemModule extends BaseSample
 
   /*input*/
   private var isLeftCtrlPressed: Boolean = false
+  private var ctrl: Option[MovableEntityController] = None
 
   override def getKeyShortcuts: Option[Map[String, String]] = {
     Option(Map("ctrl+mouse-left" -> "select an entity"))
@@ -59,6 +62,14 @@ class EntitySystemModule extends BaseSample
       val backupColor = shapeRenderer.getColor
       shapeRenderer.setColor(Color.GREEN)
       shapeRenderer.circle(center.x, center.y, getPixelsPerMeter.toFloat)
+      val t = shapeRenderer.getCurrentType
+      shapeRenderer.setAutoShapeType(true)
+      shapeRenderer.set(ShapeType.Filled)
+      val k = ctrl.get.getTargetVector.cpy().scl(getPixelsPerMeter.toFloat)
+      val cr = ScaleUtils.getPixelsPerMeter / 2f
+      shapeRenderer.rectLine(k.cpy.add(-cr, 0), k.cpy().add(cr, 0), 2)
+      shapeRenderer.rectLine(k.cpy.add(0, -cr), k.cpy().add(0, cr), 2)
+      shapeRenderer.set(t)
       shapeRenderer.setColor(backupColor)
     }
   }
@@ -77,7 +88,7 @@ class EntitySystemModule extends BaseSample
     numAgentsL.setText(entities.size + "")
   }
 
-  private def createNode(lbl: VisLabel, slid: VisSlider, label: String): VisTable = {
+  protected def createNode(lbl: VisLabel, slid: VisSlider, label: String): VisTable = {
     val t = new VisTable(true)
     t.add(label).width(200).row()
     t.add(slid).width(100).expandX()
@@ -106,6 +117,7 @@ class EntitySystemModule extends BaseSample
 
       override def touchDragged(event: InputEvent, x: Float, y: Float, pointer: Int): Unit = {
         maxLinearSpeedL.setText(maxLinearSpeedS.getValue + "")
+        ctrl.foreach(c => c.setDirectionSpeed(maxLinearSpeedS.getValue))
       }
 
       override def touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) = true
@@ -215,7 +227,7 @@ class EntitySystemModule extends BaseSample
     window.add(createNode(maxAngularSpeedL, maxAngularSpeedS, "maxAngularSpeed"))
     window.row
 
-    window.add().expandY()
+    //window.add().expandY()
   }
 
   override def init(owner: Testbed): Unit = {
@@ -234,6 +246,8 @@ class EntitySystemModule extends BaseSample
   }
 
   override def update(dt: Float): Unit = {
+    ctrl.foreach(c => c.update(dt))
+
     if (entitiesToAdd.nonEmpty) {
       entities = entities ++ entitiesToAdd
       entitiesToAdd = List[MovableEntity[Vector2]]()
@@ -255,11 +269,13 @@ class EntitySystemModule extends BaseSample
 
   override def keyDown(keycode: Int): Boolean = {
     if (keycode == Input.Keys.CONTROL_LEFT) isLeftCtrlPressed = true
+    ctrl.foreach(c => c.keyDown(keycode))
     false
   }
 
   override def keyUp(keycode: Int): Boolean = {
     if (keycode == Input.Keys.CONTROL_LEFT) isLeftCtrlPressed = false
+    ctrl.foreach(c => c.keyUp(keycode))
     false
   }
 
@@ -274,6 +290,7 @@ class EntitySystemModule extends BaseSample
           if (a.getPosition.dst(click) <= 1.1f) {
             selectedAgent = a
             updateGui()
+            ctrl = Option(new MovableEntityController(selectedAgent))
           }
         }
       }
@@ -309,6 +326,4 @@ class EntitySystemModule extends BaseSample
     val res = qtree.rangeQuery(Bounds(ePos.x - searchRadius / 2, ePos.y - searchRadius / 2, searchRadius, searchRadius))
     JavaConversions.asJavaIterable(res)
   }
-
-  override def description: String = "Entities simulation module."
 }
