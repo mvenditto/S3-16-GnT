@@ -135,12 +135,4 @@ class GraphMapTest extends BaseSample {
   }
 
   override def cleanup(): Unit = super.cleanup()
-
-  override def description: String =
-    """System init test:
-      |- Actors deployment
-      |- Map generation
-      |- Graph generation
-    """.stripMargin
-
 }

@@ -323,6 +323,4 @@ class EntitySystemModule extends BaseSample
     val res = qtree.rangeQuery(Bounds(ePos.x - searchRadius / 2, ePos.y - searchRadius / 2, searchRadius, searchRadius))
     JavaConversions.asJavaIterable(res)
   }
-
-  override def description: String = "Entities simulation module."
 }

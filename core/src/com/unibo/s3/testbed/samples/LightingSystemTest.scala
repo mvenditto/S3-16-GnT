@@ -75,14 +75,13 @@ class LightingSystemTest extends EntitySystemModule {
     rayHandler.setWorld(b2d.getWorld)
     collisionDetector = new Box2dProxyDetectorsFactory(b2d.getWorldActorRef)
       .newRaycastCollisionDetector()
-    RayHandler.setGammaCorrection(true)
+    RayHandler.setGammaCorrection(false)
     RayHandler.useDiffuseLight(true)
     this.rayHandler.setBlur(true)
     this.rayHandler.setBlurNum(2)
     this.rayHandler.setShadows(true)
     this.rayHandler.setCulling(true)
     rayHandler.setAmbientLight(new Color(.1f, .1f, .1f, .1f))
-    //loadLights("lights.txt")
   }
 
   override def render(shapeRenderer: ShapeRenderer): Unit = {
@@ -142,8 +141,24 @@ class LightingSystemTest extends EntitySystemModule {
       }
     })
 
+    val blurIntensityS = new VisSlider(0.0f, 5.0f, 1.0f, false)
+    val blurIntensityL = new VisLabel("2")
+    blurIntensityS.setValue(2)
+
+    blurIntensityS.addListener(new ChangeListener {
+      override def changed(event: ChangeListener.ChangeEvent, actor: Actor): Unit = {
+        val i = blurIntensityS.getValue
+        blurIntensityL.setText(i.toString)
+        rayHandler.setBlurNum(i.toInt)
+      }
+    })
+
     window.add[VisTable](createNode(ambientLightIntensityL,
       ambientLightIntensityS, "Ambient light intensity"))
+    window.row
+
+    window.add[VisTable](createNode(blurIntensityL,
+      blurIntensityS, "Blur level"))
     window.row
 
     val blendFunc = new VisSelectBox[String]()
