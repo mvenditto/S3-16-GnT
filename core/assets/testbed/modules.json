@@ -1,0 +1,35 @@
+{
+  "Tests": {
+    "Graph Map Test": {
+      "desc":"Graph + map generation test",
+      "class":"GraphMapTest",
+      "version": 1.0
+    },
+
+    "Lighting System Test": {
+      "desc":"Box2d lighting test",
+      "class":"LightingSystemTest",
+      "version": 1.0
+    },
+
+    "Actor System Test": {
+      "desc":"Akka actor system + game actors deployment.",
+      "class":"ActorSystemModule",
+      "version": 1.0
+    }
+  },
+
+  "Modules": {
+    "Entities Module" : {
+      "desc":"Entities system sample",
+      "class":"EntitySystemModule",
+      "version": 1.0
+    },
+
+    "Box2d Module" : {
+      "desc":"Entities system sample",
+      "class":"Box2dModulez",
+      "version": 1.0
+    }
+  }
+}

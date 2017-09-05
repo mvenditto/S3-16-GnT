@@ -13,7 +13,7 @@ case class Bounds(x: Float, y: Float, w: Float, h: Float) {
 
 }
 
-case class QuadTreeNode[T <: Steerable[Vector2]](bounds: Bounds){
+class QuadTreeNode[T <: Steerable[Vector2]](bounds: Bounds){
 
   private var entities: ListBuffer[T] = ListBuffer[T]()
   private val max_entities: Int = 4
@@ -91,5 +91,9 @@ case class QuadTreeNode[T <: Steerable[Vector2]](bounds: Bounds){
       sw.traverse(consumer)
     }
   }
+}
+
+object QuadTreeNode {
+  def apply[T <: Steerable[Vector2]](bounds: Bounds): QuadTreeNode[T] = new QuadTreeNode[T](bounds)
 }
 

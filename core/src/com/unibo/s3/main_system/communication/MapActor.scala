@@ -15,14 +15,15 @@ class MapActor extends UntypedAbstractActor {
   private[this] var mapHeight: Int = _
 
   override def onReceive(message: Any): Unit = message match {
-    case msg: MapSettingsMsg =>
-      this.mapWidth = msg.width
-      this.mapHeight = msg.height
+    case MapSettingsMsg(w, h) =>
+      this.mapWidth = w
+      this.mapHeight = h
+
     case _: GenerateMapMsg =>
       this.mapGenerator.generate(8, this.mapWidth/3, this.mapHeight/3, 0, 0) //valori da decidere una volta decise le dimensioni possibili per la mappa
       this.mapGenerator.getMap.foreach(line => SystemManager.getInstance().getLocalActor("graphActor").tell(MapElementMsg(line), getSelf()))
       this.mapGenerator.getMap.foreach(line => SystemManager.getInstance().getLocalActor("worldActor").tell(MapElementMsg(line), getSelf()))
-    // val file = Gdx.files.local(FILEPATH)
+      // val file = Gdx.files.local(FILEPATH)
      // file.readString().split("\\n").foreach(line => SystemManager.getInstance().getLocalActor("graphActor").tell(MapMsg(line), getSelf()))
     case _ => println("(mapActor) message unknown:" + message)
   }
