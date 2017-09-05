@@ -10,11 +10,10 @@ import org.jgrapht.alg.NeighborIndex;
 import org.jgrapht.graph.DefaultEdge;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-public class BaseCharacter extends BaseMovableEntity implements Character {
+public class BaseCharacterOld extends BaseMovableEntity implements CharacterInterface {
 
     private Color color;
     private final int id;
@@ -27,7 +26,7 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
     private NeighborIndex index;
     private Vector2 currentDestination;
 
-    public BaseCharacter(Vector2 position, int id) {
+    public BaseCharacterOld(Vector2 position, int id) {
         super(position);
         this.id = id;
     }
@@ -56,41 +55,11 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
         setNewDestination(currentDestination);
     }
 
-    public Vector2 getCurrentNode() {
-        return currentNode;
-    }
-
-    public List<ActorRef> getNeighbours() {
-        return neighbours;
-    }
-
-    public void setNeighboursList(List<ActorRef> neighbours){
-        this.neighbours = neighbours;
-    }
-
-
     public void addNeighbour(ActorRef neighbour){
         this.neighbours.add(neighbour);
         this.nNeighbours++;
     }
 
-    public void chooseBehaviour(){
-
-        this.currentNode = computeNearest();
-        if (currentNode.equals(currentDestination)) {
-            System.out.println(log() + "Destination " + currentDestination + " = " + currentNode + " achieved! Choose the next one");
-            currentDestination = selectRandomDestination();
-        }
-        //ora scelgo destinazione casuale tra i vicini, potenzialmente torno indietro
-    }
-
-    public void setnNeighbours(int n){
-        this.nNeighbours = n;
-    }
-
-    public Vector2 getCurrentDestination() {
-        return currentDestination;
-    }
 
     public List<Vector2> getInformations(){
         return this.visited;
@@ -117,35 +86,6 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
                 .buildPriority(true);
     }
 
-    private void chooseNextDestination(){
-        //scegli prossimo nodo tra i raggiungibili
-    }
-
-    public List<Vector2> computeNeighbours(){
-      return index.neighborListOf(currentNode);
-    }
-
-    //computo il mio nodo di riferimento
-    public Vector2 computeNearest(){
-        Vector2 nearest = currentNode;
-        float minDistance = getPosition().dst2(new Vector2(nearest.x, nearest.y));
-        List<Vector2> list = computeNeighbours();
-        for(Vector2 v : list){
-            float distance = (v.dst2(getPosition()));
-            if(distance < minDistance){
-                nearest = v;
-                minDistance = distance;
-            }
-        }
-        if(currentNode != nearest){
-            discoverNewVertex(nearest);
-        }
-        currentNode = nearest;
-        if(!computeNeighbours().contains(getCurrentDestination())){ //se ho cambiato nodo di riferimento e questo non è collegato alla destinazione la ricalcolo
-            currentDestination = selectRandomDestination();
-        }
-        return nearest;
-    }
 
     private Vector2 computeInitialNearestNode(){
         Vector2 nearest = new Vector2();
@@ -172,4 +112,62 @@ public class BaseCharacter extends BaseMovableEntity implements Character {
     private String log(){
         return "Agent " + id + ": ";
     }
+
+
+
+
+
+
+    public void chooseBehaviour(){
+
+        this.currentNode = computeNearest();
+        if (currentNode.equals(currentDestination)) {
+            System.out.println(log() + "Destination " + currentDestination + " = " + currentNode + " achieved! Choose the next one");
+            currentDestination = selectRandomDestination();
+        }
+        //ora scelgo destinazione casuale tra i vicini, potenzialmente torno indietro
+    }
+
+    public Vector2 getCurrentDestination() {
+        return currentDestination;
+    }
+
+    //computo il mio nodo di riferimento
+    public Vector2 computeNearest(){
+        Vector2 nearest = currentNode;
+        float minDistance = getPosition().dst2(new Vector2(nearest.x, nearest.y));
+        List<Vector2> list = computeNeighbours();
+        for(Vector2 v : list){
+            float distance = (v.dst2(getPosition()));
+            if(distance < minDistance){
+                nearest = v;
+                minDistance = distance;
+            }
+        }
+        if(currentNode != nearest){
+            discoverNewVertex(nearest);
+        }
+        currentNode = nearest;
+        if(!computeNeighbours().contains(getCurrentDestination())){ //se ho cambiato nodo di riferimento e questo non è collegato alla destinazione la ricalcolo
+            currentDestination = selectRandomDestination();
+        }
+        return nearest;
+    }
+
+
+    public Vector2 getCurrentNode() {
+        return currentNode;
+    }
+
+    public List<ActorRef> getNeighbours() {
+        return neighbours;
+    }
+
+
+    public List<Vector2> computeNeighbours(){
+        return index.neighborListOf(currentNode);
+    }
+
+
+
 }

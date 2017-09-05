@@ -13,7 +13,7 @@ public class CommunicationLauncher {
         config.height = 768;
         config.samples = 4;
         config.vSyncEnabled = true;
-        new LwjglApplication(new CommunicationTest(), config);
-        //new LwjglApplication(new AgentTest(), config); test sugli agenti
+        //new LwjglApplication(new CommunicationTest(), config);
+        new LwjglApplication(new AgentsTest(), config); //test sugli agenti
     }
 }

@@ -2,7 +2,7 @@ package com.unibo.s3.main_system.communication
 
 import akka.actor.{Props, UntypedAbstractActor}
 import com.badlogic.gdx.math.Vector2
-import com.unibo.s3.main_system.characters.BaseCharacter
+import com.unibo.s3.main_system.characters.{BaseCharacter}
 import com.unibo.s3.main_system.communication.Messages._
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
@@ -21,17 +21,16 @@ class CharacterActor(private[this] val character: BaseCharacter) extends Untyped
 
     case msg: SendNeighboursMsg =>
       msg.neighbours.foreach(neighbour => neighbour.tell(SendCopInfoMsg(character.getInformations.toList), getSelf()))
-      //msg.neighbours.foreach(neighbour => character.addNeighbour(neighbour))
-      msg.neighbours.filter(neighbour => !character.getNeighbours.contains(neighbour)).foreach(neighbour => character.addNeighbour(neighbour))
+      //msg.neighbours.filter(neighbour => !character.getNeighbours.contains(neighbour)).foreach(neighbour => character.addNeighbour(neighbour))
+      msg.neighbours.filter(neighbour => !character.isNeighbour(neighbour)).foreach(neighbour => character.addNeighbour(neighbour))
+      //verifica funzionamento
       println("cop: " + getSelf() + "| I have " + msg.neighbours.size + " neighbours: " + character.getNeighbours)
 
     case msg: SendCopInfoMsg =>
       println("cop: " + getSelf() + "| info from: " + getSender() + ", visited vertices: " + msg.visitedVertices)
-      character.updateGraph(msg.visitedVertices.asJava)
+      character.updateGraph(msg.visitedVertices)
       println("cop: " + getSelf() + " known vertices: " + character.getInformations)
       //qui ho le info dell'altro poliziotto quindi poi posso fare quello che devo
-
-    //case ricevo grafo iniziale => salvo grafo iniziale
 
     case msg: SendGraphMsg=>
       println("cop: " + getSelf() + "| received graph")

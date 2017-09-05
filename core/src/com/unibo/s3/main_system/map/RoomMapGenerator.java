@@ -4,10 +4,10 @@ public class RoomMapGenerator extends AbstractMapGenerator {
 
     @Override
     public void generate(int n, int width, int height, int startX, int startY){
-        int lowerX = (width/2);
-        int upperX = (width/2);
-        int lowerY = (height/2);
-        int upperY = (height/2);
+        int lowerX = (width/2 );//+ width/6);
+        int upperX = (width/2);//) - width/6);
+        int lowerY = (height/2);// + height/6);
+        int upperY = (height/2);// - width/6);
         width--;
         height--;
         /**relative position, not absolute*/
@@ -21,8 +21,7 @@ public class RoomMapGenerator extends AbstractMapGenerator {
         }
         int door3Coord = generateInRange(startY + 1, startY + wallH - 1);
         door2Coord = generateInRange(startX + wallV + 1, startX + width);
-
-        if(isHorizontalWallDenied(startY + wallH, startX, startX+width+1)){
+         if(isHorizontalWallDenied(startY + wallH, startX, startX+width+1)){
             buildWallWithRange(false, startY + wallH, startX + 1, startX+width);
         }else{
             buildWallWithRange(false, startY + wallH, startX, startX+width+1);
