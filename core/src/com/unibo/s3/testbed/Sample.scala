@@ -26,12 +26,28 @@ trait Sample {
 
   def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit
 
-  def description: String
-
   def getSubmodules: Iterable[Sample]
 
   def getKeyShortcuts: Option[Map[String, String]]
 
+}
+
+class ModuleMetadata(
+  val name: String,
+  val desc: Option[String],
+  val clazz: Option[String],
+  val version: Option[String],
+  val category: String
+)
+
+object ModuleMetadata {
+  def apply(
+    name: String,
+    desc: Option[String],
+    clazz: Option[String],
+    version: Option[String],
+    category: String): ModuleMetadata =
+      new ModuleMetadata(name, desc, clazz, version, category)
 }
 
 
@@ -70,12 +86,3 @@ abstract class BaseSample extends Sample {
   override def getSubmodules: Iterable[Sample] = submodules
 }
 
-case class DummyCircleSample() extends BaseSample {
-
-  override def render(shapeRenderer: ShapeRenderer): Unit = {
-    super.render(shapeRenderer)
-    shapeRenderer.circle(0f, 0f, 100f)
-  }
-
-  override def description: String = "Just a dummy circle."
-}

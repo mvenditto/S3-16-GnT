@@ -3,12 +3,11 @@ package com.unibo.s3.testbed
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Tree.Node
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent
 import com.badlogic.gdx.scenes.scene2d.utils.{ChangeListener, ClickListener}
-import com.badlogic.gdx.scenes.scene2d.{Actor, InputEvent, Stage}
+import com.badlogic.gdx.scenes.scene2d.{Actor, Group, InputEvent, Stage}
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.{Gdx, InputMultiplexer}
@@ -18,8 +17,12 @@ import com.kotcrab.vis.ui.widget.toast.Toast
 import com.kotcrab.vis.ui.widget.{VisLabel, VisTree, _}
 import com.unibo.s3.InputProcessorAdapter
 import com.unibo.s3.main_system.AbstractMainApplication
+import com.unibo.s3.main_system.util.GraphicsUtils
 import com.unibo.s3.testbed.samples._
-import com.unibo.s3.testbed.ui.{Console, GraphicsUtil, KeyHelpTable, LogMessage}
+import com.unibo.s3.testbed.ui.{AdaptiveSizeActor, Anchorable, Console, FpsCounter, KeyHelpTable, LogMessage, Toggleable, TopLeft, TopRight, TransitionFunctions}
+
+import scala.util.{Failure, Success, Try}
+import scala.util.parsing.json.JSON
 
 trait Testbed {
 
@@ -32,9 +35,9 @@ trait Testbed {
   def getLogger: (LogMessage => Unit)
 }
 
-trait TestbedListener extends InputProcessorAdapter {
+trait TestbedListener {
 
-  def onSampleSelection(name: String): Unit
+  def onSampleSelection(metadata: ModuleMetadata): Unit
 
   def onPause(pause: Boolean): Unit
 
@@ -42,48 +45,51 @@ trait TestbedListener extends InputProcessorAdapter {
 
 case class TestbedView(listener: TestbedListener) {
 
+  type AnchorableToggleableActor =
+    AdaptiveSizeActor with Anchorable with Toggleable
+
   private var stage: Stage = _
   private var menuBar: MenuBar = _
-  private var viewport: Cell[_ <: Actor] = _
-  private var centerPane: VisTable = _
   private var loadingBar: VisProgressBar = _
   private var loadingLog: VisLabel = _
-  private var samplePane: VisWindow = _
+  private var samplePane: AnchorableToggleableActor = _
+  private var eastPane: AnchorableToggleableActor = _
   private var console: Console = _
-  private var consolePane: VisScrollPane = _
+  private var consolePane: AdaptiveSizeActor with Toggleable = _
   private var toastManager: ToastManager = _
+  private var fpsCounter: AdaptiveSizeActor with Anchorable = _
   private var currSampleShortcuts: Option[KeyHelpTable] = None
+  private var tree: VisTree = _
 
-  private val defaultPaneSize = 200f
-  private val currentSampleMenuWidth = 300f
   private val consolePadding = 50f
-  private val consoleYOffset= 0f
-  private var lastTransitionOut = false
   private val customBlue = new Color(0f, 0.7f, 1f, 1f)
 
 
   def resize(newWidth: Integer, newHeight: Integer): Unit = {
     stage.getViewport.update(newWidth, newHeight, true)
-    viewport.width(Gdx.graphics.getWidth - (currentSampleMenuWidth + defaultPaneSize))
-    consolePane.setSize(stage.getWidth - consolePadding * 2, stage.getHeight / 4.5f)
+
+    List(consolePane, eastPane, samplePane, fpsCounter).foreach(w =>
+      w.resize(newWidth.toFloat, newHeight.toFloat)
+    )
+
     console.setSize(stage.getWidth - consolePadding * 2, stage.getHeight / 4.5f)
     console.rebuild()
   }
 
   def init(): Unit = {
     stage = new Stage(new ScreenViewport())
-    VisUI.load()//Gdx.files.internal("skins/testbed/tinted.json"))
+    VisUI.load()
     toastManager = new ToastManager(stage)
     toastManager.setAlignment(Align.bottomRight)
 
-    val eastPane = new VisWindow("")
+    val _eastPane = new VisWindow("")
 
-    eastPane.getTitleLabel.setText("Testbed menu")
-    eastPane.getTitleLabel.setColor(customBlue)
+    _eastPane.getTitleLabel.setText("Testbed menu")
+    _eastPane.getTitleLabel.setColor(customBlue)
 
     val simulationLabel = new VisLabel("Simulation")
     simulationLabel.setColor(Color.LIGHT_GRAY)
-    eastPane.add(simulationLabel).fillX().expandX().row()
+    _eastPane.add(simulationLabel).fillX().expandX().row()
 
     val pauseCheckbox = new VisCheckBox("update")
     pauseCheckbox.addListener(new ChangeListener {
@@ -91,74 +97,97 @@ case class TestbedView(listener: TestbedListener) {
         listener.onPause(!pauseCheckbox.isChecked)
     })
 
-    eastPane.add(pauseCheckbox).row()
+    _eastPane.add(pauseCheckbox).row()
     pauseCheckbox.setChecked(true)
 
     val samplesLabel = new VisLabel("Samples")
     samplesLabel.setColor(Color.LIGHT_GRAY)
 
-    val tree = buildSamplesTree()
-    eastPane.add(samplesLabel).fillX().expandX().row()
-    eastPane.add(tree).expand().fill().row()
-    eastPane.setMovable(false)
+    tree = new VisTree()
+    _eastPane.add(samplesLabel).fillX().expandX().row()
+    _eastPane.add(tree).expand().fill().row()
+    _eastPane.setMovable(false)
 
-    /*loading bar and log*/
     loadingLog = new VisLabel("")
     loadingLog.setColor(customBlue)
-    eastPane.add(loadingLog).fillX().expandX().row()
+    _eastPane.add(loadingLog).fillX().expandX().row()
 
     loadingBar = new VisProgressBar(0f, 100f, 1f, false)
     loadingBar.setAnimateDuration(2)
-    eastPane.add(loadingBar).fillX().expandX()
+    _eastPane.add(loadingBar).fillX().expandX()
 
-    /*current sample panel (left panel)*/
-    samplePane = new VisWindow("")
-    samplePane.setWidth(defaultPaneSize)
-    samplePane.getTitleLabel.setColor(customBlue)
-    samplePane.setKeepWithinParent(false)
-    samplePane.setKeepWithinStage(false)
+    eastPane = new AdaptiveSizeActor(_eastPane) with Anchorable with Toggleable
+    eastPane.setAnchor(TopRight)
 
-    /*menu bar*/
+    val sp =  new VisWindow("")
+    sp.getTitleLabel.setColor(customBlue)
+    sp.setKeepWithinParent(false)
+    sp.setKeepWithinStage(false)
+
+    samplePane = new AdaptiveSizeActor(sp) with Toggleable with Anchorable
+    samplePane.setSize(20, 100)
+    samplePane.setAnchor(TopLeft)
+    samplePane.setTransitionFunc(TransitionFunctions.slideLeft)
+
     menuBar = new MenuBar()
     createMenu()
 
-    /*root table*/
-    centerPane = new VisTable()
-
     console = new Console()
-    consolePane = new VisScrollPane(console)
-    consolePane.setPosition(consolePadding, -consolePane.getHeight)
-
+    val ss = new VisScrollPane(console)
+    consolePane = new AdaptiveSizeActor(ss) with Toggleable
+    consolePane.setTransitionFunc(TransitionFunctions.slideDown)
     val tmp = Color.BLACK.cpy()
     tmp.a = 0.5f
-
-    val bg = GraphicsUtil.drawableFromColor(stage.getWidth.toInt,
+    val bg = GraphicsUtils.drawableFromColor(stage.getWidth.toInt,
       (stage.getHeight / 4.5f).toInt, tmp)
+    ss.getStyle.background = bg
 
-    consolePane.getStyle.background = bg
+    val _fps = new FpsCounter()
+    _fps.setSize(64, 48)
+    fpsCounter = new AdaptiveSizeActor(_fps) with Anchorable
+    fpsCounter.setAnchor(TopRight)
 
     val root = new VisTable()
     root.setFillParent(true)
-    root.add(menuBar.getTable).colspan(3).fillX().expandX().row()
-    root.add(samplePane).width(currentSampleMenuWidth).fillY().expandY()
-    viewport = root.add(centerPane).fillY()
+    root.add(menuBar.getTable).fillX().expandX().row()
+    root.add().fillY().expandY()
     resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
-    root.add(eastPane).width(defaultPaneSize).fillY().expandY()
 
+    val hud = new Group()
+    hud.addActor(sp)
+    hud.addActor(_eastPane)
+
+    stage.addActor(hud)
+    stage.addActor(ss)
+    stage.addActor(_fps)
     stage.addActor(root)
-    stage.addActor(consolePane)
 
+    val padY = menuBar.getTable.getPrefHeight
+    val yPerc = 100 - (100 * padY) / stage.getHeight
+    List(eastPane, samplePane, fpsCounter)
+      .foreach(w => w.setPadding(0, -padY.toInt))
+    consolePane.setSize(100, 20)
+    samplePane.setSize(25, yPerc)
+    eastPane.setSize(20, yPerc)
+    consolePane.toggle(stage.getWidth, stage.getHeight)
   }
 
-  def addSampleEntry(node: Node, sampleName: String): Unit = {
-    val lab2 = new VisLabel(sampleName)
-    lab2.addListener(new ClickListener(){
-      override def clicked(event: InputEvent, x: Float, y: Float): Unit = {
-        super.clicked(event, x, y)
-        listener.onSampleSelection(lab2.getText.toString)
-      }
-    })
-    node.add(new Node(lab2))
+  def addSampleEntry(node: Node, sample: ModuleMetadata): Unit = {
+    val sampleNameLbl = new VisLabel(sample.name)
+
+    if (sample.clazz.isEmpty) {
+      sampleNameLbl.setColor(Color.RED)
+      new Tooltip.Builder("Wrong/Undefined 'class' attribute!")
+        .target(sampleNameLbl).build()
+    } else {
+      sampleNameLbl.addListener(new ClickListener() {
+        override def clicked(event: InputEvent, x: Float, y: Float): Unit = {
+          super.clicked(event, x, y)
+          listener.onSampleSelection(sample)
+        }
+      })
+    }
+    node.add(new Node(sampleNameLbl))
   }
 
   def setProgressBarValue(value: Float): Unit = loadingBar.setValue(value)
@@ -173,7 +202,7 @@ case class TestbedView(listener: TestbedListener) {
     loadingBar.setAnimateDuration(0.2f)
   }
 
-  def resetSamplePane(): Unit = samplePane.clear()
+  def resetSamplePane(): Unit = samplePane.getActor[VisWindow].clear()
 
   def displayModuleLoadedToast(name: String): Unit = {
     val toast = new Toast("dark", new VisTable(true))
@@ -198,26 +227,20 @@ case class TestbedView(listener: TestbedListener) {
   def attachInputProcessor(inputMultiplexer: InputMultiplexer): Unit =
     inputMultiplexer.addProcessor(stage)
 
-  def getSamplePane: VisWindow = samplePane
+  def getSamplePane: VisWindow = samplePane.getActor[VisWindow]
 
   def render(): Unit = stage.draw()
 
-  def update(dt: Float): Unit = stage.act(dt)
+  def update(dt: Float): Unit = {
+    stage.act(dt)
+  }
 
   def toggleSamplePane(): Unit = {
-    samplePane.addAction(
-      Actions.moveTo(if (lastTransitionOut) -samplePane.getWidth else 0,
-        0, 0.30f))
-    lastTransitionOut = !lastTransitionOut
+    samplePane.toggle(stage.getWidth, stage.getHeight)
   }
 
   def toggleConsole(): Unit = {
-    val targetY =
-      if (consolePane.getY < consoleYOffset) consoleYOffset
-      else -consolePane.getHeight
-    consolePane.addAction(
-      Actions.moveTo(consolePadding, targetY, 0.30f)
-    )
+    consolePane.toggle(stage.getWidth, stage.getHeight)
   }
 
   private def createMenu() = {
@@ -272,32 +295,21 @@ case class TestbedView(listener: TestbedListener) {
     toast.getMainTable.setX((stage.getWidth / 2) - toast.getMainTable.getPrefWidth / 2 )
   }
 
-  private def buildSamplesTree(): VisTree = {
-    val tree = new VisTree
+  def buildSamplesTree(modules: Iterable[ModuleMetadata]): Unit = {
+    var categories = Map[String, Node]()
 
-    /*categories*/
-    val core = new Node(new VisLabel("Core"))
-    val dummy = new Node(new VisLabel("Dummy"))
-    val actors = new Node(new VisLabel("Actors"))
-    val tests = new Node(new VisLabel("Test"))
-    core.setExpanded(true)
-
-    /*add samples by name*/
-    addSampleEntry(dummy, "Dummy Circle")
-    addSampleEntry(dummy, "Dummy Circle 2")
-    addSampleEntry(core, "Entities Playground")
-    addSampleEntry(core, "Box2d World")
-    addSampleEntry(actors, "Actor System")
-    addSampleEntry(tests, "Graph/Map Test")
-    addSampleEntry(tests, "Lighting Test")
-
-    tree.add(core)
-    tree.add(dummy)
-    tree.add(actors)
-    tree.add(tests)
-    tree
+    modules.foreach(m => {
+      val c = m.category
+      if(!categories.contains(c)) {
+        val n = new Node(new VisLabel(c))
+        categories += (c -> n)
+        addSampleEntry(n, m)
+      } else {
+        addSampleEntry(categories(c),m)
+      }
+    })
+    categories.values.foreach(n => tree.add(n))
   }
-
 }
 
 case class FutureTestbed() extends AbstractMainApplication with Testbed {
@@ -308,11 +320,13 @@ case class FutureTestbed() extends AbstractMainApplication with Testbed {
   private[this] var loadingFinished = true
   private[this] var currSampleName: String = _
 
+  private[this] val testbedPackage: String = "com.unibo.s3.testbed.samples."
+  private[this] val testbedModulesFile: String = "testbed/modules.json"
+
   private[this] val gui = TestbedView(new TestbedListener {
-    override def onSampleSelection(name: String): Unit = {
-      println(name)
-      currSampleName = name
-      matchSample(name).foreach(s => setSample(s))
+    override def onSampleSelection(metadata: ModuleMetadata): Unit = {
+      currSampleName = metadata.name
+      loadSample(metadata.clazz.get).foreach(s => setSample(s))
     }
 
     override def onPause(flag: Boolean): Unit = {
@@ -320,14 +334,35 @@ case class FutureTestbed() extends AbstractMainApplication with Testbed {
     }
   })
 
-  private def matchSample(sampleName: String): Option[Sample] = sampleName match {
-    case "Dummy Circle" => Option(DummyCircleSample())
-    case "Entities Playground" => Option(new EntitySystemModule())
-    case "Box2d World" => Option(new Box2dModule())
-    case "Actor System" => Option(new ActorSystemModule())
-    case "Graph/Map Test" => Option(new GraphMapTest())
-    case "Lighting Test" => Option(new LightingSystemTest())
-    case _ => None
+  private def loadSample(sampleClass: String): Option[Sample] = {
+    Option(Class.forName(sampleClass).newInstance().asInstanceOf[Sample])
+  }
+
+  private def checkModuleClassExits(clazz: String): Option[String] = {
+    Try(Class.forName(testbedPackage + clazz)) match {
+      case Success(c) => Some(c.getName)
+      case Failure(_) => None
+    }
+  }
+
+  private def parseModulesFile(): Option[Iterable[ModuleMetadata]] = {
+    val modulesJson = Gdx.files.internal(testbedModulesFile).readString()
+    val modulesMap = JSON.parseFull(modulesJson)
+
+    modulesMap match {
+      case Some(m: Map[String, Map[String, Map[String, String]]]) =>
+        val modules =
+          m.keys.flatMap(cat =>
+            m(cat).map(mm => (cat, mm._1, mm._2)))
+          .map(md => {
+            val meta = md._3
+            var clazz = meta.get("class")
+            if (clazz.isDefined) clazz = checkModuleClassExits(clazz.get)
+            ModuleMetadata(md._2, meta.get("desc"), clazz, meta.get("version"), md._1)
+          })
+        Some(modules)
+      case _ => None
+    }
   }
 
   private def resetInputProcessor(sample: Sample): Unit = {
@@ -400,6 +435,8 @@ case class FutureTestbed() extends AbstractMainApplication with Testbed {
     pause = false
     gui.writeConsoleLog(LogMessage("Testbed", "*** Welcome ***", Color.CYAN))
     gui.writeConsoleLog(LogMessage("Testbed", "Version : 0.9fut", Color.CYAN))
+
+    parseModulesFile().foreach(modules => gui.buildSamplesTree(modules))
   }
 
   override def doRender(): Unit = {

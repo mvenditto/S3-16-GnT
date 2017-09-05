@@ -78,8 +78,6 @@ class Box2dModule extends BaseSample with InputProcessorAdapter {
 
   override def initGui(menuTable: VisWindow): Unit = {}
 
-  override def description: String = "Box2d world module."
-
   def loadWorld(name: String): Unit = {
     val w = Gdx.files.internal("maps/" + name)
     w.readString().split("\n").foreach(l => worldActor ! MapElementMsg(l))
