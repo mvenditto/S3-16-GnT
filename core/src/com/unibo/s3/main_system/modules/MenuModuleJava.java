@@ -18,7 +18,7 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.*;
 import com.unibo.s3.Main;
 
-public class MenuModule extends BasicModuleWithGui {
+public class MenuModuleJava extends BasicModuleWithGui {
     //private SpriteBatch textBatch;
     //private World world;
     private BitmapFont font;
@@ -28,6 +28,7 @@ public class MenuModule extends BasicModuleWithGui {
     private int thiefsNum = 1;
     private boolean pause = false;
     private boolean simulation = false;
+    private boolean mazeMap = true;
 
     @Override
     public void init(Main owner) {
@@ -48,15 +49,6 @@ public class MenuModule extends BasicModuleWithGui {
         title.setColor(Color.GREEN);
         System.out.println("align = " + title.getLabelAlign());
         title.setAlignment(Align.center);
-        /*table.setWidth(Gdx.graphics.getWidth());
-        table.setHeight(Gdx.graphics.getHeight());*/
-        /*table.setKeepWithinParent(false);
-        table.setKeepWithinStage(false);*/
-
-
-        /*VisLabel l = new VisLabel("Menu");
-        l.setColor(Color.GREEN);
-        table.add(l);*/
 
         table.row();
         VisSlider guardsNumS = new VisSlider(2f, 20f, 1f, false);
@@ -106,6 +98,15 @@ public class MenuModule extends BasicModuleWithGui {
         tableThiefType.add(new VisLabel("Thief type: "));
         tableThiefType.add(simThief).padRight(5);
         tableThiefType.add(pilThief).padLeft(5);
+        simThief.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if(simThief.isChecked())
+                    simulation = true;
+                else
+                    simulation = false;
+            }
+        });
         table.add(tableThiefType).padTop(10).padLeft(5).padRight(5);
 
         //60x60, 80x60
@@ -149,6 +150,15 @@ public class MenuModule extends BasicModuleWithGui {
         tableMapType.add(new VisLabel("Map type: "));
         tableMapType.add(mazeCheck).padRight(5);
         tableMapType.add(roomCheck).padLeft(5);
+        mazeCheck.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if(mazeCheck.isChecked())
+                    mazeMap = true;
+                else
+                    mazeMap = false;
+            }
+        });
         table.add(tableMapType).padTop(10);
 
         table.row();

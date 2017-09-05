@@ -55,6 +55,8 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
     uiSetColor(Color.GREEN)
     loadingLabel.setText("Ready!")
     startBtn.setDisabled(false)
+    this.enable(false)
+    listener(UserAck())
   }
 
   private def createGui(): Unit = {
