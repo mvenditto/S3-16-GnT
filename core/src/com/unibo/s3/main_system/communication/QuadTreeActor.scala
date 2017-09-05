@@ -1,8 +1,10 @@
 package com.unibo.s3.main_system.communication
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
+
 import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.communication.Messages.{AskNeighboursMsg, InitialSavingCharacterMsg, RebuildQuadTreeMsg, SendNeighboursMsg}
 import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
+
 import com.unibo.s3.main_system.communication.Messages._
 
 import scala.collection.immutable.HashMap

@@ -2,6 +2,7 @@ package com.unibo.s3.main_system.map;
 
 public class MazeMapGenerator extends AbstractMapGenerator {
 
+
     @Override
     public void generate(int n, int width, int height, int startX, int startY){
         /**relative position, not absolute*/

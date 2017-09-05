@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class AbstractMapGenerator implements MapGenerator{
+public abstract class AbstractMapGenerator implements GenerationStrategy{
 
-    private static final float BASE_UNIT = 3;
+    public static final int BASE_UNIT = 3;
     private static final float HALF_BASE_UNIT = BASE_UNIT/2;
     private static final int MAP_WIDTH = 60;
     private static final int MAP_HEIGHT = 60;
@@ -15,13 +15,13 @@ public abstract class AbstractMapGenerator implements MapGenerator{
     private static final String END_OF_FILE = "0.0:0.0:0.0:0.0";
     private static final String SEPARATOR = ":";
 
-    private int[][] maze = new int[WIDTH_SPLITS][HEIGHT_SPLITS];
+    private int[][] generatedMap = new int[WIDTH_SPLITS][HEIGHT_SPLITS];
 
     public List<String> getMap(){
         ArrayList<String> map = new ArrayList<>();
         for(int i = 0; i < WIDTH_SPLITS; i++){
             for (int j = 0; j < HEIGHT_SPLITS; j++){
-                if(maze[i][j] == 1){
+                if(generatedMap[i][j] == 1){
                     map.add(((i * BASE_UNIT + HALF_BASE_UNIT) + BASE_UNIT) + SEPARATOR + ((j * BASE_UNIT + HALF_BASE_UNIT) + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + BASE_UNIT);
                 }
             }
@@ -44,11 +44,11 @@ public abstract class AbstractMapGenerator implements MapGenerator{
     protected void buildWall(boolean orientation, int coord){
         if(orientation){ //vertical wall
             for(int i = 0; i < WIDTH_SPLITS; i++){
-                this.maze[coord - 1][i] = 1;
+                this.generatedMap[coord - 1][i] = 1;
             }
         } else{
             for(int i = 0; i < HEIGHT_SPLITS; i++){
-                this.maze[i][coord - 1] = 1;
+                this.generatedMap[i][coord - 1] = 1;
             }
         }
     }
@@ -60,19 +60,19 @@ public abstract class AbstractMapGenerator implements MapGenerator{
                 stop = HEIGHT_SPLITS;
             }
             for(int i = start; i < stop; i++){
-                this.maze[coordinate][i] = 1;
+                this.generatedMap[coordinate][i] = 1;
             }
         } else{
             if (stop > WIDTH_SPLITS){
                 stop = WIDTH_SPLITS;
             }
             for(int i = start; i < stop; i++){
-                this.maze[i][coordinate] = 1;
+                this.generatedMap[i][coordinate] = 1;
             }
         }
     }
 
-    protected void buildDoor(int x, int y){ maze[x][y] = 0; }
+    protected void buildDoor(int x, int y){ generatedMap[x][y] = 0; }
 
     /**true vertical, false horizontal**/
     protected boolean getVerticalOrHorizontal(){
@@ -102,8 +102,8 @@ public abstract class AbstractMapGenerator implements MapGenerator{
     protected boolean isIntersection(int x, int y){
         if(x > 1 && y > 1 && x < WIDTH_SPLITS-1 && y < HEIGHT_SPLITS-1){
             System.out.println("up dx down sx");
-            System.out.println(maze[x][y+1] + " " + maze[x+1][y] + " " + maze[x][y-1] + " " + maze[x-1][y]);
-            if(maze[x][y+1] == 1 && maze[x+1][y] == 1 && maze[x][y-1] == 1 && maze[x-1][y] == 1){
+            System.out.println(generatedMap[x][y+1] + " " + generatedMap[x+1][y] + " " + generatedMap[x][y-1] + " " + generatedMap[x-1][y]);
+            if(generatedMap[x][y+1] == 1 && generatedMap[x+1][y] == 1 && generatedMap[x][y-1] == 1 && generatedMap[x-1][y] == 1){
                 System.out.println();
                 System.out.println(x + " " + y + " IS AN INTERSECTION!");
 
@@ -119,7 +119,7 @@ public abstract class AbstractMapGenerator implements MapGenerator{
     public boolean containsIntersections(){
         for(int i = 1; i < WIDTH_SPLITS-1; i++){
             for(int j = 1; j < HEIGHT_SPLITS-1; j++){
-                if(maze[i][j] == 0 && maze[i][j+1] == 1 && maze[i+1][j] == 1 && maze[i][j-1] == 1 && maze[i-1][j] == 1){
+                if(generatedMap[i][j] == 0 && generatedMap[i][j+1] == 1 && generatedMap[i+1][j] == 1 && generatedMap[i][j-1] == 1 && generatedMap[i-1][j] == 1){
                     System.out.println();
                     System.out.println(i + " " + j + " is a bad INTERSECTION!");
                     System.out.println();
@@ -135,16 +135,16 @@ public abstract class AbstractMapGenerator implements MapGenerator{
             //System.out.println("Initial wall OK");
         }
         else if(endY == HEIGHT_SPLITS){
-            if (maze[coordinate][startY - 1] == 0) {
+            if (generatedMap[coordinate][startY - 1] == 0) {
                 return  true;
             }
         }else if(startY == 0){
-            if (maze[coordinate][endY] == 0) {
+            if (generatedMap[coordinate][endY] == 0) {
                 System.out.println();
                 return true;
             }
         } else {
-            if (maze[coordinate][startY - 1] == 0 || maze[coordinate][endY] == 0) {
+            if (generatedMap[coordinate][startY - 1] == 0 || generatedMap[coordinate][endY] == 0) {
                 System.out.println();
                 return true;
             }
@@ -157,17 +157,17 @@ public abstract class AbstractMapGenerator implements MapGenerator{
             //System.out.println("Initial wall OK");
         }
         else if(endX == WIDTH_SPLITS){
-            if(maze[startX - 1][coordinate] == 0){
+            if(generatedMap[startX - 1][coordinate] == 0){
                 System.out.println();
                 return true;
             }
         } else if(startX == 0){
-            if (maze[endX][coordinate] == 0) {
+            if (generatedMap[endX][coordinate] == 0) {
                 System.out.println();
                 return true;
             }
         } else {
-            if (maze[startX - 1][coordinate] == 0 || maze[endX][coordinate] == 0) {
+            if (generatedMap[startX - 1][coordinate] == 0 || generatedMap[endX][coordinate] == 0) {
                 System.out.println();
                 return true;
             }

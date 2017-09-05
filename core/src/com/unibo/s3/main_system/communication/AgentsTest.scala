@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.{GL20, Texture}
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.World
-import com.unibo.s3.main_system.characters.BaseCharacter
+import com.unibo.s3.main_system.characters.{BaseCharacter}
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, SendGraphMsg, SendNeighboursMsg}
 import com.unibo.s3.main_system.world.actors.WorldActor
 import org.jgrapht.graph.{DefaultEdge, SimpleGraph}
@@ -34,10 +34,10 @@ class AgentsTest extends ApplicationAdapter{
     testGraph.addEdge(v2, v5)
     SystemManager.getInstance.createSystem("System", null)
     SystemManager.getInstance.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor")
-    SystemManager.getInstance.createActor(GraphActor.props, "graphActor")
-    val mapActor = SystemManager.getInstance.createActor(MapActor.props, "mapActor")
-    SystemManager.getInstance.createActor(QuadTreeActor.props, "quadTreeActor")
-    val masterActor = SystemManager.getInstance.createActor(MasterActor.props, "masterActor")
+    SystemManager.getInstance.createActor(GraphActor.props(), "graphActor")
+    val mapActor = SystemManager.getInstance.createActor(MapActor.props(), "mapActor")
+    SystemManager.getInstance.createActor(QuadTreeActor.props(), "quadTreeActor")
+    val masterActor = SystemManager.getInstance.createActor(MasterActor.props(), "masterActor")
 
     masterActor ! ActMsg(0.016f)
 
