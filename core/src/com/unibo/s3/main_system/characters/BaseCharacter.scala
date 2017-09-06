@@ -30,7 +30,7 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
 
   private var nNeighbours = 0 //guard
 
-  private var currentNode : Vector2 = _
+  private var currentNode : Vector2 = _ /***todo make option*/
   var neighbours = List[ActorRef]() //char?
 
   var visited = List[Vector2]()
@@ -62,7 +62,7 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
 
   def isNeighbour(possibleNeighbour : ActorRef) : Boolean = neighbours.contains(possibleNeighbour)
 
-  def getInformations: scala.List[Vector2] = this.visited
+  def getInformation: scala.List[Vector2] = this.visited
 
   def updateGraph(colleagueList: List[Vector2]): Unit = {
     this.nNeighbours -= 1
@@ -75,6 +75,7 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
 
 
   private def setNewDestination(destination: Vector2) = { //setta destinazione
+    println(log + "Going to " + destination)
     this.setComplexSteeringBehavior.avoidCollisionsWithWorld.arriveTo(new CustomLocation(destination)).buildPriority(true)
   }
 
@@ -110,8 +111,15 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
 
   def chooseBehaviour(): Unit = {
     this.currentNode = computeNearest
+    System.out.println("Choose behaviour, currentNode/dest " + getCurrentNode + "/" + currentDestination)
     if (currentNode == currentDestination) {
+      System.out.println()
+      System.out.println()
+      System.out.println()
       System.out.println(log + "Destination " + currentDestination + " = " + currentNode + " achieved! Choose the next one")
+      System.out.println()
+      System.out.println()
+      System.out.println()
       currentDestination = selectRandomDestination
     }
     //ora scelgo destinazione casuale tra i vicini, potenzialmente torno indietro
@@ -134,8 +142,20 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
         minDistance = distance
       }
     }
-    if (currentNode ne nearest) discoverNewVertex(nearest)
-    currentNode = nearest
+    if (currentNode ne nearest){
+      discoverNewVertex(nearest)
+      System.out.println()
+      System.out.println()
+      System.out.println()
+      System.out.println(log + "Cambio nodo di riferimento " + currentNode + " to " + nearest)
+      System.out.println()
+      System.out.println()
+      System.out.println()
+      currentNode = nearest
+
+      currentDestination = selectRandomDestination
+      setNewDestination(currentDestination)
+    }
     if (!computeNeighbours.contains(getCurrentDestination)) { //se ho cambiato nodo di riferimento e questo non è collegato alla destinazione la ricalcolo
       currentDestination = selectRandomDestination
     }

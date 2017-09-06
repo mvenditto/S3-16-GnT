@@ -7,7 +7,7 @@ import java.util.Random;
 public abstract class AbstractMapGenerator implements GenerationStrategy{
 
 
-    public static final int BASE_UNIT = 3;
+    public static final int BASE_UNIT = 2;
     private static final float HALF_BASE_UNIT = BASE_UNIT/2;
    // private static final int MAP_WIDTH = 60;
    // private static final int MAP_HEIGHT = 60;
