@@ -59,15 +59,15 @@ class Box2dModule extends BaseTestbedModule with InputProcessorAdapter {
     val conf = "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," + "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" + ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" + ",\"netty\":{\"tcp\":{\"hostname\":\"" + "127.0.0.1" + "\",\"port\":5050}}}}}"
     val customConfig = ConfigFactory.parseString(conf)
     log("Starting actor system")
-    SystemManager.getInstance.createSystem("b2d", customConfig)
-    SystemManager.getInstance.createActor(Props.create(classOf[WorldActor], world), "world")
-    worldActor = SystemManager.getInstance.getLocalActor("world")
+    SystemManager.createSystem("b2d", customConfig)
+    SystemManager.createActor(Props.create(classOf[WorldActor], world), "world")
+    worldActor = SystemManager.getLocalActor("world")
   }
 
   override def cleanup(): Unit = {
     super.cleanup()
     world.dispose()
-    SystemManager.getInstance().shutdownSystem()
+    SystemManager.shutdownSystem()
   }
 
   override def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit = {

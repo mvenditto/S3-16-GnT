@@ -85,7 +85,7 @@ class ActorSystemModule extends BaseTestbedModule {
           """+messageTextField.getText
 
         val msg = Eval[Any](src)
-        SystemManager.getInstance()
+        SystemManager
           .getLocalActor(selectBox.getSelected).tell(msg, loggerActor)
       }
     })
@@ -94,23 +94,23 @@ class ActorSystemModule extends BaseTestbedModule {
   override def setup(f: (String) => Unit): Unit = {
     super.setup(f)
     f("Init actor system")
-    SystemManager.getInstance.createSystem("System", null)
+    SystemManager.createSystem("System", null)
 
     f("Deploy -> WorldActor")
-    SystemManager.getInstance().createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor")
+    SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor")
 
     f("Deploy -> MapActor")
-    SystemManager.getInstance.createActor(MapActor.props(), "mapActor")
+    SystemManager.createActor(MapActor.props(), "mapActor")
 
     f("Deploy -> GraphActor")
-    SystemManager.getInstance.createActor(GraphActor.props(), "graphActor")
+    SystemManager.createActor(GraphActor.props(), "graphActor")
 
     f("Deploy -> ProximityActor")
-    SystemManager.getInstance.createActor(QuadTreeActor.props(), "quadTreeActor")
+    SystemManager.createActor(QuadTreeActor.props(), "quadTreeActor")
 
     f("Deploy -> ProximityActor")
-    SystemManager.getInstance.createActor(LoggerActor.props(responseTextField), "loggerActor")
-    loggerActor = SystemManager.getInstance().getLocalActor("loggerActor")
+    SystemManager.createActor(LoggerActor.props(responseTextField), "loggerActor")
+    loggerActor = SystemManager.getLocalActor("loggerActor")
   }
 }
 

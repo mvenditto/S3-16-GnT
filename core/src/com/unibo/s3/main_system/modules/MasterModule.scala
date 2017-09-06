@@ -1,7 +1,5 @@
 package com.unibo.s3.main_system.modules
 
-import java.util
-
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -16,8 +14,8 @@ import com.unibo.s3.main_system.communication.SystemManager
 import com.unibo.s3.main_system.game.GameSettings
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig}
-import com.unibo.s3.main_system.util.ScaleUtils
 import com.unibo.s3.main_system.util.ImplicitConversions._
+import com.unibo.s3.main_system.util.ScaleUtils
 
 
 class MasterModule extends BasicModuleWithGui {
@@ -65,7 +63,7 @@ class MasterModule extends BasicModuleWithGui {
   private[this] var actorsMap: Option[Map[GameActors.Value, String]] = None
 
   private def getActor(actor: GameActors.Value): ActorRef =
-    SystemManager.getInstance.getLocalActor(actorsMap.get(actor))
+    SystemManager.getLocalActor(actorsMap.get(actor))
 
   private def cacheMap() = {
     val map = Gdx.files.internal(mapFilePath)
@@ -99,7 +97,7 @@ class MasterModule extends BasicModuleWithGui {
     worldActor = getActor(GameActors.World)
     quadTreeActor = getActor(GameActors.QuadTree)
     graphActor = getActor(GameActors.Graph)
-    dummyReceiverActor = SystemManager.getInstance()
+    dummyReceiverActor = SystemManager
       .createActor(DummyReceiverActor.props(), "graphReceiver")
 
     List(graphActor, quadTreeActor).foreach(a =>
@@ -118,7 +116,7 @@ class MasterModule extends BasicModuleWithGui {
 
   override def cleanup(): Unit = {
     super.cleanup()
-    SystemManager.getInstance().shutdownSystem()
+    SystemManager.shutdownSystem()
   }
 
   override def render(shapeRenderer: ShapeRenderer): Unit = {

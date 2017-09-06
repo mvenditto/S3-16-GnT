@@ -47,7 +47,7 @@ public class GraphGenerator {
     }
 
     public static UndirectedGraph<Vector2, DefaultEdge> createGraph(int width, int height, String mapFilename) {
-        ActorRef worldActor = SystemManager.getInstance().getLocalActor("worldActor");
+        ActorRef worldActor = SystemManager.getLocalActor("worldActor");
         RaycastCollisionDetector<Vector2> collisionDetector = new Box2dProxyDetectorsFactory(worldActor).newRaycastCollisionDetector();
         HashMap<Vector2, Vector2> walls = new HashMap<>();
         Integer[][] grid = new Integer[width+6][height+6];
