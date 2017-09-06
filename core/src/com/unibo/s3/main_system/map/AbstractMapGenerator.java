@@ -6,21 +6,32 @@ import java.util.Random;
 
 public abstract class AbstractMapGenerator implements GenerationStrategy{
 
-    public static final int BASE_UNIT = 2;
+
+    public static final int BASE_UNIT = 3;
     private static final float HALF_BASE_UNIT = BASE_UNIT/2;
-    private static final int MAP_WIDTH = 60;
-    private static final int MAP_HEIGHT = 60;
-    private static final int WIDTH_SPLITS = (int) (MAP_WIDTH / BASE_UNIT);
-    private static final int HEIGHT_SPLITS = (int) (MAP_HEIGHT / BASE_UNIT);
+   // private static final int MAP_WIDTH = 60;
+   // private static final int MAP_HEIGHT = 60;
+
+    private int widthSplits;// = (int) (MAP_WIDTH / BASE_UNIT);
+    private int heightSplits;// = (int) (MAP_HEIGHT / BASE_UNIT);
     private static final String END_OF_FILE = "0.0:0.0:0.0:0.0";
     private static final String SEPARATOR = ":";
 
-    private int[][] generatedMap = new int[WIDTH_SPLITS][HEIGHT_SPLITS];
+    private int[][] generatedMap;// = new int[widthSplits][heightSplits];
+
+
+    public void initialSetup(int width, int height){
+        this.widthSplits = width;
+        this.heightSplits = height;
+        this.generatedMap = new int[widthSplits][heightSplits];
+        System.out.println("splits: " + widthSplits + " " + heightSplits);
+        System.out.println("Generated matrix " + generatedMap.length + "x" + generatedMap[0].length);
+    }
 
     public List<String> getMap(){
         ArrayList<String> map = new ArrayList<>();
-        for(int i = 0; i < WIDTH_SPLITS; i++){
-            for (int j = 0; j < HEIGHT_SPLITS; j++){
+        for(int i = 0; i < widthSplits; i++){
+            for (int j = 0; j < heightSplits; j++){
                 if(generatedMap[i][j] == 1){
                     map.add(((i * BASE_UNIT + HALF_BASE_UNIT) + BASE_UNIT) + SEPARATOR + ((j * BASE_UNIT + HALF_BASE_UNIT) + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + BASE_UNIT);
                 }
@@ -33,21 +44,21 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
 
     private ArrayList<String> generatePerimeterWalls(){
         ArrayList<String> perimeter = new ArrayList<>();
-        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((HEIGHT_SPLITS * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * HEIGHT_SPLITS + BASE_UNIT));
-        perimeter.add(((WIDTH_SPLITS * BASE_UNIT) + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + ((HEIGHT_SPLITS * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + (BASE_UNIT * HEIGHT_SPLITS + BASE_UNIT));
-        perimeter.add(((WIDTH_SPLITS * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + HALF_BASE_UNIT + SEPARATOR + (BASE_UNIT * WIDTH_SPLITS + BASE_UNIT) + SEPARATOR + BASE_UNIT);
-        perimeter.add(((WIDTH_SPLITS * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + (HEIGHT_SPLITS * BASE_UNIT + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + (BASE_UNIT * WIDTH_SPLITS + BASE_UNIT + SEPARATOR + BASE_UNIT));
+        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((heightSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * heightSplits + BASE_UNIT));
+        perimeter.add(((widthSplits * BASE_UNIT) + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + ((heightSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + (BASE_UNIT * heightSplits + BASE_UNIT));
+        perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + HALF_BASE_UNIT + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT) + SEPARATOR + BASE_UNIT);
+        perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + (heightSplits * BASE_UNIT + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT + SEPARATOR + BASE_UNIT));
 
         return perimeter;
     }
 
     protected void buildWall(boolean orientation, int coord){
         if(orientation){ //vertical wall
-            for(int i = 0; i < WIDTH_SPLITS; i++){
+            for(int i = 0; i < widthSplits; i++){
                 this.generatedMap[coord - 1][i] = 1;
             }
         } else{
-            for(int i = 0; i < HEIGHT_SPLITS; i++){
+            for(int i = 0; i < heightSplits; i++){
                 this.generatedMap[i][coord - 1] = 1;
             }
         }
@@ -56,15 +67,15 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
     protected void buildWallWithRange(boolean orientation, int coordinate, int start, int stop){
 
         if(orientation){ //vertical wall
-            if (stop > HEIGHT_SPLITS){
-                stop = HEIGHT_SPLITS;
+            if (stop > heightSplits){
+                stop = heightSplits;
             }
             for(int i = start; i < stop; i++){
                 this.generatedMap[coordinate][i] = 1;
             }
         } else{
-            if (stop > WIDTH_SPLITS){
-                stop = WIDTH_SPLITS;
+            if (stop > widthSplits){
+                stop = widthSplits;
             }
             for(int i = start; i < stop; i++){
                 this.generatedMap[i][coordinate] = 1;
@@ -100,7 +111,7 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
     }
 
     protected boolean isIntersection(int x, int y){
-        if(x > 1 && y > 1 && x < WIDTH_SPLITS-1 && y < HEIGHT_SPLITS-1){
+        if(x > 1 && y > 1 && x < widthSplits -1 && y < heightSplits -1){
             System.out.println("up dx down sx");
             System.out.println(generatedMap[x][y+1] + " " + generatedMap[x+1][y] + " " + generatedMap[x][y-1] + " " + generatedMap[x-1][y]);
             if(generatedMap[x][y+1] == 1 && generatedMap[x+1][y] == 1 && generatedMap[x][y-1] == 1 && generatedMap[x-1][y] == 1){
@@ -117,8 +128,8 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
     }
 
     public boolean containsIntersections(){
-        for(int i = 1; i < WIDTH_SPLITS-1; i++){
-            for(int j = 1; j < HEIGHT_SPLITS-1; j++){
+        for(int i = 1; i < widthSplits -1; i++){
+            for(int j = 1; j < heightSplits -1; j++){
                 if(generatedMap[i][j] == 0 && generatedMap[i][j+1] == 1 && generatedMap[i+1][j] == 1 && generatedMap[i][j-1] == 1 && generatedMap[i-1][j] == 1){
                     System.out.println();
                     System.out.println(i + " " + j + " is a bad INTERSECTION!");
@@ -131,10 +142,10 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
     }
 
     protected boolean isVerticalWallDenied(int coordinate, int startY, int endY){
-        if (startY == 0 && endY == HEIGHT_SPLITS) {
+        if (startY == 0 && endY == heightSplits) {
             //System.out.println("Initial wall OK");
         }
-        else if(endY == HEIGHT_SPLITS){
+        else if(endY == heightSplits){
             if (generatedMap[coordinate][startY - 1] == 0) {
                 return  true;
             }
@@ -153,10 +164,10 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
     }
 
     protected boolean isHorizontalWallDenied(int coordinate, int startX, int endX) {
-        if (startX == 0 && endX == WIDTH_SPLITS) {
+        if (startX == 0 && endX == widthSplits) {
             //System.out.println("Initial wall OK");
         }
-        else if(endX == WIDTH_SPLITS){
+        else if(endX == widthSplits){
             if(generatedMap[startX - 1][coordinate] == 0){
                 System.out.println();
                 return true;
