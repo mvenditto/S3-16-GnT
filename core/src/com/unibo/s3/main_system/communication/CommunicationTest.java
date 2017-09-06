@@ -13,6 +13,9 @@ import com.unibo.s3.main_system.world.actors.WorldActor;
 import com.unibo.s3.main_system.communication.Messages.CreateCharacterMsg;
 import com.unibo.s3.main_system.communication.Messages.ActMsg;
 import com.unibo.s3.main_system.communication.Messages.GenerateMapMsg;
+import org.jgrapht.UndirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
 
 public class CommunicationTest extends ApplicationAdapter {
 
@@ -21,20 +24,26 @@ public class CommunicationTest extends ApplicationAdapter {
 
     @Override
     public void create() {
+        UndirectedGraph<Vector2, DefaultEdge> graph = new SimpleGraph<>(DefaultEdge.class);
+        Vector2 v1 = new Vector2(3f, 3f);
+        Vector2 v2 = new Vector2(7f, 3f);
+        graph.addVertex(v1);
+        graph.addVertex(v2);
+        graph.addEdge(v1, v2);
         this.batch = new SpriteBatch();
         this.img = new Texture("badlogic.jpg");
 
         SystemManager.createSystem("System", null);
-        SystemManager.createActor(MasterActor.props(), GeneralActors.MASTER_ACTOR().name());
-        SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR().name());
-        SystemManager.createActor(QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR().name());
-        SystemManager.createActor(MapActor.props(), GeneralActors.MAP_ACTOR().name());
-        SystemManager.createActor(GraphActor.props(), GeneralActors.GRAPH_ACTOR().name());
+        SystemManager.createGeneralActor(MasterActor.props(), GeneralActors.MASTER_ACTOR());
+        SystemManager.createGeneralActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR());
+        SystemManager.createGeneralActor(QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR());
+        SystemManager.createGeneralActor(MapActor.props(), GeneralActors.MAP_ACTOR());
+        SystemManager.createGeneralActor(GraphActor.props(), GeneralActors.GRAPH_ACTOR());
 
-        ActorRef masterActor = SystemManager.getLocalActor(GeneralActors.MASTER_ACTOR().name());
-        ActorRef mapActor = SystemManager.getLocalActor(GeneralActors.MAP_ACTOR().name());
-        ActorRef graphActor = SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR().name());
-        ActorRef quadTreeActor = SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR().name());
+        ActorRef masterActor = SystemManager.getLocalGeneralActor(GeneralActors.MASTER_ACTOR());
+        ActorRef mapActor = SystemManager.getLocalGeneralActor(GeneralActors.MAP_ACTOR());
+        ActorRef graphActor = SystemManager.getLocalGeneralActor(GeneralActors.GRAPH_ACTOR());
+        ActorRef quadTreeActor = SystemManager.getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR());
 
         mapActor.tell(new Messages.MapSettingsMsg(60, 60), ActorRef.noSender());
         graphActor.tell(new Messages.MapSettingsMsg(60, 60), ActorRef.noSender());
@@ -54,10 +63,23 @@ public class CommunicationTest extends ApplicationAdapter {
             e.printStackTrace();
         }
 
-        masterActor.tell(new CreateCharacterMsg(new Vector2(1,1)), ActorRef.noSender());
-        masterActor.tell(new CreateCharacterMsg(new Vector2(2,2)), ActorRef.noSender());
         masterActor.tell(new CreateCharacterMsg(new Vector2(3,3)), ActorRef.noSender());
-        masterActor.tell(new CreateCharacterMsg(new Vector2(24,34)), ActorRef.noSender());
+        masterActor.tell(new CreateCharacterMsg(new Vector2(2,2)), ActorRef.noSender());
+        masterActor.tell(new CreateCharacterMsg(new Vector2(6.5f,3)), ActorRef.noSender());
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ActorRef cop1 = SystemManager.getLocalCharacterActor(CharacterActors.COP(), 1);
+        ActorRef cop2 = SystemManager.getLocalCharacterActor(CharacterActors.COP(), 2);
+        ActorRef cop3 = SystemManager.getLocalCharacterActor(CharacterActors.COP(), 3);
+
+        cop1.tell(new Messages.SendGraphMsg(graph), ActorRef.noSender());
+        cop2.tell(new Messages.SendGraphMsg(graph), ActorRef.noSender());
+        cop3.tell(new Messages.SendGraphMsg(graph), ActorRef.noSender());
 
         masterActor.tell(new ActMsg(0.016f), ActorRef.noSender());
     }

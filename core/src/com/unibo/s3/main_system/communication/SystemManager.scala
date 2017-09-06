@@ -14,6 +14,15 @@ object SystemManager {
     this.system = ActorSystem.create(systemName, config)
   }
 
+  def createActor(props: Props, actorCode: String): ActorRef = {
+    if(this.actorList == null) {
+      this.actorList = Map()
+    }
+    val ref: ActorRef = this.system.actorOf(props, actorCode)
+    this.actorList += actorCode -> ref
+    ref
+  }
+
   def createGeneralActor(props: Props, actorName: GeneralActors): ActorRef = {
     createActor(props, actorName.toString)
   }
@@ -21,24 +30,17 @@ object SystemManager {
   def createCharacterActor(props: Props, actorName: CharacterActors, id: Int): ActorRef = {
     val actorCode = actorName.toString + id
     createActor(props, actorCode)
-    /*
-    if(this.actorList == null) {
-      this.actorList = Map()
-    }
-    val ref: ActorRef = this.system.actorOf(props, actorCode)
-    this.actorList += actorCode -> ref
-    ref*/
   }
+
+  def getLocalActor(actorCode: String): ActorRef = this.actorList.filter(elem => elem._1.equals(actorCode)).head._2
 
   def getLocalGeneralActor(actorName: GeneralActors): ActorRef = {
     getLocalActor(actorName.toString)
-    //this.actorList.filter(elem => elem._1.equals(actorName.toString)).head._2
   }
 
   def getLocalCharacterActor(actorName: CharacterActors, id: Int): ActorRef = {
     val actorCode = actorName.toString + id
     getLocalActor(actorCode.toString)
-    //this.actorList.filter(elem => elem._1.equals(actorCode)).head._2
   }
 
 
@@ -55,15 +57,4 @@ object SystemManager {
   }
 
   def shutdownSystem(): Unit = this.system.terminate()
-
-  def createActor(props: Props, actorCode: String): ActorRef = {
-    if(this.actorList == null) {
-      this.actorList = Map()
-    }
-    val ref: ActorRef = this.system.actorOf(props, actorCode)
-    this.actorList += actorCode -> ref
-    ref
-  }
-
-  def getLocalActor(actorCode: String): ActorRef = this.actorList.filter(elem => elem._1.equals(actorCode)).head._2
 }

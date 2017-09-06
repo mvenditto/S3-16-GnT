@@ -46,7 +46,7 @@ public class SimulatedRemoteSystemTest {
 
     @AfterClass
     public static void teardown() {
-        SystemManager.getInstance().shutdownSystem();
+        SystemManager.shutdownSystem();
         TestKit.shutdownActorSystem(testSystem);
         testSystem = null;
     }
@@ -60,13 +60,13 @@ public class SimulatedRemoteSystemTest {
                         ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
                         ",\"netty\":{\"tcp\":{\"hostname\":\""+ Inet4Address.getLocalHost().getHostAddress() +"\",\"port\":2727}}}}}";
                 Config customConf = ConfigFactory.parseString(confText);
-                SystemManager.getInstance().createSystem("LocalSystem", customConf);
-                ActorRef localActor = SystemManager.getInstance().createActor(Props.create(TestActor.class), "localActor");
+                SystemManager.createSystem("LocalSystem", customConf);
+                ActorRef localActor = SystemManager.createActor(Props.create(TestActor.class), "localActor");
                 customConf = ConfigFactory.parseString(confText.replace("2727", "5050"));
                 ActorSystem remoteSystem = ActorSystem.create("RemoteSystem", customConf);
                 remoteSystem.actorOf(Props.create(TestActor.class), "remoteActor");
 
-                ActorSelection remoteActor = SystemManager.getInstance().getRemoteActor
+                ActorSelection remoteActor = SystemManager.getRemoteActor
                         ("RemoteSystem",Inet4Address.getLocalHost().getHostAddress(),"5050","/user/remoteActor");
 
                 TestKit probe = new TestKit(testSystem);
