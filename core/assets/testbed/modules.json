@@ -28,7 +28,7 @@
 
     "Box2d Module" : {
       "desc":"Entities system sample",
-      "class":"Box2dModulez",
+      "class":"Box2dModule",
       "version": 1.0
     }
   }
