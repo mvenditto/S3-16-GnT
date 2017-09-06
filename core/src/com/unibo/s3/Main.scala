@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.kotcrab.vis.ui.VisUI
 import com.unibo.s3.main_system.AbstractMainApplication
+import com.unibo.s3.main_system.game.GameSettings
 import com.unibo.s3.main_system.modules._
 import com.unibo.s3.main_system.util.ScaleUtils._
 
@@ -38,12 +39,11 @@ class Main extends AbstractMainApplication {
     val master = new MasterModule()
     master.enable(false)
 
+    var settings: Option[GameSettings] = None
     val cm = new MenuModule({
       case Start(guardsNum, thiefsNum, simulation, mapDimension, mazeTypeMap) =>
-        //System.out.println("Dimensione mappa = " + mapDimension.toString)
-        master.enable(true)
-        master.init(guardsNum, thiefsNum, simulation, mapDimension, mazeTypeMap)
-      //master.dummyInit()
+        settings = Option(GameSettings(mapSize = mapDimension))
+        bootstrapModule.enable(true)
       case Pause(pause) =>
         println("Sistem pause: " + pause)
       case Stop() =>
@@ -51,7 +51,7 @@ class Main extends AbstractMainApplication {
       case ViewDebug(debug) =>
         println("View debug activated: " + debug)
     })
-    cm.enable(false)
+    cm.enable(true)
 
     var actorsMap: Option[Map[GameActors.Value, String]] = None
     bootstrapModule = new BootstrapModule({
@@ -62,16 +62,15 @@ class Main extends AbstractMainApplication {
         println(err)
 
       case UserAck() if actorsMap.isDefined =>
-        //master.dummyInit(actorsMap.get)
-        //master.enable(true)
-        master.setActors(actorsMap.get)
+        master.initGame(actorsMap.get, settings.get)
+        master.enable(true)
         removeModule(bootstrapModule)
-        cm.enable(true)
     })
+    bootstrapModule.enable(false)
 
+    modules :+= cm
     modules :+= bootstrapModule
     modules :+= master
-    modules :+= cm
   }
 
   private def renderAxis(shapeRenderer: ShapeRenderer) = {

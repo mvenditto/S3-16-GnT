@@ -60,6 +60,8 @@ class AgentsTest extends ApplicationAdapter{
     copOne ! SendNeighboursMsg(list1)
     copTwo ! SendNeighboursMsg(list2)
     copThree ! SendNeighboursMsg(list3)
+
+    copTwo ! SendNeighboursMsg(List())
   }
 
   override def render(): Unit = {

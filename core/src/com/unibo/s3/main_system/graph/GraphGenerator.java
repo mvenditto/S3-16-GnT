@@ -295,9 +295,9 @@ public class GraphGenerator {
     }
 
     private static void addFirstNodes(Integer[][] grid, UndirectedGraph<Vector2, DefaultEdge> graph) {
-        int step = 4;
-        for(int row = (step - 1); row < grid.length; row+=step) {
-            for(int col = (step - 1); col < grid[0].length; col+=step) {
+        int step = 3;
+        for(int row = (3); row < grid.length; row+=step) {
+            for(int col = (3); col < grid[0].length; col+=step) {
                 if(checkGrid(row, col, grid)) {
                     Vector2 v = createVector(row, col);
                     graph.addVertex(v);
@@ -321,14 +321,14 @@ public class GraphGenerator {
 
     private static void addWallsNode(HashMap<Vector2, Vector2> walls, Integer[][] grid, UndirectedGraph<Vector2, DefaultEdge> graph) {
         walls.forEach((pos, size) -> {
-            //log("Muro in " + pos.toString() + " di " + size.toString());
+            float dist = 1f;
             Vector2[] vertex = new Vector2[4];
             float halfWidth = size.x / 2;
             float halfHeight = size.y / 2;
-            vertex[0] = createVector((pos.x - halfWidth - 2f), pos.y);
-            vertex[1] = createVector((pos.x + halfWidth + 2f), pos.y);
-            vertex[2] = createVector(pos.x, (pos.y + halfHeight + 2f));
-            vertex[3] = createVector(pos.x, (pos.y - halfHeight - 2f));
+            vertex[0] = createVector((pos.x - halfWidth - dist), pos.y);
+            vertex[1] = createVector((pos.x + halfWidth + dist), pos.y);
+            vertex[2] = createVector(pos.x, (pos.y + halfHeight + dist));
+            vertex[3] = createVector(pos.x, (pos.y - halfHeight - dist));
 
             for(int i = 0; i < 4; i++) {
                 int x = (int) vertex[i].x;
