@@ -20,6 +20,8 @@ class CharacterActor(private[this] val character: BaseCharacter) extends Untyped
       SystemManager.getInstance().getLocalActor("quadTreeActor").tell(AskNeighboursMsg(this.character), getSelf())
 
     case msg: SendNeighboursMsg =>
+      //refresha vicini
+      character.refreshNeighbours()
       msg.neighbours.foreach(neighbour => neighbour.tell(SendCopInfoMsg(character.getInformations.toList), getSelf()))
       //msg.neighbours.filter(neighbour => !character.getNeighbours.contains(neighbour)).foreach(neighbour => character.addNeighbour(neighbour))
       msg.neighbours.filter(neighbour => !character.isNeighbour(neighbour)).foreach(neighbour => character.addNeighbour(neighbour))

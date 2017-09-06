@@ -12,11 +12,17 @@ import org.jgrapht.graph.DefaultEdge
 
 import scala.util.Random
 
-trait CharacterTrait{
+trait Character{
+
+  //add neighbours
+
+  //refresh neighbours
+
+  //get info
 
 }
 
-class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector2){
+class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector2) with Character{
 
   private var color : Color = _
 
@@ -51,6 +57,8 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
     this.neighbours :+= neighbour
     this.nNeighbours += 1
   }
+
+  def refreshNeighbours() : Unit = this.neighbours = List()
 
   def isNeighbour(possibleNeighbour : ActorRef) : Boolean = neighbours.contains(possibleNeighbour)
 
@@ -138,8 +146,4 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
   def getCurrentDestination: Vector2 = currentDestination
 
 }
-
-//class BaseCharacter(vector : Vector2, id : Int) extends Character(vector){
-
-//}
-
+/**todo refresh vicini**/
