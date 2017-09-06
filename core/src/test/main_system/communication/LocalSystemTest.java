@@ -40,16 +40,16 @@ public class LocalSystemTest {
 
     @BeforeClass
     public static void setup() {
-        SystemManager.getInstance().createSystem("MySystem", null);
-        SystemManager.getInstance().createActor(Props.create(TestActor.class), "firstActor");
-        SystemManager.getInstance().createActor(Props.create(TestActor.class), "secondActor");
+        SystemManager.createSystem("MySystem", null);
+        SystemManager.createActor(Props.create(TestActor.class), "firstActor");
+        SystemManager.createActor(Props.create(TestActor.class), "secondActor");
         testSystem = ActorSystem.create();
 
     }
 
     @AfterClass
     public static void teardown() {
-        SystemManager.getInstance().shutdownSystem();
+        SystemManager.shutdownSystem();
         TestKit.shutdownActorSystem(testSystem);
         testSystem = null;
     }
@@ -58,8 +58,8 @@ public class LocalSystemTest {
     public void localSystemTest() {
         new TestKit(testSystem) {{
 
-            ActorRef firstActor = SystemManager.getInstance().getLocalActor("firstActor");
-            ActorRef secondActor = SystemManager.getInstance().getLocalActor("secondActor");
+            ActorRef firstActor = SystemManager.getLocalActor("firstActor");
+            ActorRef secondActor = SystemManager.getLocalActor("secondActor");
 
             TestKit probe = new TestKit(testSystem);
 
