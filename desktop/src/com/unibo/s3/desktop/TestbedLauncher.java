@@ -2,7 +2,7 @@ package com.unibo.s3.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.unibo.s3.testbed.FutureTestbed;
+import com.unibo.s3.testbed.model.TestbedImpl;
 
 public class TestbedLauncher {
 	public static void main (String[] arg) {
@@ -11,6 +11,6 @@ public class TestbedLauncher {
 		config.height = 700;
 		config.samples = 4;
 		config.vSyncEnabled = true;
-		new LwjglApplication(new FutureTestbed(), config);
+		new LwjglApplication(new TestbedImpl(), config);
 	}
 }

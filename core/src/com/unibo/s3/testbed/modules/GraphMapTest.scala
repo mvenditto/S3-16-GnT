@@ -1,4 +1,4 @@
-package com.unibo.s3.testbed.samples
+package com.unibo.s3.testbed.modules
 
 import java.util
 
@@ -19,14 +19,14 @@ import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig}
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.world.actors.{CreateBox, ResetWorld}
-import com.unibo.s3.testbed.{BaseSample, Testbed}
+import com.unibo.s3.testbed.model.{BaseTestbedModule, Testbed}
 import org.jgrapht.alg.NeighborIndex
 import org.jgrapht.graph.DefaultEdge
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class GraphMapTest extends BaseSample {
+class GraphMapTest extends BaseTestbedModule {
 
   private[this] var graphActor: ActorRef = _
   private[this] var worldActor: ActorRef = _

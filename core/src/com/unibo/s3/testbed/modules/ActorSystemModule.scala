@@ -1,4 +1,4 @@
-package com.unibo.s3.testbed.samples
+package com.unibo.s3.testbed.modules
 
 import java.io.File
 
@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.main_system.communication.{GraphActor, MapActor, QuadTreeActor, SystemManager}
 import com.unibo.s3.main_system.world.actors.WorldActor
-import com.unibo.s3.testbed.BaseSample
+import com.unibo.s3.testbed.model.BaseTestbedModule
 
 import scala.reflect.runtime.currentMirror
 import scala.tools.reflect.ToolBox
@@ -44,7 +44,7 @@ object LoggerActor {
   def props(logger: {def setText(s: String)}): Props = Props(new LoggerActor(logger))
 }
 
-class ActorSystemModule extends BaseSample {
+class ActorSystemModule extends BaseTestbedModule {
 
   private[this] var loggerActor: ActorRef = _
   private[this] var messageTextField: VisTextArea = _

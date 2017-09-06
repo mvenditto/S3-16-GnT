@@ -1,4 +1,4 @@
-package com.unibo.s3.testbed.samples
+package com.unibo.s3.testbed.modules
 
 import akka.actor.{ActorRef, Props}
 import akka.pattern.Patterns
@@ -17,13 +17,12 @@ import com.unibo.s3.main_system.communication.SystemManager
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.util.ScaleUtils.{getMetersPerPixel, getPixelsPerMeter, metersToPixels, pixelsToMeters}
 import com.unibo.s3.main_system.world.actors._
-import com.unibo.s3.testbed.{BaseSample, Testbed}
-import com.unibo.s3.testbed.BaseSample
+import com.unibo.s3.testbed.model.{BaseTestbedModule, Testbed}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class Box2dModule extends BaseSample with InputProcessorAdapter {
+class Box2dModule extends BaseTestbedModule with InputProcessorAdapter {
 
   private var world: World = _
   private var worldActor: ActorRef = _
