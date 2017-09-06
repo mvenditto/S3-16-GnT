@@ -1,4 +1,4 @@
-package com.unibo.s3.testbed.samples
+package com.unibo.s3.testbed.modules
 
 import akka.actor.{ActorRef, Props}
 import akka.pattern.Patterns
@@ -17,13 +17,12 @@ import com.unibo.s3.main_system.communication.SystemManager
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.util.ScaleUtils.{getMetersPerPixel, getPixelsPerMeter, metersToPixels, pixelsToMeters}
 import com.unibo.s3.main_system.world.actors._
-import com.unibo.s3.testbed.{BaseSample, Testbed}
-import com.unibo.s3.testbed.BaseSample
+import com.unibo.s3.testbed.model.{BaseTestbedModule, Testbed}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class Box2dModule extends BaseSample with InputProcessorAdapter {
+class Box2dModule extends BaseTestbedModule with InputProcessorAdapter {
 
   private var world: World = _
   private var worldActor: ActorRef = _
@@ -60,15 +59,15 @@ class Box2dModule extends BaseSample with InputProcessorAdapter {
     val conf = "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," + "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" + ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" + ",\"netty\":{\"tcp\":{\"hostname\":\"" + "127.0.0.1" + "\",\"port\":5050}}}}}"
     val customConfig = ConfigFactory.parseString(conf)
     log("Starting actor system")
-    SystemManager.getInstance.createSystem("b2d", customConfig)
-    SystemManager.getInstance.createActor(Props.create(classOf[WorldActor], world), "world")
-    worldActor = SystemManager.getInstance.getLocalActor("world")
+    SystemManager.createSystem("b2d", customConfig)
+    SystemManager.createActor(Props.create(classOf[WorldActor], world), "world")
+    worldActor = SystemManager.getLocalActor("world")
   }
 
   override def cleanup(): Unit = {
     super.cleanup()
     world.dispose()
-    SystemManager.getInstance().shutdownSystem()
+    SystemManager.shutdownSystem()
   }
 
   override def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit = {

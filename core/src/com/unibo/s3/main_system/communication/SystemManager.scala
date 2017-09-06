@@ -14,18 +14,11 @@ object SystemManager {
     this.system = ActorSystem.create(systemName, config)
   }
 
-  def createActor(props: Props, actorName: GeneralActors): ActorRef = {
+  def createGeneralActor(props: Props, actorName: GeneralActors): ActorRef = {
     createActor(props, actorName.toString)
-    /*
-    if(this.actorList == null) {
-      this.actorList = Map()
-    }
-    val ref: ActorRef = this.system.actorOf(props, actorName.toString)
-    this.actorList += actorName.toString -> ref
-    ref*/
   }
 
-  def createActor(props: Props, actorName: CharacterActors, id: Int): ActorRef = {
+  def createCharacterActor(props: Props, actorName: CharacterActors, id: Int): ActorRef = {
     val actorCode = actorName.toString + id
     createActor(props, actorCode)
     /*
@@ -37,14 +30,14 @@ object SystemManager {
     ref*/
   }
 
-  def getLocalActor(actorName: GeneralActors): ActorRef = {
-    getActorRef(actorName.toString)
+  def getLocalGeneralActor(actorName: GeneralActors): ActorRef = {
+    getLocalActor(actorName.toString)
     //this.actorList.filter(elem => elem._1.equals(actorName.toString)).head._2
   }
 
-  def getLocalActor(actorName: CharacterActors, id: Int): ActorRef = {
+  def getLocalCharacterActor(actorName: CharacterActors, id: Int): ActorRef = {
     val actorCode = actorName.toString + id
-    getActorRef(actorCode.toString)
+    getLocalActor(actorCode.toString)
     //this.actorList.filter(elem => elem._1.equals(actorCode)).head._2
   }
 
@@ -63,7 +56,7 @@ object SystemManager {
 
   def shutdownSystem(): Unit = this.system.terminate()
 
-  private def createActor(props: Props, actorCode: String): ActorRef = {
+  def createActor(props: Props, actorCode: String): ActorRef = {
     if(this.actorList == null) {
       this.actorList = Map()
     }
@@ -72,5 +65,5 @@ object SystemManager {
     ref
   }
 
-  private def getActorRef(actorCode: String): ActorRef = this.actorList.filter(elem => elem._1.equals(actorCode)).head._2
+  def getLocalActor(actorCode: String): ActorRef = this.actorList.filter(elem => elem._1.equals(actorCode)).head._2
 }

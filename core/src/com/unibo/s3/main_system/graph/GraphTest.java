@@ -62,8 +62,8 @@ public class GraphTest {
 
     @Test
     public void checkNewGraph() {
-        SystemManager.getInstance().createSystem("TestSystem", null);
-        SystemManager.getInstance().createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor");
+        //SystemManager.getInstance().createSystem("TestSystem", null);
+        //SystemManager.getInstance().createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor");
 
         UndirectedGraph<Vector2, DefaultEdge> objectGraph = null;
         //try {

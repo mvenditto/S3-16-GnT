@@ -96,24 +96,23 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
     val world = new World(new Vector2(0, 0), true)
     setProgress(20)
 
-    SystemManager.getInstance().createActor(
-      MasterActor.props(), gameActorsNames(GameActors.Master))
+    SystemManager.createGeneralActor(
+      MasterActor.props(), GeneralActors.MASTER_ACTOR)
     setProgress(30)
 
-    SystemManager.getInstance.createActor(
-      WorldActor.props(world), gameActorsNames(GameActors.World))
+    SystemManager.createGeneralActor(
+      WorldActor.props(world), GeneralActors.WORLD_ACTOR)
     setProgress(40)
 
-    SystemManager.getInstance.createActor(
-      QuadTreeActor.props(), gameActorsNames(GameActors.QuadTree))
-    setProgress(60)
+    SystemManager.createGeneralActor(
+      QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)
 
-    SystemManager.getInstance.createActor(
-      MapActor.props(), gameActorsNames(GameActors.Map))
+    SystemManager.createGeneralActor(
+      MapActor.props(), GeneralActors.MAP_ACTOR)
     setProgress(80)
 
-    SystemManager.getInstance.createActor(
-      GraphActor.props(), gameActorsNames(GameActors.Graph))
+    SystemManager.createGeneralActor(
+      GraphActor.props(), GeneralActors.GRAPH_ACTOR)
     setProgress(100)
 
     loadingFinished = true
