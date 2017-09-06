@@ -91,7 +91,7 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
 
   private def initActorSystem(): Unit = {
     setProgress(0)
-    SystemManager.getInstance.createSystem(actorSystemName, null)
+    SystemManager.createSystem(actorSystemName, null)
 
     val world = new World(new Vector2(0, 0), true)
     setProgress(20)
