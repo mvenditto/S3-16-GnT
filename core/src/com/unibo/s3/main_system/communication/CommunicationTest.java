@@ -25,16 +25,16 @@ public class CommunicationTest extends ApplicationAdapter {
         this.img = new Texture("badlogic.jpg");
 
         SystemManager.createSystem("System", null);
-        SystemManager.createActor(MasterActor.props(), Actors.MASTER_ACTOR().name());
-        SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), Actors.WORLD_ACTOR().name());
-        SystemManager.createActor(QuadTreeActor.props(), Actors.QUAD_TREE_ACTOR().name());
-        SystemManager.createActor(MapActor.props(), Actors.MAP_ACTOR().name());
-        SystemManager.createActor(GraphActor.props(), Actors.GRAPH_ACTOR().name());
+        SystemManager.createActor(MasterActor.props(), GeneralActors.MASTER_ACTOR().name());
+        SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR().name());
+        SystemManager.createActor(QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR().name());
+        SystemManager.createActor(MapActor.props(), GeneralActors.MAP_ACTOR().name());
+        SystemManager.createActor(GraphActor.props(), GeneralActors.GRAPH_ACTOR().name());
 
-        ActorRef masterActor = SystemManager.getLocalActor(Actors.MASTER_ACTOR().name());
-        ActorRef mapActor = SystemManager.getLocalActor(Actors.MAP_ACTOR().name());
-        ActorRef graphActor = SystemManager.getLocalActor(Actors.GRAPH_ACTOR().name());
-        ActorRef quadTreeActor = SystemManager.getLocalActor(Actors.QUAD_TREE_ACTOR().name());
+        ActorRef masterActor = SystemManager.getLocalActor(GeneralActors.MASTER_ACTOR().name());
+        ActorRef mapActor = SystemManager.getLocalActor(GeneralActors.MAP_ACTOR().name());
+        ActorRef graphActor = SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR().name());
+        ActorRef quadTreeActor = SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR().name());
 
         mapActor.tell(new Messages.MapSettingsMsg(60, 60), ActorRef.noSender());
         graphActor.tell(new Messages.MapSettingsMsg(60, 60), ActorRef.noSender());

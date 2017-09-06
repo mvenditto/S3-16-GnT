@@ -1,9 +1,12 @@
 package com.unibo.s3.main_system.communication
 
-import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.actor.{ActorRef, ActorSelection, ActorSystem, Props}
 import com.typesafe.config.Config
 
 object SystemManager {
+  private[this] type GeneralActors = GeneralActors.Value
+  private[this] type CharacterActors = CharacterActors.Value
+
   private[this] var system: ActorSystem = _
   private[this] var actorList: Map[String, ActorRef] = _
 
@@ -11,18 +14,42 @@ object SystemManager {
     this.system = ActorSystem.create(systemName, config)
   }
 
-  def createActor(props: Props, actorName: String): ActorRef = {
+  def createActor(props: Props, actorName: GeneralActors): ActorRef = {
+    createActor(props, actorName.toString)
+    /*
     if(this.actorList == null) {
       this.actorList = Map()
     }
-    val ref: ActorRef = this.system.actorOf(props, actorName)
-    this.actorList += actorName -> ref
-    ref
+    val ref: ActorRef = this.system.actorOf(props, actorName.toString)
+    this.actorList += actorName.toString -> ref
+    ref*/
   }
 
-  def getLocalActor(actors: String): ActorRef = this.actorList.filter(elem => elem._1.equals(actors)).head._2
+  def createActor(props: Props, actorName: CharacterActors, id: Int): ActorRef = {
+    val actorCode = actorName.toString + id
+    createActor(props, actorCode)
+    /*
+    if(this.actorList == null) {
+      this.actorList = Map()
+    }
+    val ref: ActorRef = this.system.actorOf(props, actorCode)
+    this.actorList += actorCode -> ref
+    ref*/
+  }
 
-  def getRemoteActor(systemName: String, ip: String, portNumber: String, path: String) = {
+  def getLocalActor(actorName: GeneralActors): ActorRef = {
+    getActorRef(actorName.toString)
+    //this.actorList.filter(elem => elem._1.equals(actorName.toString)).head._2
+  }
+
+  def getLocalActor(actorName: CharacterActors, id: Int): ActorRef = {
+    val actorCode = actorName.toString + id
+    getActorRef(actorCode.toString)
+    //this.actorList.filter(elem => elem._1.equals(actorCode)).head._2
+  }
+
+
+  def getRemoteActor(systemName: String, ip: String, portNumber: String, path: String): ActorSelection = {
     val tmp = new StringBuilder(60)
     tmp.append("akka.tcp://")
     tmp.append(systemName)
@@ -36,4 +63,14 @@ object SystemManager {
 
   def shutdownSystem(): Unit = this.system.terminate()
 
+  private def createActor(props: Props, actorCode: String): ActorRef = {
+    if(this.actorList == null) {
+      this.actorList = Map()
+    }
+    val ref: ActorRef = this.system.actorOf(props, actorCode)
+    this.actorList += actorCode -> ref
+    ref
+  }
+
+  private def getActorRef(actorCode: String): ActorRef = this.actorList.filter(elem => elem._1.equals(actorCode)).head._2
 }

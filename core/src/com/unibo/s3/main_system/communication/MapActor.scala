@@ -32,8 +32,8 @@ class MapActor extends UntypedAbstractActor {
       }
       //valori da decidere una volta decise le dimensioni possibili per la mappa
       this.mapGenerator.generateMap(this.mapWidth, this.mapHeight)
-      this.mapGenerator.getMap.foreach(line => SystemManager.getLocalActor(Actors.GRAPH_ACTOR.name).tell(MapElementMsg(line), getSelf()))
-      this.mapGenerator.getMap.foreach(line => SystemManager.getLocalActor(Actors.WORLD_ACTOR.name).tell(MapElementMsg(line), getSelf()))
+      this.mapGenerator.getMap.foreach(line => SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR).tell(MapElementMsg(line), getSelf()))
+      this.mapGenerator.getMap.foreach(line => SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR).tell(MapElementMsg(line), getSelf()))
       // val file = Gdx.files.local(FILEPATH)
      // file.readString().split("\\n").foreach(line => SystemManager.getInstance().getLocalActor("graphActor").tell(MapMsg(line), getSelf()))
     case _ => println("(mapActor) message unknown:" + message)
