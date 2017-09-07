@@ -19,7 +19,9 @@ class CharacterActor(private[this] val character: BaseCharacter) extends Untyped
       character.act(dt)
       SystemManager.getInstance().getLocalActor("quadTreeActor").tell(AskNeighboursMsg(this.character), getSelf())
       println(log() + "Act received")
-    case msg: SendNeighboursMsg =>
+      println(log() + "Current node/destination: " + character.getCurrentNode.getOrElse("Not definied") + "," + character.getCurrentDestination)
+      character.chooseBehaviour()
+   /* case msg: SendNeighboursMsg =>
       //refresha vicini
       character.refreshNeighbours()
       println("My neighbours are: " + msg.neighbours.filter(neighbour => !neighbour.equals(getSelf())))
@@ -29,8 +31,6 @@ class CharacterActor(private[this] val character: BaseCharacter) extends Untyped
       //verifica funzionamento
       println(log() + "Neibours in list " + character.getNeighbours)
       println(log() + "Current node/destination " + character.getCurrentNode + "/" + character.getCurrentDestination)
-      //character.chooseBehaviour()
-      //println("cop: " + getSelf() + "| I have " + msg.neighbours.size + " neighbours: " + character.getNeighbours)
 
     case msg: SendCopInfoMsg =>
       println(log() + "Infos received")
@@ -38,13 +38,13 @@ class CharacterActor(private[this] val character: BaseCharacter) extends Untyped
       character.updateGraph(msg.visitedVertices)
       println("cop: " + getSelf() + " known vertices: " + character.getInformation)
       //qui ho le info dell'altro poliziotto quindi poi posso fare quello che devo
-
+*/
     case msg: SendGraphMsg=>
       System.out.println(log() + "Initial graph received")
       println("cop: " + getSelf() + "| received graph")
       character.setGraph(msg.graph)
 
-    case _ => println("(characterActor) message unknown:" + message)
+    case _ => //println("(characterActor) message unknown:" + message)
   }
 
   def log() : String = "[CHARACTER " + character.getId + "]: "

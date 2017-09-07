@@ -48,11 +48,11 @@ public class CharacterTest {
     public void testCharacter(){
         System.out.println("Initial position: " + character.getPosition());
         System.out.println("Graph: " + testGraph.toString());
-        assertTrue(character.computeNearest() == v1);
+        assertTrue(new Vector2(character.computeNearest().get()) == v1);
         //System.out.println("Nearest vertex is " + character.computeNearest());
         character.getPosition().add(5, 5);
-        assertFalse(character.computeNearest() == v1);
-        assertTrue(character.computeNearest() == v5);
+        assertFalse(new Vector2(character.computeNearest().get()) == v1);
+        assertTrue(new Vector2(character.computeNearest().get()) == v5);
         character.computeNeighbours();
     }
 
