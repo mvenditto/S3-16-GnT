@@ -10,7 +10,7 @@ import com.kotcrab.vis.ui.widget.{BusyBar, VisWindow}
 import com.unibo.s3.Main
 import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.communication.Messages._
-import com.unibo.s3.main_system.communication.SystemManager
+import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
 import com.unibo.s3.main_system.game.GameSettings
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig}
@@ -60,10 +60,9 @@ class MasterModule extends BasicModuleWithGui {
   private[this] var worldMap = List[Rectangle]()
   private[this] var busyBarWindow: VisWindow = _
 
-  private[this] var actorsMap: Option[Map[GameActors.Value, String]] = None
 
-  private def getActor(actor: GameActors.Value): ActorRef =
-    SystemManager.getLocalActor(actorsMap.get(actor))
+  private def getActor(actor: GeneralActors.Value): ActorRef =
+    SystemManager.getLocalGeneralActor(actor)
 
   private def cacheMap() = {
     val map = Gdx.files.internal(mapFilePath)
@@ -85,18 +84,17 @@ class MasterModule extends BasicModuleWithGui {
     busyBarWindow.centerWindow()
   }
 
-  def initGame(actors: Map[GameActors.Value, String], config: GameSettings): Unit = {
+  def initGame(config: GameSettings): Unit = {
 
     val mapSize = config.mapSize
     val w = mapSize.x.toInt
     val h = mapSize.y.toInt
-    this.actorsMap = Option(actors)
 
-    masterActor = getActor(GameActors.Master)
-    mapActor = getActor(GameActors.Map)
-    worldActor = getActor(GameActors.World)
-    quadTreeActor = getActor(GameActors.QuadTree)
-    graphActor = getActor(GameActors.Graph)
+    masterActor = getActor(GeneralActors.MASTER_ACTOR)
+    mapActor = getActor(GeneralActors.MAP_ACTOR)
+    worldActor = getActor(GeneralActors.WORLD_ACTOR)
+    quadTreeActor = getActor(GeneralActors.QUAD_TREE_ACTOR)
+    graphActor = getActor(GeneralActors.GRAPH_ACTOR)
     dummyReceiverActor = SystemManager
       .createActor(DummyReceiverActor.props(), "graphReceiver")
 
@@ -132,13 +130,17 @@ class MasterModule extends BasicModuleWithGui {
     inputMultiplexer.addProcessor(this)
   }
 
+
   override def touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
+    //need to be fixed, out of sync, new characters shows only after next added.
+    quadTreeActor tell(AskAllCharactersMsg, dummyReceiverActor)
+    false
+  }
+
+  override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
     val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
     mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
     masterActor ! CreateCharacterMsg(mouseWorldPos)
-
-    //need to be fixed, out of sync, new characters shows only after next added.
-    quadTreeActor tell(AskAllCharactersMsg, dummyReceiverActor)
     false
   }
 

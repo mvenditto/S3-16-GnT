@@ -12,12 +12,9 @@ import com.unibo.s3.main_system.communication._
 import com.unibo.s3.main_system.world.actors.WorldActor
 
 
-object GameActors extends Enumeration {
-  val World, Graph, Map, QuadTree, Master = Value
-}
 
 sealed trait BootstrapEvent
-case class BootstrapOk(actorsMap: Map[GameActors.Value, String]) extends BootstrapEvent
+case class BootstrapOk() extends BootstrapEvent
 case class BootstrapFailed(error: String) extends BootstrapEvent
 case class UserAck() extends BootstrapEvent
 
@@ -26,12 +23,6 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
 
   private[this] var loadingFinished = false
   private[this] val actorSystemName = "System"
-  private[this] val gameActorsNames = Map(
-    GameActors.World -> "worldActor",
-    GameActors.Graph -> "graphActor",
-    GameActors.Map -> "mapActor",
-    GameActors.Master -> "masterActor",
-    GameActors.QuadTree -> "quadTreeActor")
 
   private[this] val loadingDialogTitle = "System Initialization"
   private[this] var loadingBar: VisProgressBar = _
@@ -132,7 +123,7 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
         try {
           initActorSystem()
           loadingFinished = true
-          listener(BootstrapOk(gameActorsNames))
+          listener(BootstrapOk())
         } catch {
           case err: Exception =>
             listener(BootstrapFailed(err.getMessage))

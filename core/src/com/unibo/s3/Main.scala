@@ -34,6 +34,7 @@ class Main extends AbstractMainApplication {
     Gdx.input.setInputProcessor(inputMultiplexer)
   }
 
+
   private def addModules() = {
 
     val master = new MasterModule()
@@ -53,16 +54,14 @@ class Main extends AbstractMainApplication {
     })
     cm.enable(true)
 
-    var actorsMap: Option[Map[GameActors.Value, String]] = None
     bootstrapModule = new BootstrapModule({
-      case BootstrapOk(actors) =>
-        actorsMap = Option(actors)
+      case BootstrapOk() =>
 
       case BootstrapFailed(err) =>
         println(err)
 
-      case UserAck() if actorsMap.isDefined =>
-        master.initGame(actorsMap.get, settings.get)
+      case UserAck() if settings.isDefined =>
+        master.initGame(settings.get)
         master.enable(true)
         removeModule(bootstrapModule)
     })
