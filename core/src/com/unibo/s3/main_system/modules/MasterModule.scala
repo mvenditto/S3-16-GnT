@@ -135,19 +135,12 @@ class MasterModule extends BasicModuleWithGui {
   }
 
   override def touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
-    /*val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
-    mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
-    masterActor ! CreateCharacterMsg(mouseWorldPos)*/
-
-    //need to be fixed, out of sync, new characters shows only after next added.
-    quadTreeActor tell(AskAllCharactersMsg, dummyReceiverActor)
-    false
-  }
-
-  override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
     val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
     mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
     masterActor ! CreateCharacterMsg(mouseWorldPos)
+
+    //need to be fixed, out of sync, new characters shows only after next added.
+    quadTreeActor tell(AskAllCharactersMsg, dummyReceiverActor)
     false
   }
 

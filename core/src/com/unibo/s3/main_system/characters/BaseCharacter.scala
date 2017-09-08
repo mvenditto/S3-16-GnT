@@ -30,8 +30,8 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
 
   private var nNeighbours = 0 //guard
 
-  private var currentNode : Option[Vector2] = None /***todo make option*/
-  private var previousNode : Option[Vector2] = None /**Nodo prevedente**/
+  private var currentNode : Option[Vector2] = Option[Vector2](new Vector2())
+  private var previousNode : Option[Vector2] = Option[Vector2](new Vector2()) /**Nodo precedente**/
   private var neighbours = List[ActorRef]() //char?
 
   private var visited = List[Vector2]()
@@ -109,9 +109,9 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
     }else{
       out = Option[Vector2](scala.util.Random.shuffle(list.filter(node => !node.equals(previousNode.get))).get(0))
     }
-    println(log + "previous/current " + previousNode + " " + currentNode)
-    println(log + "OUT pre : " + list)
-    println(log + "OUT post : " + list.filter(node => !node.equals(previousNode.get)))
+   // println(log + "previous/current " + previousNode + " " + currentNode)
+   // println(log + "OUT pre : " + list)
+   // println(log + "OUT post : " + list.filter(node => !node.equals(previousNode.get)))
 
     out
   }
@@ -163,13 +163,7 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
     }
     if (currentNode ne nearest){
       discoverNewVertex(nearest)
-      System.out.println()
-      System.out.println()
-      System.out.println()
       System.out.println(log + "Cambio nodo di riferimento " + currentNode + " to " + nearest)
-      System.out.println()
-      System.out.println()
-      System.out.println()
       previousNode = currentNode
       currentNode = nearest
 
@@ -185,7 +179,6 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
   }
 
 
-  def getCurrentDestination: Vector2 = currentDestination.get /**should be getOrElse**/
+  def getCurrentDestination: Vector2 = currentDestination.getOrElse(new Vector2())
 
 }
-/**todo refresh vicini**/
