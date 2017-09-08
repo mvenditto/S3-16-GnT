@@ -9,23 +9,27 @@ import org.jgrapht.graph.DefaultEdge;
 
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Semaphore;
 
 public class ConcurrentAddEdges implements Callable<Void> {
     private final List<Vector2> nodes;
     private UndirectedGraph<Vector2, DefaultEdge> graph;
     private RaycastCollisionDetector<Vector2> collisionDetector;
     private int id;
+    private Semaphore semGrap;
 
     public ConcurrentAddEdges(List<Vector2> nodes, UndirectedGraph<Vector2, DefaultEdge> graph,
-                              RaycastCollisionDetector<Vector2> collisionDetector, int id) {
+                              RaycastCollisionDetector<Vector2> collisionDetector, int id,
+                              Semaphore sem) {
         this.nodes = nodes;
         this.graph = graph;
         this.collisionDetector = collisionDetector;
         this.id = id;
+        this.semGrap = sem;
     }
 
     private void log(String msg) {
-        //System.out.println("[Thread " + id + "] " + msg);
+        System.out.println("[Thread " + id + "] " + msg);
     }
 
     @Override
@@ -40,12 +44,28 @@ public class ConcurrentAddEdges implements Callable<Void> {
                     Vector2 toCompare = new Vector2(x, y);
                     //log("Sto comparando " + node.toString() + " con " + toCompare.toString());
                     if(graph.containsVertex(toCompare)) {
-                        if (!toCompare.equals(node) && ksp.getPaths(node, toCompare).size() == 0) {
+                        int pathSize = -1;
+                        //try {
+                        try {
+                            semGrap.acquire();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        try {
+                            if (!toCompare.equals(node)) pathSize = ksp.getPaths(node, toCompare).size();
+                            semGrap.release();
+                        } catch (Exception e) {
+                            semGrap.release();
+                        }
+                        /*} catch (Exception e) {
+                            System.out.println("Eccezione " + e.getMessage() + " tra i nodi " + node.toString() + " e " + toCompare.toString());
+                        }*/
+                        if (pathSize == 0 || pathSize > 5) {
                             //log(node.toString() + " non arriva a " + toCompare.toString());
                             if(checkEdgeRayCast(collisionDetector, node, toCompare, 0.5f, 16)) {
                                 DefaultEdge edge = graph.addEdge(node, toCompare);
-                                if(edge != null)
-                                    System.out.println("Secondi archi dal thread: aggiunto " + edge.toString());
+                                /*if(edge != null)
+                                    log("Secondi archi dal thread: aggiunto " + edge.toString());*/
                             }
                         }
 
@@ -53,7 +73,7 @@ public class ConcurrentAddEdges implements Callable<Void> {
                 }
             }
         });
-        log("Controllati tutti i nodi");
+        //log("Controllati tutti i nodi");
 
         return null;
     }
