@@ -32,6 +32,8 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
 
     protected abstract void doRender();
 
+    protected abstract void doCustomRender();
+
     protected abstract void doUpdate(float delta);
 
     @Override
@@ -67,6 +69,7 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
         doRender();
         shapeRenderer.end();
 
+        doCustomRender();
     }
 
     @Override
