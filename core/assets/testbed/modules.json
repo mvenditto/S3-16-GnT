@@ -16,6 +16,12 @@
       "desc":"Akka actor system + game actors deployment.",
       "class":"ActorSystemModule",
       "version": 1.0
+    },
+
+    "Wall Trap Test": {
+      "desc":"Test agent movement near/overlapping trajectory to wall edge.",
+      "class":"WallTrapTest",
+      "version": 0.1
     }
   },
 
