@@ -117,6 +117,10 @@ case class TestbedImpl() extends AbstractMainApplication with Testbed {
 
   override def doRender(): Unit = {
     if (loadingFinished) currentSample.foreach(s => s.render(shapeRenderer))
+  }
+
+  override def doCustomRender(): Unit = {
+    if (loadingFinished) currentSample.foreach(s => s.customRender())
     gui.render()
   }
 
@@ -149,5 +153,4 @@ case class TestbedImpl() extends AbstractMainApplication with Testbed {
   override def getCamera: OrthographicCamera = cam
 
   override def getLogger: (LogMessage) => Unit = gui.writeConsoleLog
-
 }

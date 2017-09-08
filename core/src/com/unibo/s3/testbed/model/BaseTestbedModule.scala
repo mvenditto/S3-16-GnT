@@ -18,6 +18,9 @@ abstract class BaseTestbedModule extends TestbedModule {
   override def render(shapeRenderer: ShapeRenderer): Unit =
     submodules.foreach(sm => sm.render(shapeRenderer))
 
+  override def customRender(): Unit =
+    submodules.foreach(sm => sm.customRender())
+
   override def update(dt: Float): Unit =
     submodules.foreach(sm => sm.update(dt))
 
