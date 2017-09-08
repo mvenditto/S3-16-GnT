@@ -2,7 +2,7 @@ package com.unibo.s3.main_system.modules
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import box2dLight.{ConeLight, PointLight, RayHandler}
-import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.{Gdx, InputMultiplexer}
 import com.badlogic.gdx.graphics.{Color, GL20, OrthographicCamera}
 import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.physics.box2d.World
@@ -79,6 +79,10 @@ class LightingSystemModule extends BasicModuleWithGui {
     rayHandler.diffuseBlendFunc.set(GL20.GL_DST_COLOR, GL20.GL_SRC_COLOR)
   }
 
+  override def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit = {
+    super.attachInputProcessors(inputMultiplexer)
+    inputMultiplexer.addProcessor(this)
+  }
 
   override def update(dt: Float): Unit = {
     super.update(dt)
@@ -91,6 +95,15 @@ class LightingSystemModule extends BasicModuleWithGui {
       .getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR)
       .tell(AskAllCharactersMsg, worldObserverActor)
 
+  }
+
+  override def touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
+    if (button == 1) {
+      val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
+      mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
+      new PointLight(rayHandler, 64, brightWhite, 25, mouseWorldPos.x, mouseWorldPos.y)
+    }
+    false
   }
 
   override def customRender(): Unit = {

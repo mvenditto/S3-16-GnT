@@ -67,7 +67,7 @@ class Main extends AbstractMainApplication {
         master.initGame(settings.get)
         master.enable(true)
         lighting.setup()
-        lighting.enable(false)
+        lighting.enable(true)
         removeModule(bootstrapModule)
     })
     bootstrapModule.enable(false)

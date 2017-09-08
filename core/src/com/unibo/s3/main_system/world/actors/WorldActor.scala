@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d._
 import com.unibo.s3.main_system.characters.steer.collisions.{Box2dDetectorsFactory, Box2dRaycastCollisionDetector, Box2dSquareAABBProximity}
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
 import com.unibo.s3.main_system.util.GdxImplicits._
+import com.unibo.s3.main_system.world.{BodyData, Exit, Hideout}
 import net.dermetfan.gdx.physics.box2d.WorldObserver
 
 case class RayCastCollidesQuery(ray: Ray[Vector2])
@@ -53,21 +54,31 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
     worldObserver.update(world, dt)
   }
 
-  private def createBox(position: Vector2, size: Vector2) = {
+  private def createBox(position: Vector2, size: Vector2): Body = {
     val groundBodyDef = new BodyDef
     groundBodyDef.position.set(position)
     val groundBody = world.createBody(groundBodyDef)
     val groundBox = new PolygonShape
     groundBox.setAsBox(Math.abs(size.x / 2), Math.abs(size.y / 2))
     groundBody.createFixture(groundBox, 0.0f)
-    groundBody.setUserData(size.x + ":" + size.y)
+    //groundBody.setUserData(size.x + ":" + size.y)
     groundBox.dispose()
+    groundBody
   }
 
   private def getBodies: com.badlogic.gdx.utils.Array[Body] = {
     val bodies = new com.badlogic.gdx.utils.Array[Body]()
     world.getBodies(bodies)
     bodies
+  }
+
+  private def parseBodyData(s: String): Option[BodyData] = {
+    val b = BodyData()
+    s match {
+      case "E" => b.bodyType = Option(Exit); Option(b)
+      case "H" => b.bodyType = Option(Hideout); Option(b)
+      case _ => None
+    }
   }
 
   override def onReceive(message: Any): Unit = message match {
@@ -100,8 +111,21 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       sender() ! ProximityQueryResponse(neighbors)
 
     case msg: MapElementMsg =>
-      val b = msg.line.split(":").map(v => v.toFloat).toList
-      createBox(new Vector2(b.head, b(1)), new Vector2(b(2), b.last))
+      val toks = msg.line.split(":").toList
+
+      var body = List[Float]()
+      var extraData: Option[BodyData] = None
+
+      for (i <- toks.indices) {
+        if (i < 4) {
+          body :+= toks(i).toFloat
+        } else {
+          extraData = parseBodyData(toks(i))
+        }
+      }
+
+      val newBody = createBox(new Vector2(body.head, body(1)), new Vector2(body(2), body.last))
+      if (extraData.isDefined) newBody.setUserData(extraData.get)
 
     case ResetWorld => getBodies.asScalaIterable.foreach( b => bodiesToDelete :+= b)
 

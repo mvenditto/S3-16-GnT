@@ -22,41 +22,13 @@ import com.badlogic.gdx.ai.utils.RaycastCollisionDetector
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
+import com.unibo.s3.main_system.util.PimpedNumeric._
+
 
 /** A raycast collision detector for box2d.
  * 
  * @author mvenditto */
 
-trait CornerCollisionFix extends RayCastCallback {
-  val COLL_POINT_ADJUSTMENT = 0.1f
-  val tmp = new Vector2()
-
-  /*Experimental! if collision point is precisely on corner..*/
-  private def fixPerimeterStuck(fixture: Fixture, p: Vector2) {
-    val c  = fixture.getBody.getWorldCenter
-
-    fixture.getShape match {
-      case ps: PolygonShape =>
-        ps.getVertex(0, tmp)
-      case cs: CircleShape =>
-        tmp.set(cs.getRadius, cs.getRadius)
-      case _ => tmp.set(0, 0)
-    }
-
-    val hw = Math.abs(tmp.x)
-    val hh = Math.abs(tmp.y)
-
-    if (p.x == c.x + hw) p.x += COLL_POINT_ADJUSTMENT
-    if (p.x == c.x - hw) p.x -= COLL_POINT_ADJUSTMENT
-    if (p.y == c.y + hh) p.y += COLL_POINT_ADJUSTMENT
-    if (p.y == c.y - hw) p.y -= COLL_POINT_ADJUSTMENT
-  }
-
-  abstract override def reportRayFixture(fixture: Fixture, point: Vector2, normal: Vector2, fraction: Float): Float = {
-    fixPerimeterStuck(fixture, point)
-    super.reportRayFixture(fixture, point, normal, fraction)
-  }
-}
 
 class Box2dRaycastCallback extends RayCastCallback {
   var outputCollision: Collision[Vector2] = _
@@ -72,7 +44,7 @@ class Box2dRaycastCallback extends RayCastCallback {
 class Box2dRaycastCollisionDetector(val world: World, val callback: Box2dRaycastCallback) extends RaycastCollisionDetector[Vector2] {
 
 	def this(world: World) {
-    this(world, new Box2dRaycastCallback() with CornerCollisionFix)
+    this(world, new Box2dRaycastCallback())
 	}
 
 	override def collides (ray: Ray[Vector2]): Boolean = findCollision(null, ray)

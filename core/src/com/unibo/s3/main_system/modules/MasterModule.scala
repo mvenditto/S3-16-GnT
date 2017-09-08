@@ -138,10 +138,11 @@ class MasterModule extends BasicModuleWithGui {
   }
 
   override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
-    val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
-    mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
-    masterActor ! CreateCharacterMsg(mouseWorldPos)
+    if (button != 1){
+      val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
+      mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
+      masterActor ! CreateCharacterMsg(mouseWorldPos)
+    }
     false
   }
-
 }
