@@ -2,7 +2,7 @@ package com.unibo.s3
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
-import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.kotcrab.vis.ui.VisUI
@@ -40,6 +40,9 @@ class Main extends AbstractMainApplication {
     val master = new MasterModule()
     master.enable(false)
 
+    val lighting = new LightingSystemModule()
+    lighting.enable(false)
+
     var settings: Option[GameSettings] = None
     val cm = new MenuModule({
       case Start(guardsNum, thiefsNum, simulation, mapDimension, mazeTypeMap) =>
@@ -63,13 +66,17 @@ class Main extends AbstractMainApplication {
       case UserAck() if settings.isDefined =>
         master.initGame(settings.get)
         master.enable(true)
+        lighting.setup()
+        lighting.enable(false)
         removeModule(bootstrapModule)
     })
     bootstrapModule.enable(false)
 
+
     modules :+= cm
     modules :+= bootstrapModule
     modules :+= master
+    modules :+= lighting
   }
 
   private def renderAxis(shapeRenderer: ShapeRenderer) = {
@@ -114,14 +121,21 @@ class Main extends AbstractMainApplication {
     })
   }
 
+  def getCamera(): OrthographicCamera = cam
+
   override protected def doRender(): Unit = {
     renderAxis(shapeRenderer)
     val enabledModules = modules.filter(m => m.isEnabled)
     enabledModules.foreach(m => m.render(shapeRenderer))
+  }
+
+  override def doCustomRender(): Unit = {
+    val enabledModules = modules.filter(m => m.isEnabled)
+    enabledModules.foreach(m =>m.customRender())
     enabledModules.foreach(m => m.renderGui())
   }
 
-  override protected def doUpdate(delta: Float): Unit =
+  override def doUpdate(delta: Float): Unit =
     modules.filter(m => m.isEnabled).foreach(m => m.update(delta))
 
   override def resize(newWidth: Int, newHeight: Int): Unit = {

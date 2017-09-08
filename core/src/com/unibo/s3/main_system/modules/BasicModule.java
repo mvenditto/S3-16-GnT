@@ -16,6 +16,8 @@ public interface BasicModule extends InputProcessorAdapter {
 
     void render(ShapeRenderer shapeRenderer);
 
+    void customRender();
+
     void renderGui();
 
     void update(float dt);

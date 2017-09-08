@@ -1,6 +1,6 @@
 package com.unibo.s3.main_system.world.actors
 
-import akka.actor.{Props, UntypedAbstractActor}
+import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import com.badlogic.gdx.ai.steer.Proximity.ProximityCallback
 import com.badlogic.gdx.ai.steer.Steerable
 import com.badlogic.gdx.ai.utils.{Collision, Ray}
@@ -8,8 +8,8 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 import com.unibo.s3.main_system.characters.steer.collisions.{Box2dDetectorsFactory, Box2dRaycastCollisionDetector, Box2dSquareAABBProximity}
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
-
 import com.unibo.s3.main_system.util.GdxImplicits._
+import net.dermetfan.gdx.physics.box2d.WorldObserver
 
 case class RayCastCollidesQuery(ray: Ray[Vector2])
 case class RayCastCollidesResponse(collides: Boolean)
@@ -21,6 +21,8 @@ case class DeleteBodyAt(x: Float, y: Float)
 case class CreateBox(position: Vector2, size: Vector2)
 case class ResetWorld()
 case class GetAllBodies()
+case class RegisterAsWorldChangeObserver()
+case class WorldChangeMsg(w: World)
 
 class WorldActor(val world: World) extends UntypedAbstractActor {
 
@@ -32,12 +34,23 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
   private[this] val velocityIters = 8
   private[this] val positionIters = 3
 
+  private[this] var worldChangeObservers = List[ActorRef]()
+  private[this] val worldObserver = new WorldObserver()
+
+  worldObserver.setListener(new WorldObserver.Listener.Adapter {
+    override def changed(world: World, change: WorldObserver.WorldChange): Unit = {
+      super.changed(world, change)
+      worldChangeObservers.foreach(o => o ! WorldChangeMsg(world))
+    }
+  })
+
   private def act(dt: Float) = {
     if (bodiesToDelete.nonEmpty) {
       bodiesToDelete.foreach(b => world.destroyBody(b))
       bodiesToDelete = List()
     }
     world.step(dt, velocityIters, positionIters)
+    worldObserver.update(world, dt)
   }
 
   private def createBox(position: Vector2, size: Vector2) = {
@@ -74,7 +87,7 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
         override def reportFixture(f: Fixture): Boolean = {bodiesToDelete :+= f.getBody; true}
       }, x - aabbWidth, y - aabbWidth, x + aabbWidth, y + aabbWidth)
 
-    case CreateBox(pos, size) => createBox(pos, size);
+    case CreateBox(pos, size) => createBox(pos, size)
 
     case GetAllBodies() => sender() ! getBodies
 
@@ -91,6 +104,8 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       createBox(new Vector2(b.head, b(1)), new Vector2(b(2), b.last))
 
     case ResetWorld => getBodies.asScalaIterable.foreach( b => bodiesToDelete :+= b)
+
+    case RegisterAsWorldChangeObserver => worldChangeObservers :+= sender
   }
 }
 
