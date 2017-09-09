@@ -23,7 +23,7 @@ case class CreateBox(position: Vector2, size: Vector2)
 case class ResetWorld()
 case class GetAllBodies()
 case class RegisterAsWorldChangeObserver()
-case class WorldChangeMsg(w: World)
+case class WorldChangeMsg(b: Body)
 
 class WorldActor(val world: World) extends UntypedAbstractActor {
 
@@ -39,9 +39,8 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
   private[this] val worldObserver = new WorldObserver()
 
   worldObserver.setListener(new WorldObserver.Listener.Adapter {
-    override def changed(world: World, change: WorldObserver.WorldChange): Unit = {
-      super.changed(world, change)
-      worldChangeObservers.foreach(o => o ! WorldChangeMsg(world))
+    override def created(body: Body): Unit = {
+      worldChangeObservers.foreach(o => o ! WorldChangeMsg(body))
     }
   })
 
@@ -61,7 +60,6 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
     val groundBox = new PolygonShape
     groundBox.setAsBox(Math.abs(size.x / 2), Math.abs(size.y / 2))
     groundBody.createFixture(groundBox, 0.0f)
-    //groundBody.setUserData(size.x + ":" + size.y)
     groundBox.dispose()
     groundBody
   }

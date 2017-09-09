@@ -1,9 +1,22 @@
 package com.unibo.s3.main_system.util
 
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.{Body, CircleShape, PolygonShape}
+import com.badlogic.gdx.physics.box2d._
 
 object Box2dImplicits {
+
+  implicit class AugmentedWorld(world: World) {
+    def createBox(position: Vector2, size: Vector2): Body = {
+      val bodyDef = new BodyDef
+      bodyDef.position.set(position)
+      val body = world.createBody(bodyDef)
+      val box = new PolygonShape
+      box.setAsBox(Math.abs(size.x / 2), Math.abs(size.y / 2))
+      body.createFixture(box, 0.0f)
+      box.dispose()
+      body
+    }
+  }
 
   implicit class AugmentedBody(b: Body) {
 
