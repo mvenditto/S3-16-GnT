@@ -9,8 +9,10 @@ import com.badlogic.gdx.physics.box2d._
 import com.unibo.s3.main_system.characters.steer.collisions.{Box2dDetectorsFactory, Box2dRaycastCollisionDetector, Box2dSquareAABBProximity}
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
 import com.unibo.s3.main_system.util.GdxImplicits._
+import com.unibo.s3.main_system.util.GntUtils
 import com.unibo.s3.main_system.world.{BodyData, Exit, Hideout}
 import net.dermetfan.gdx.physics.box2d.WorldObserver
+
 
 case class RayCastCollidesQuery(ray: Ray[Vector2])
 case class RayCastCollidesResponse(collides: Boolean)
@@ -109,21 +111,14 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       sender() ! ProximityQueryResponse(neighbors)
 
     case msg: MapElementMsg =>
-      val toks = msg.line.split(":").toList
 
-      var body = List[Float]()
-      var extraData: Option[BodyData] = None
-
-      for (i <- toks.indices) {
-        if (i < 4) {
-          body :+= toks(i).toFloat
-        } else {
-          extraData = parseBodyData(toks(i))
-        }
-      }
+      val entry = GntUtils.parseMapEntry(msg.line)
+      val body = entry._1
+      val bodyData = entry._2
 
       val newBody = createBox(new Vector2(body.head, body(1)), new Vector2(body(2), body.last))
-      if (extraData.isDefined) newBody.setUserData(extraData.get)
+      bodyData.foreach(bodyData =>
+          parseBodyData(bodyData).foreach(bd => newBody.setUserData(bd)))
 
     case ResetWorld => getBodies.asScalaIterable.foreach( b => bodiesToDelete :+= b)
 

@@ -15,7 +15,7 @@ import com.unibo.s3.main_system.game.GameSettings
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig}
 import com.unibo.s3.main_system.util.ImplicitConversions._
-import com.unibo.s3.main_system.util.ScaleUtils
+import com.unibo.s3.main_system.util.{GntUtils, ScaleUtils}
 
 
 class MasterModule extends BasicModuleWithGui {
@@ -60,16 +60,12 @@ class MasterModule extends BasicModuleWithGui {
   private[this] var worldMap = List[Rectangle]()
   private[this] var busyBarWindow: VisWindow = _
 
-
   private def getActor(actor: GeneralActors.Value): ActorRef =
     SystemManager.getLocalGeneralActor(actor)
 
   private def cacheMap() = {
-    val map = Gdx.files.internal(mapFilePath)
-
-    worldMap = map.readString().split("\n")
-      .map(b => b.split(":").map(f => f.toFloat))
-      .map(b => new Rectangle(b(0),b(1),b(2),b(3))).toList
+    worldMap = GntUtils.parseMapToRectangles(
+      Gdx.files.internal(mapFilePath)).toList
   }
 
   override def init(owner: Main): Unit = {
@@ -129,7 +125,6 @@ class MasterModule extends BasicModuleWithGui {
     super.attachInputProcessors(inputMultiplexer)
     inputMultiplexer.addProcessor(this)
   }
-
 
   override def touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
     //need to be fixed, out of sync, new characters shows only after next added.
