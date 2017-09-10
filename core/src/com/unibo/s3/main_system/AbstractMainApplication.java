@@ -2,7 +2,7 @@ package com.unibo.s3.main_system;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -11,6 +11,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.unibo.s3.BasicCameraInputController;
+import com.unibo.s3.CameraInputControllerKeymap;
 import com.unibo.s3.InputProcessorAdapter;
 
 import static com.unibo.s3.main_system.util.ScaleUtils.getPixelsPerMeter;
@@ -26,7 +28,11 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
     protected OrthographicCamera cam;
     private float cameraSpeed = 20f;
     private float cameraZoomSpeed = 0.1f;
+    private float minZoom = 1.5f;
+    private float maxZoom = 50f;
     private float cameraViewportWidthMeters = 30f;
+    private BasicCameraInputController camController;
+    private CameraInputControllerKeymap camKeymap;
 
     protected boolean pause = false;
 
@@ -41,13 +47,13 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
         shapeRenderer = new ShapeRenderer();
         textBatch = new SpriteBatch();
         font = new BitmapFont();
-        cam = new OrthographicCamera();
         initCamera();
     }
 
     @Override
     public void render () {
-        handleCameraInput();
+        //handleCameraInput();
+        camController.handleInput();
         cam.update();
         Gdx.graphics.setTitle("camera@"+cam.position+"("+cam.zoom+")");
 
@@ -91,7 +97,7 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
 
     @Override
     public boolean keyUp(int keycode) {
-        if (keycode == Input.Keys.P) {
+        if (keycode == Keys.P) {
             pause = !pause;
         }
         return false;
@@ -105,32 +111,14 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
         cam = new OrthographicCamera(cameraViewportWidthMeters,
                 cameraViewportWidthMeters * aspectRatio);
 
-        //cam.position.set(2550,1630,0);
-        //cam.position.set(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 0);
+        camKeymap = new CameraInputControllerKeymap(Keys.UP, Keys.DOWN, Keys.LEFT, Keys.RIGHT, Keys.Q, Keys.R);
+
+        camController = new BasicCameraInputController(cam, cameraSpeed, cameraZoomSpeed,
+                minZoom, maxZoom, camKeymap);
+
         cam.position.set(cam.viewportWidth / 2 , cam.viewportHeight / 2,0);
         cam.zoom = 5;
         cam.update();
-    }
-
-    private void handleCameraInput() {
-        if (Gdx.input.isKeyPressed(Input.Keys.R)) {
-            cam.zoom += cameraZoomSpeed;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
-            cam.zoom -= cameraZoomSpeed;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            cam.translate(-cameraSpeed, 0, 0);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            cam.translate(cameraSpeed, 0, 0);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            cam.translate(0, -cameraSpeed, 0);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            cam.translate(0, cameraSpeed, 0);
-        }
     }
 
     /**

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.{Color, GL20, OrthographicCamera}
 import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.physics.box2d.World
 import com.unibo.s3.Main
+import com.unibo.s3.main_system.util.GntMathUtils.keepInRange
 import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.communication.Messages.{AskAllCharactersMsg, SendAllCharactersMsg}
 import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
@@ -193,10 +194,6 @@ object LightingSystemModule {
   private val EnableShadows = "ls_enable_shadows"
 
   def apply: LightingSystemModule = new LightingSystemModule()
-
-  private def keepInRange(v: Float, min: Float, max: Float): Float = {
-    if (v < min) v else if(v > max) max else v
-  }
 
   def loadConfigFromPreferences(p: Preferences): LightingSystemConfig = {
     LightingSystemConfig(
