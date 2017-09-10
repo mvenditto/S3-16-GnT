@@ -20,11 +20,9 @@ case class UserAck() extends BootstrapEvent
 
 
 class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithGui {
+  import BootstrapModule._
 
   private[this] var loadingFinished = false
-  private[this] val actorSystemName = "System"
-
-  private[this] val loadingDialogTitle = "System Initialization"
   private[this] var loadingBar: VisProgressBar = _
   private[this] var loadingLabel: VisLabel = _
   private[this] var startBtn: VisTextButton = _
@@ -50,7 +48,7 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
   }
 
   private def createGui(): Unit = {
-    val w = new VisWindow(loadingDialogTitle)
+    val w = new VisWindow(LoadingDialogTitle)
     w.setModal(true)
 
     startBtn = new VisTextButton("Start!", "blue")
@@ -82,7 +80,7 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
 
   private def initActorSystem(): Unit = {
     setProgress(0)
-    SystemManager.createSystem(actorSystemName, null)
+    SystemManager.createSystem(ActorSystemName, null)
 
     val world = new World(new Vector2(0, 0), true)
     setProgress(20)
@@ -155,4 +153,12 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
     super.cleanup()
   }
 
+}
+
+object BootstrapModule {
+  private val ActorSystemName = "System"
+  private val LoadingDialogTitle = "System Initialization"
+
+  def apply(listener: BootstrapEvent => Unit): BootstrapModule =
+    new BootstrapModule(listener)
 }

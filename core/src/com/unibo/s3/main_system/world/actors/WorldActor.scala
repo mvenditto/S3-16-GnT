@@ -6,37 +6,35 @@ import com.badlogic.gdx.ai.steer.Steerable
 import com.badlogic.gdx.ai.utils.{Collision, Ray}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
-import com.unibo.s3.main_system.characters.steer.collisions.{Box2dDetectorsFactory, Box2dRaycastCollisionDetector, Box2dSquareAABBProximity}
+import com.unibo.s3.main_system.characters.steer.collisions.{Box2dRaycastCollisionDetector, Box2dSquareAABBProximity}
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
-import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.util.GntUtils
 import com.unibo.s3.main_system.world.{BodyData, Exit, Hideout}
 import net.dermetfan.gdx.physics.box2d.WorldObserver
-
+import com.unibo.s3.main_system.util.GdxImplicits._
+import com.unibo.s3.main_system.util.Box2dImplicits._
 
 case class RayCastCollidesQuery(ray: Ray[Vector2])
 case class RayCastCollidesResponse(collides: Boolean)
 case class RayCastCollisionQuery(ray: Ray[Vector2])
 case class RayCastCollisionResponse(collided: Boolean, coll: Collision[Vector2])
 case class ProximityQuery(subject: Steerable[Vector2], detectionRadius: Float)
-case class ProximityQueryResponse(neghbors: Seq[Steerable[Vector2]])
+case class ProximityQueryResponse(neighbors: Seq[Steerable[Vector2]])
 case class DeleteBodyAt(x: Float, y: Float)
 case class CreateBox(position: Vector2, size: Vector2)
 case class ResetWorld()
 case class GetAllBodies()
 case class RegisterAsWorldChangeObserver()
 case class WorldChangeMsg(b: Body)
+case class AskWorldMask(w:Int, h:Int, cellWidth: Float)
+
 
 class WorldActor(val world: World) extends UntypedAbstractActor {
+  import WorldActor._
 
-  private[this] val raycastCollisionDetector = new Box2dRaycastCollisionDetector(world)
+  private[this] val rayCastCollisionDetector = new Box2dRaycastCollisionDetector(world)
   private[this] val proximityDetector = new Box2dSquareAABBProximity(null, world, 2.0f)
   private[this] var bodiesToDelete: Seq[Body] = List()
-  private[this] val aabbWidth = 0.1f
-
-  private[this] val velocityIters = 8
-  private[this] val positionIters = 3
-
   private[this] var worldChangeObservers = List[ActorRef]()
   private[this] val worldObserver = new WorldObserver()
 
@@ -51,19 +49,8 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       bodiesToDelete.foreach(b => world.destroyBody(b))
       bodiesToDelete = List()
     }
-    world.step(dt, velocityIters, positionIters)
+    world.step(dt, VelocityIterations, PositionIterations)
     worldObserver.update(world, dt)
-  }
-
-  private def createBox(position: Vector2, size: Vector2): Body = {
-    val groundBodyDef = new BodyDef
-    groundBodyDef.position.set(position)
-    val groundBody = world.createBody(groundBodyDef)
-    val groundBox = new PolygonShape
-    groundBox.setAsBox(Math.abs(size.x / 2), Math.abs(size.y / 2))
-    groundBody.createFixture(groundBox, 0.0f)
-    groundBox.dispose()
-    groundBody
   }
 
   private def getBodies: com.badlogic.gdx.utils.Array[Body] = {
@@ -86,19 +73,19 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
     case ActMsg(dt) => act(dt)
 
     case RayCastCollidesQuery(ray) =>
-      sender() ! RayCastCollidesResponse(raycastCollisionDetector.collides(ray))
+      sender() ! RayCastCollidesResponse(rayCastCollisionDetector.collides(ray))
 
     case RayCastCollisionQuery(ray) =>
       val outputCollision = new Collision[Vector2](new Vector2(0,0), new Vector2(0,0))
-      val collided = raycastCollisionDetector.findCollision(outputCollision, ray)
+      val collided = rayCastCollisionDetector.findCollision(outputCollision, ray)
       sender ! RayCastCollisionResponse(collided, outputCollision)
 
     case DeleteBodyAt(x, y) =>
       world.QueryAABB(new QueryCallback {
         override def reportFixture(f: Fixture): Boolean = {bodiesToDelete :+= f.getBody; true}
-      }, x - aabbWidth, y - aabbWidth, x + aabbWidth, y + aabbWidth)
+      }, x - AABBWidth, y - AABBWidth, x + AABBWidth, y + AABBWidth)
 
-    case CreateBox(pos, size) => createBox(pos, size)
+    case CreateBox(pos, size) => world.createBox(pos, size)
 
     case GetAllBodies() => sender() ! getBodies
 
@@ -110,22 +97,30 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       })
       sender() ! ProximityQueryResponse(neighbors)
 
-    case msg: MapElementMsg =>
+    case MapElementMsg(line) =>
 
-      val entry = GntUtils.parseMapEntry(msg.line)
+      val entry = GntUtils.parseMapEntry(line)
       val body = entry._1
       val bodyData = entry._2
 
-      val newBody = createBox(new Vector2(body.head, body(1)), new Vector2(body(2), body.last))
+      val newBody = world.createBox(new Vector2(body(0), body(1)), new Vector2(body(2), body(3)))
       bodyData.foreach(bodyData =>
           parseBodyData(bodyData).foreach(bd => newBody.setUserData(bd)))
 
-    case ResetWorld => getBodies.asScalaIterable.foreach( b => bodiesToDelete :+= b)
+    case ResetWorld =>
+      getBodies.asScalaIterable.foreach( b => bodiesToDelete :+= b)
 
-    case RegisterAsWorldChangeObserver => worldChangeObservers :+= sender
+    case RegisterAsWorldChangeObserver =>
+      worldChangeObservers :+= sender
+      
   }
 }
 
 object WorldActor {
+
+  private val AABBWidth = 0.1f
+  private val VelocityIterations = 8
+  private val PositionIterations = 3
+
   def props(world: World): Props = Props(new WorldActor(world))
 }

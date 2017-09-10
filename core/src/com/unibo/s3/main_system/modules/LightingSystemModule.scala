@@ -2,39 +2,53 @@ package com.unibo.s3.main_system.modules
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import box2dLight.{ConeLight, PointLight, RayHandler}
-import com.badlogic.gdx.{Gdx, InputMultiplexer}
+import com.badlogic.gdx.{Gdx, InputMultiplexer, Preferences}
 import com.badlogic.gdx.graphics.{Color, GL20, OrthographicCamera}
 import com.badlogic.gdx.math.{MathUtils, Vector2}
-import com.badlogic.gdx.physics.box2d.{Body, World}
+import com.badlogic.gdx.physics.box2d.World
 import com.unibo.s3.Main
 import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.communication.Messages.{AskAllCharactersMsg, SendAllCharactersMsg}
 import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
+import com.unibo.s3.main_system.util.Box2dImplicits._
 import com.unibo.s3.main_system.util.ScaleUtils
 import com.unibo.s3.main_system.world.actors.{RegisterAsWorldChangeObserver, WorldChangeMsg}
-import com.unibo.s3.main_system.util.Box2dImplicits._
 
 import scala.collection.mutable
 
 case class AskIsPointAtShadow(p: Vector2)
 
-class LightingSystemModule extends BasicModuleWithGui {
+case class LightingSystemConfig(
+  enableLightingSystem: Boolean,
+  enableDiffuseLight: Boolean,
+  enableCulling: Boolean,
+  enableGammaCorrection: Boolean,
+  enableBlur: Boolean,
+  enableShadows: Boolean,
+  lightQualityModiefier: Float,
+  blurLevel: Int,
+  blendingFunc: Int
+  )
 
-  private[this] var updatedWorld: Option[World] = None
+class LightingSystemModule extends BasicModuleWithGui {
+  import LightingSystemModule._
+
   private[this] var rayHandler: RayHandler = _
   private[this] var cam: OrthographicCamera = _
   private[this] var worldObserverActor: ActorRef = _
 
-  private[this] var torches = mutable.Map[Int, ConeLight]()
+  private[this] val torches = mutable.Map[Int, ConeLight]()
   private[this] var charactersUpdate: Option[Iterable[BaseCharacter]] = None
-
-  private[this] val ambientLightColor = new Color(.1f, .1f, .1f, .1f)
-  private[this] val brightWhite = new Color(1.0f, 1.0f, 1.0f, 1.0f)
   private[this] var worldShadowCopy: World = _
-
 
   private class LightingActor extends UntypedAbstractActor {
     override def onReceive(msg: Any): Unit = msg match {
+      /*
+      Sync with 'world' held by WorldActor, this is needed because:
+       - don't want to expose 'world' from WorldActor,
+       - RayHandler uses RayCasting and we can't use the 'proxy' version
+       that works with WorldActor.
+      */
       case WorldChangeMsg(bd) =>
         worldShadowCopy.createBox(bd.getWorldCenter, bd.size2)
 
@@ -48,10 +62,9 @@ class LightingSystemModule extends BasicModuleWithGui {
 
   override def init(owner: Main): Unit = {
     super.init(owner)
-    cam = owner.getCamera()
+    cam = owner.getCamera
     worldShadowCopy = new World(new Vector2(0,0), true)
-    rayHandler = new RayHandler(
-      worldShadowCopy, Gdx.graphics.getWidth/4, Gdx.graphics.getHeight/4)
+    rayHandler = new RayHandler(worldShadowCopy)
   }
 
   def setup(): Unit = {
@@ -63,15 +76,29 @@ class LightingSystemModule extends BasicModuleWithGui {
       .getLocalGeneralActor(GeneralActors.WORLD_ACTOR)
       .tell(RegisterAsWorldChangeObserver, worldObserverActor)
 
+    val c = loadConfigFromPreferences(owner.getPrefs)
+    val lqm = c.lightQualityModiefier
+
     rayHandler.setWorld(worldShadowCopy)
-    RayHandler.setGammaCorrection(true)//false
-    RayHandler.useDiffuseLight(true)
-    rayHandler.setBlur(true)
-    rayHandler.setBlurNum(1)
-    rayHandler.setShadows(true)
-    rayHandler.setCulling(false)
-    rayHandler.setAmbientLight(ambientLightColor)
-    rayHandler.diffuseBlendFunc.set(GL20.GL_DST_COLOR, GL20.GL_SRC_COLOR)
+    RayHandler.setGammaCorrection(c.enableGammaCorrection)
+    RayHandler.useDiffuseLight(c.enableDiffuseLight)
+
+    rayHandler.resizeFBO(
+      (Gdx.graphics.getWidth * lqm).toInt,
+      (Gdx.graphics.getHeight * lqm).toInt)
+
+    rayHandler.setBlur(c.enableBlur)
+    rayHandler.setBlurNum(c.blurLevel)
+    rayHandler.setShadows(c.enableShadows)
+    rayHandler.setCulling(c.enableCulling)
+    rayHandler.setAmbientLight(WhiteAmbientLightColor)
+
+    val blendFunc = c.blendingFunc match {
+      case 1 => (GL20.GL_DST_COLOR, GL20.GL_ZERO)
+      case 2 => (GL20.GL_DST_COLOR, GL20.GL_SRC_COLOR)
+      case 3 => (GL20.GL_SRC_COLOR, GL20.GL_DST_COLOR)
+    }
+    rayHandler.diffuseBlendFunc.set(blendFunc._1, blendFunc._2)
   }
 
   override def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit = {
@@ -91,8 +118,9 @@ class LightingSystemModule extends BasicModuleWithGui {
           t.setPosition(c.getPosition)
           t.setDirection(angle)
         } else {
-          torches(id) = new ConeLight(rayHandler, 65, brightWhite, 15f,
-            c.getPosition.x, c.getPosition.y, angle, 25f)
+          torches(id) = new ConeLight(
+            rayHandler, TorchRaysNum, BrightWhiteColor, TorchDistance,
+            c.getPosition.x, c.getPosition.y, angle, TorchDegrees)
         }
       })
     }
@@ -101,7 +129,7 @@ class LightingSystemModule extends BasicModuleWithGui {
 
   override def update(dt: Float): Unit = {
     super.update(dt)
-    worldShadowCopy.step(dt, 8, 3)
+    //worldShadowCopy.step(dt, 8, 3)
 
     SystemManager
       .getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR)
@@ -114,7 +142,9 @@ class LightingSystemModule extends BasicModuleWithGui {
     if (button == 1) {
       val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
       mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
-      new PointLight(rayHandler, 32, brightWhite, 25, mouseWorldPos.x, mouseWorldPos.y)
+      new PointLight(
+        rayHandler, PointLightRaysNum, BrightWhiteColor,
+        PointLightRadius, mouseWorldPos.x, mouseWorldPos.y)
     }
     false
   }
@@ -138,5 +168,47 @@ class LightingSystemModule extends BasicModuleWithGui {
   override def cleanup(): Unit = {
     super.cleanup()
     rayHandler.dispose()
+  }
+}
+
+object LightingSystemModule {
+  private val WhiteAmbientLightColor = new Color(.1f, .1f, .1f, .1f)
+  private val BrightWhiteColor = new Color(1.0f, 1.0f, 1.0f, 1.0f)
+
+  private val TorchRaysNum = 64
+  private val TorchDistance = 15f
+  private val TorchDegrees = 25f
+
+  private val PointLightRaysNum = 32
+  private val PointLightRadius = 25f
+
+  private val LightQualityModifier = "ls_light_quality"
+  private val LightSystemEnabled = "ls_enabled"
+  private val DiffuseLightEnabled = "ls_diffuse_light_enabled"
+  private val BlurEnabled = "ls_blur_enabled"
+  private val BlurLevel = "ls_blur_level"
+  private val CullingEnabled = "ls_culling_enabled"
+  private val GammaCorrectionEnabled = "ls_gamma_correction_enabled"
+  private val BlendingFunction = "ls_blend_func"
+  private val EnableShadows = "ls_enable_shadows"
+
+  def apply: LightingSystemModule = new LightingSystemModule()
+
+  private def keepInRange(v: Float, min: Float, max: Float): Float = {
+    if (v < min) v else if(v > max) max else v
+  }
+
+  def loadConfigFromPreferences(p: Preferences): LightingSystemConfig = {
+    LightingSystemConfig(
+      p.getBoolean(LightSystemEnabled, true),
+      p.getBoolean(DiffuseLightEnabled, true),
+      p.getBoolean(CullingEnabled, false),
+      p.getBoolean(GammaCorrectionEnabled, true),
+      p.getBoolean(BlurEnabled, true),
+      p.getBoolean(EnableShadows, true),
+      keepInRange(p.getFloat(LightQualityModifier, 0.25f), 0.25f, 4f),
+      keepInRange(p.getInteger(BlurLevel, 2).toFloat, 1f, 4f).toInt,
+      keepInRange(p.getInteger(BlendingFunction, 2).toFloat, 0f, 3f).toInt
+    )
   }
 }

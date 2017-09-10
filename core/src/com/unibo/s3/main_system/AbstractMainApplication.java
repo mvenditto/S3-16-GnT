@@ -41,6 +41,7 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
         shapeRenderer = new ShapeRenderer();
         textBatch = new SpriteBatch();
         font = new BitmapFont();
+        cam = new OrthographicCamera();
         initCamera();
     }
 
@@ -80,6 +81,8 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
 
     @Override
     public void resize(int newWidth, int newHeight){
+        //cam.setToOrtho(false, cameraViewportWidthMeters,cameraViewportWidthMeters * newWidth / (float)newHeight);
+
         cam.viewportWidth = cameraViewportWidthMeters *  getPixelsPerMeter();
         cam.viewportHeight = (cameraViewportWidthMeters *  getPixelsPerMeter()) * (((float)newHeight) / newWidth);
         cam.update();
@@ -98,8 +101,9 @@ public abstract class AbstractMainApplication extends ApplicationAdapter impleme
 
         final float aspectRatio = (float) Gdx.graphics.getHeight() / Gdx.graphics.getWidth();
 
-        cam = new OrthographicCamera(cameraViewportWidthMeters *  getPixelsPerMeter(),
-                (cameraViewportWidthMeters *  getPixelsPerMeter()) * aspectRatio);
+        // *  getPixelsPerMeter()
+        cam = new OrthographicCamera(cameraViewportWidthMeters,
+                cameraViewportWidthMeters * aspectRatio);
 
         //cam.position.set(2550,1630,0);
         //cam.position.set(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 0);

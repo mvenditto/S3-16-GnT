@@ -1,7 +1,7 @@
 package com.unibo.s3.main_system.modules
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
-import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Color._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
@@ -17,8 +17,8 @@ import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingC
 import com.unibo.s3.main_system.util.ImplicitConversions._
 import com.unibo.s3.main_system.util.{GntUtils, ScaleUtils}
 
-
 class MasterModule extends BasicModuleWithGui {
+  import MasterModule._
 
   private[this] var graph: Option[GraphAdapter[Vector2]] = None
   private[this] var characters: Option[Iterable[BaseCharacter]] = None
@@ -54,9 +54,7 @@ class MasterModule extends BasicModuleWithGui {
   private[this] var quadTreeActor: ActorRef = _
   private[this] var dummyReceiverActor: ActorRef = _
 
-  private[this] val renderer = new GeometryRendererImpl()
-  private[this] val graphRenderingConfig = GraphRenderingConfig(Color.GREEN, Color.YELLOW, 0.5f)
-  private[this] val mapFilePath = "maps/map.txt"
+  private[this] val renderer = GeometryRendererImpl()
   private[this] var worldMap = List[Rectangle]()
   private[this] var busyBarWindow: VisWindow = _
 
@@ -65,7 +63,7 @@ class MasterModule extends BasicModuleWithGui {
 
   private def cacheMap() = {
     worldMap = GntUtils.parseMapToRectangles(
-      Gdx.files.internal(mapFilePath)).toList
+      Gdx.files.internal(MapFilePath)).toList
   }
 
   override def init(owner: Main): Unit = {
@@ -115,8 +113,11 @@ class MasterModule extends BasicModuleWithGui {
 
   override def render(shapeRenderer: ShapeRenderer): Unit = {
     super.render(shapeRenderer)
-    graph.foreach(g => renderer.renderGraph(shapeRenderer, g, graphRenderingConfig))
+    graph.foreach(g =>
+      renderer.renderGraph(shapeRenderer, g, DefaultGraphRenderingConfig))
+
     renderer.renderMap(shapeRenderer, worldMap)
+
     characters.foreach(characters =>
       characters.foreach(c => renderer.renderCharacter(shapeRenderer, c)))
   }
@@ -140,4 +141,11 @@ class MasterModule extends BasicModuleWithGui {
     }
     false
   }
+}
+
+object MasterModule {
+  private val DefaultGraphRenderingConfig = GraphRenderingConfig(GREEN, YELLOW, 0.5f)
+  private val MapFilePath = "maps/map.txt"
+
+  def apply: MasterModule = new MasterModule()
 }

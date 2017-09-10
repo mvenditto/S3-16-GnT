@@ -1,7 +1,6 @@
 package com.unibo.s3
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.{Gdx, InputMultiplexer, Preferences}
 import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
@@ -17,9 +16,12 @@ class Main extends AbstractMainApplication {
 
   private var bootstrapModule: BootstrapModule = _
   private[this] var cm: MenuModule = _
+  private[this] val prefsName = "GntPreferences"
+  private[this] var prefs: Preferences =  _
 
   override def create(): Unit = {
     super.create()
+    prefs = Gdx.app.getPreferences(prefsName)
     inputMultiplexer = new InputMultiplexer
     VisUI.load()
 
@@ -33,7 +35,6 @@ class Main extends AbstractMainApplication {
     inputMultiplexer.addProcessor(this)
     Gdx.input.setInputProcessor(inputMultiplexer)
   }
-
 
   private def addModules() = {
 
@@ -121,7 +122,9 @@ class Main extends AbstractMainApplication {
     })
   }
 
-  def getCamera(): OrthographicCamera = cam
+  def getCamera: OrthographicCamera = cam
+
+  def getPrefs: Preferences = prefs
 
   override protected def doRender(): Unit = {
     renderAxis(shapeRenderer)
@@ -142,4 +145,5 @@ class Main extends AbstractMainApplication {
     super.resize(newWidth, newHeight)
     modules.foreach(m => m.resize(newWidth, newHeight))
   }
+
 }
