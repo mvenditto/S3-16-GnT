@@ -7,13 +7,13 @@ import com.badlogic.gdx.graphics.g2d.{BitmapFont, SpriteBatch}
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.{Color, Texture}
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.{Body, PolygonShape, World}
+import com.badlogic.gdx.physics.box2d.{Body, CircleShape, PolygonShape, World}
 import com.badlogic.gdx.{Gdx, Input, InputMultiplexer}
 import com.kotcrab.vis.ui.widget.VisWindow
 import com.typesafe.config.ConfigFactory
 import com.unibo.s3.InputProcessorAdapter
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
-import com.unibo.s3.main_system.communication.SystemManager
+import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.util.ScaleUtils.{getMetersPerPixel, getPixelsPerMeter, metersToPixels, pixelsToMeters}
 import com.unibo.s3.main_system.world.actors._
@@ -21,11 +21,16 @@ import com.unibo.s3.testbed.model.{BaseTestbedModule, Testbed}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+import com.unibo.s3.main_system.util.Box2dImplicits._
+import com.unibo.s3.main_system.world.{BodyData, Exit}
+import org.junit.internal.runners.statements.Fail
+
+import scala.util.{Success, Try}
 
 class Box2dModule extends BaseTestbedModule with InputProcessorAdapter {
 
   private var world: World = _
-  private var worldActor: ActorRef = _
+  protected var worldActor: ActorRef = _
 
   private var bodyEditorEnabled = false
   private var topLeft: Option[Vector2] = None
@@ -56,12 +61,10 @@ class Box2dModule extends BaseTestbedModule with InputProcessorAdapter {
   override def setup(log: String => Unit): Unit = {
     log("Initializing world")
     world = new World(new Vector2(0, 0), true)
-    val conf = "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," + "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" + ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" + ",\"netty\":{\"tcp\":{\"hostname\":\"" + "127.0.0.1" + "\",\"port\":5050}}}}}"
-    val customConfig = ConfigFactory.parseString(conf)
     log("Starting actor system")
-    SystemManager.createSystem("b2d", customConfig)
-    SystemManager.createActor(Props.create(classOf[WorldActor], world), "world")
-    worldActor = SystemManager.getLocalActor("world")
+    SystemManager.createSystem("System", null)
+    SystemManager.createGeneralActor(Props.create(classOf[WorldActor], world), GeneralActors.WORLD_ACTOR)
+    worldActor = SystemManager.getLocalGeneralActor(GeneralActors.WORLD_ACTOR)
   }
 
   override def cleanup(): Unit = {
@@ -87,11 +90,12 @@ class Box2dModule extends BaseTestbedModule with InputProcessorAdapter {
     val s = StringBuilder.newBuilder
     getAllBodies().asScalaIterable.foreach(b => {
       val c = b.getWorldCenter
+      val size = b.size2
       s append c.x
       s append ":"
       s append c.y
       s append ":"
-      s append b.getUserData.toString
+      s append size.x+":"+size.y
       s append "\n"
     })
     w.writeString(s.toString(), false)
@@ -206,15 +210,15 @@ class Box2dModule extends BaseTestbedModule with InputProcessorAdapter {
     else renderer.setColor(Color.GRAY)
 
     val v0 = new Vector2(vertices(0), vertices(1))
-    val t = b.getUserData.asInstanceOf[String].split(":")
+    val t = b.size2
     val s = getPixelsPerMeter
 
     renderer.setAutoShapeType(true)
     renderer.set(ShapeRenderer.ShapeType.Filled)
-    renderer.rect(v0.x, v0.y, t(0).toFloat * s, t(1).toFloat * s)
+    renderer.rect(v0.x, v0.y, t.x * s, t.y * s)
     renderer.set(ShapeRenderer.ShapeType.Line)
     renderer.setColor(Color.BLACK)
-    renderer.rect(v0.x, v0.y, t(0).toFloat * s, t(1).toFloat * s)
+    renderer.rect(v0.x, v0.y, t.x * s, t.y * s)
     renderer.setAutoShapeType(false)
     renderer.setColor(c)
   }

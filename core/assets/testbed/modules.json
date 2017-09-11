@@ -16,6 +16,12 @@
       "desc":"Akka actor system + game actors deployment.",
       "class":"ActorSystemModule",
       "version": 1.0
+    },
+
+    "Map rooms identify": {
+      "desc":"",
+      "class":"TestMapRoomIdentify",
+      "version": 0.1
     }
   },
 

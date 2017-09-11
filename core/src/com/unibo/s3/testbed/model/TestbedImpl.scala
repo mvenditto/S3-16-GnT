@@ -26,7 +26,7 @@ case class TestbedImpl() extends AbstractMainApplication with Testbed {
       moduleLoader.newModuleInstance(metadata.clazz.get).foreach(s => setSample(s))
     }
     override def onPause(flag: Boolean): Unit = {
-      pause = flag
+      paused = flag
     }
   })
 
@@ -102,7 +102,7 @@ case class TestbedImpl() extends AbstractMainApplication with Testbed {
     })
 
     Gdx.input.setInputProcessor(inputMultiplexer)
-    pause = false
+    paused = false
     gui.writeConsoleLog(LogMessage("Testbed", "*** Welcome ***", Color.CYAN))
     gui.writeConsoleLog(LogMessage("Testbed", "Version : 0.9fut", Color.CYAN))
 
@@ -117,6 +117,10 @@ case class TestbedImpl() extends AbstractMainApplication with Testbed {
 
   override def doRender(): Unit = {
     if (loadingFinished) currentSample.foreach(s => s.render(shapeRenderer))
+  }
+
+  override def doCustomRender(): Unit = {
+    if (loadingFinished) currentSample.foreach(s => s.customRender())
     gui.render()
   }
 
@@ -149,5 +153,4 @@ case class TestbedImpl() extends AbstractMainApplication with Testbed {
   override def getCamera: OrthographicCamera = cam
 
   override def getLogger: (LogMessage) => Unit = gui.writeConsoleLog
-
 }

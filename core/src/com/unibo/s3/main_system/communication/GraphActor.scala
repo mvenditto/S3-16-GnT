@@ -27,9 +27,9 @@ class GraphActor extends  UntypedAbstractActor with Stash {
       this.height = h
 
     case msg: MapElementMsg =>
-      val verifyClose = msg.line.split(":").map(_.toFloat)
-      def writeFunction(verifyClose: Array[Float]): Unit = verifyClose match {
-        case _ if verifyClose.forall(value => value == 0.0) =>
+      val verifyClose = msg.line.split(":")
+      def writeFunction(verifyClose: Array[String]): Unit = verifyClose match {
+        case _ if verifyClose.forall(value => value == "0.0") =>
           getSelf().tell(GenerateGraphMsg(), getSender())
         case _ =>
           file.writeString(msg.line + "\n", true)
