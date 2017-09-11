@@ -17,14 +17,11 @@ class CharacterActor(private[this] val character: BaseCharacter) extends Untyped
   override def onReceive(message: Any): Unit = message match {
     case ActMsg(dt) =>
       character.act(dt)
-      SystemManager.getInstance().getLocalActor("quadTreeActor").tell(AskNeighboursMsg(this.character), getSelf())
+      SystemManager.getLocalActor("quadTreeActor").tell(AskNeighboursMsg(this.character), getSelf())
       println(log() + "Act received")
       println(log() + "Current node/destination: " + character.getCurrentNode.getOrElse("Not definied") + "," + character.getCurrentDestination)
       character.chooseBehaviour()
    /* case msg: SendNeighboursMsg =>
-      SystemManager.getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR).tell(AskNeighboursMsg(this.character), getSelf())
-
-    case msg: SendNeighboursMsg =>
       //refresha vicini
       character.refreshNeighbours()
       println("My neighbours are: " + msg.neighbours.filter(neighbour => !neighbour.equals(getSelf())))
