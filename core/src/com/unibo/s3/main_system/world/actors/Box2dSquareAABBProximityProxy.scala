@@ -23,7 +23,7 @@ class Box2dSquareAABBProximityProxy (
   override def findNeighbors(callback: Proximity.ProximityCallback[Vector2]): Int = {
     val future = worldActor ? ProximityQuery(owner, detectionRadius)
     val result = Await.result(future, timeout.duration).asInstanceOf[ProximityQueryResponse]
-    result.neghbors.foreach(n => callback.reportNeighbor(n))
-    result.neghbors.length
+    result.neighbors.foreach(n => callback.reportNeighbor(n))
+    result.neighbors.length
   }
 }

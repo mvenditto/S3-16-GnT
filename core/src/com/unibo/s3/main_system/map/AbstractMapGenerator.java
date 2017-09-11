@@ -1,5 +1,7 @@
 package com.unibo.s3.main_system.map;
 
+import com.badlogic.gdx.math.Vector2;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -7,13 +9,14 @@ import java.util.Random;
 public abstract class AbstractMapGenerator implements GenerationStrategy{
 
 
-    public static final int BASE_UNIT = 3;
+    public static final int BASE_UNIT = 2;
     private static final float HALF_BASE_UNIT = BASE_UNIT/2;
    // private static final int MAP_WIDTH = 60;
    // private static final int MAP_HEIGHT = 60;
 
     private int widthSplits;// = (int) (MAP_WIDTH / BASE_UNIT);
     private int heightSplits;// = (int) (MAP_HEIGHT / BASE_UNIT);
+    private boolean perimeterGenerated = false;
     private static final String END_OF_FILE = "0.0:0.0:0.0:0.0";
     private static final String SEPARATOR = ":";
 
@@ -37,17 +40,37 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
                 }
             }
         }
-        map.addAll(generatePerimeterWalls());
+        if(!perimeterGenerated){
+            map.addAll(generatePerimeterWalls());
+        }
         map.add(END_OF_FILE);
         return map;
     }
 
     private ArrayList<String> generatePerimeterWalls(){
+        perimeterGenerated = true;
         ArrayList<String> perimeter = new ArrayList<>();
-        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((heightSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * heightSplits + BASE_UNIT));
+        //perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((heightSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * heightSplits + BASE_UNIT));
         perimeter.add(((widthSplits * BASE_UNIT) + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + ((heightSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + (BASE_UNIT * heightSplits + BASE_UNIT));
-        perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + HALF_BASE_UNIT + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT) + SEPARATOR + BASE_UNIT);
-        perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + (heightSplits * BASE_UNIT + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT + SEPARATOR + BASE_UNIT));
+        perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + HALF_BASE_UNIT + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
+        perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + (heightSplits * BASE_UNIT + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
+
+        float doorCoord = generateExit().y;
+
+        //double firstSplit = 5;
+        double firstSplit = doorCoord/2;
+
+        //double secondSplit = 20.5;
+        double secondSplit = (heightSplits - doorCoord)/2 + 0.5;
+
+
+        System.out.println("DOOR:");
+        System.out.println("coord: " + doorCoord);
+        System.out.println("under: " + firstSplit);
+        System.out.println("over: " + secondSplit);
+        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((firstSplit * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * firstSplit * 2));
+        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((doorCoord * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT) + SEPARATOR + "E");
+        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((secondSplit * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT));
 
         return perimeter;
     }
@@ -185,4 +208,15 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
         }
         return false;
     }
+
+    private Vector2 generateExit(){
+        int x = 0;
+        int y = generateInRange(1, heightSplits);
+        if(generatedMap[1][y] == 1){
+            System.out.println("La porta non va bene");
+        }
+        System.out.println("Door: " + x + "," +y);
+        return new Vector2(x, y);
+    }
+
 }

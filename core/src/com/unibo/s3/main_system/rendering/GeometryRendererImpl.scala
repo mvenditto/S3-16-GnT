@@ -109,3 +109,7 @@ class GeometryRendererImpl extends GeometryRenderer[Vector2] {
     })
   }
 }
+
+object GeometryRendererImpl {
+  def apply(): GeometryRendererImpl = new GeometryRendererImpl()
+}
