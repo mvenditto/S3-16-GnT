@@ -31,4 +31,7 @@ object Messages {
   case class RebuildQuadTreeMsg()
   case class CreateCharacterMsg(position: Vector2)
   case class InitialSavingCharacterMsg(newCharacter: BaseCharacter, characterRef: ActorRef)
+
+  //message for SpawnActor
+  case class GenerateNewCharacterPositionMsg() //forse ci andrebbe indicato anche se è ladro o guardia ?
 }
