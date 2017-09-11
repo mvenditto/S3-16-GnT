@@ -26,7 +26,7 @@ case class TestbedImpl() extends AbstractMainApplication with Testbed {
       moduleLoader.newModuleInstance(metadata.clazz.get).foreach(s => setSample(s))
     }
     override def onPause(flag: Boolean): Unit = {
-      pause = flag
+      paused = flag
     }
   })
 
@@ -102,7 +102,7 @@ case class TestbedImpl() extends AbstractMainApplication with Testbed {
     })
 
     Gdx.input.setInputProcessor(inputMultiplexer)
-    pause = false
+    paused = false
     gui.writeConsoleLog(LogMessage("Testbed", "*** Welcome ***", Color.CYAN))
     gui.writeConsoleLog(LogMessage("Testbed", "Version : 0.9fut", Color.CYAN))
 
