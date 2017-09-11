@@ -41,7 +41,7 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
     private final static float minMainRayLenght = 1.5f;
     private final static float whiskerLenght = 1.0f; //2
     private final static float whiskerAngle = 35;
-    private final static float rayCastingDistFromBoundary = 100;
+    private final static float rayCastingDistFromBoundary = 1.0f;
     private final static float proximityDetectionRadius = 10f;
 
     /*wander behavior*/

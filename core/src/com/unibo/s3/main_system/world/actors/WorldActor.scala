@@ -10,9 +10,9 @@ import com.unibo.s3.main_system.characters.steer.collisions.{Box2dRaycastCollisi
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
 import com.unibo.s3.main_system.util.GntUtils
 import com.unibo.s3.main_system.world.{BodyData, Exit, Hideout}
-import net.dermetfan.gdx.physics.box2d.WorldObserver
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.util.Box2dImplicits._
+import net.dermetfan.gdx.physics.box2d.WorldObserver
 
 case class RayCastCollidesQuery(ray: Ray[Vector2])
 case class RayCastCollidesResponse(collides: Boolean)

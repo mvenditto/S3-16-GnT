@@ -12,7 +12,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -49,11 +48,11 @@ public class CharacterTest {
     public void testCharacter(){
         System.out.println("Initial position: " + character.getPosition());
         System.out.println("Graph: " + testGraph.toString());
-        assertTrue(character.computeNearest() == v1);
+        assertTrue(new Vector2(character.computeNearest().get()) == v1);
         //System.out.println("Nearest vertex is " + character.computeNearest());
         character.getPosition().add(5, 5);
-        assertFalse(character.computeNearest() == v1);
-        assertTrue(character.computeNearest() == v5);
+        assertFalse(new Vector2(character.computeNearest().get()) == v1);
+        assertTrue(new Vector2(character.computeNearest().get()) == v5);
         character.computeNeighbours();
     }
 
@@ -99,8 +98,8 @@ public class CharacterTest {
   //      assertEquals(character.getInformations(), Arrays.asList(v1, v2));
 
         //information exchange
-        character.updateGraph(secondCharacter.getInformations());
-        secondCharacter.updateGraph(character.getInformations());
+        character.updateGraph(secondCharacter.getInformation());
+        secondCharacter.updateGraph(character.getInformation());
     //    assertEquals(character.getInformations(), Arrays.asList(v1, v2, v5));
       //  assertEquals(secondCharacter.getInformations(), Arrays.asList(v5, v2, v1));
     }
