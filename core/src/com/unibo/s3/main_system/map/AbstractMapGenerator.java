@@ -55,22 +55,23 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
         perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + HALF_BASE_UNIT + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
         perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + (heightSplits * BASE_UNIT + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
 
-        float doorCoord = generateExit().y;
+        //float doorCoord = generateExit().y;
+        float doorCoord = 10;
 
-        //double firstSplit = 5;
-        double firstSplit = doorCoord/2;
+        double firstSplit = 5;
+        //double firstSplit = doorCoord/2;
 
-        //double secondSplit = 20.5;
-        double secondSplit = (heightSplits - doorCoord)/2 + 0.5;
+        double secondSplit = 20.5;
+        //double secondSplit = (heightSplits - doorCoord)/2 + 0.5;
 
 
         System.out.println("DOOR:");
         System.out.println("coord: " + doorCoord);
         System.out.println("under: " + firstSplit);
         System.out.println("over: " + secondSplit);
-        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((firstSplit * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * firstSplit * 2));
+        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((firstSplit * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * 5 * 2));
         perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((doorCoord * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT) + SEPARATOR + "E");
-        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((secondSplit * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT));
+        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((secondSplit * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT* 20));
 
         return perimeter;
     }
