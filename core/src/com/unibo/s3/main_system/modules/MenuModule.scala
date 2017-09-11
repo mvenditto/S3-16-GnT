@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Align
 import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.Main
+import com.unibo.s3.testbed.ui.{AdaptiveSizeActor, Anchorable, TopLeft}
 
 sealed trait MenuEvent
 case class Start(guardsNum: Int, thiefsNum: Int, simulation: Boolean, mapDimension: Vector2, mazeTypeMap: Boolean) extends MenuEvent
@@ -20,7 +21,7 @@ case class ViewDebug(debug: Boolean) extends MenuEvent
 class MenuModule(listener: MenuEvent => Unit) extends BasicModuleWithGui{
   private var enabled = true
   private var windowSettings, windowMenu: VisWindow = _
-
+  private var menuWindowPane: AdaptiveSizeActor with Anchorable = _
   private var guardsNum = 5
   private var thiefsNum = 1
   private var simulation = true
@@ -190,7 +191,16 @@ class MenuModule(listener: MenuEvent => Unit) extends BasicModuleWithGui{
 
     gui.addActor(windowMenu)
     windowMenu.pack()
-    windowMenu.setPosition(50, Gdx.graphics.getHeight - 200)
+    //windowMenu.setPosition(50, Gdx.graphics.getHeight - 200)
+
+    menuWindowPane = new AdaptiveSizeActor(windowMenu) with Anchorable
+    menuWindowPane.setSize(10, 20) //10 % 20 % of stage size
+    menuWindowPane.setAnchor(TopLeft)
+  }
+
+  override def resize(newWidth: Int, newHeight: Int): Unit = {
+    super.resize(newWidth, newHeight)
+    menuWindowPane.resize(newWidth, newHeight)
   }
 
   override def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit = {

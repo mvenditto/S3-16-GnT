@@ -16,6 +16,8 @@ trait TestbedModule {
 
   def render(shapeRenderer: ShapeRenderer): Unit
 
+  def customRender(): Unit
+
   def update(dt: Float): Unit
 
   def cleanup(): Unit

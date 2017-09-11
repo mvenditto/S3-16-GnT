@@ -21,12 +21,12 @@ import scala.collection.JavaConversions._
 class LightingSystemTest extends EntitySystemModule {
 
 
-  private var rayHandler: RayHandler = _
+  protected var rayHandler: RayHandler = _
   private var cam: OrthographicCamera = _
   private var torches = List[ConeLight]()
-  private var lights = List[PointLight]()
+  protected var lights = List[PointLight]()
 
-  private val LIGHT_WHITE = new Color(1.0f, 1.0f, 1.0f, 1.0f)
+  protected val LIGHT_WHITE = new Color(1.0f, 1.0f, 1.0f, 1.0f)
   private var lightEditorEnabled = false
   private var renderLightsAfterBodies = true
 
@@ -84,20 +84,12 @@ class LightingSystemTest extends EntitySystemModule {
     rayHandler.setAmbientLight(new Color(.1f, .1f, .1f, .1f))
   }
 
-  override def render(shapeRenderer: ShapeRenderer): Unit = {
-    if (renderLightsAfterBodies) {
-      super.render(shapeRenderer)
-    }
-
+  override def customRender(): Unit = {
     rayHandler.setCombinedMatrix(
       cam.combined.cpy().scl(ScaleUtils.getPixelsPerMeter.toFloat), 0, 0,
       cam.viewportWidth, cam.viewportHeight)
     rayHandler.updateAndRender()
     rayHandler.useDefaultViewport()
-
-    if (!renderLightsAfterBodies) {
-      super.render(shapeRenderer)
-    }
   }
 
   override def resize(newWidth: Int, newHeight: Int): Unit = {
