@@ -1,4 +1,4 @@
-package com.unibo.s3.testbed.samples
+package com.unibo.s3.testbed.modules
 
 import java.io.File
 
@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.main_system.communication.{GraphActor, MapActor, QuadTreeActor, SystemManager}
 import com.unibo.s3.main_system.world.actors.WorldActor
-import com.unibo.s3.testbed.BaseSample
+import com.unibo.s3.testbed.model.BaseTestbedModule
 
 import scala.reflect.runtime.currentMirror
 import scala.tools.reflect.ToolBox
@@ -44,7 +44,7 @@ object LoggerActor {
   def props(logger: {def setText(s: String)}): Props = Props(new LoggerActor(logger))
 }
 
-class ActorSystemModule extends BaseSample {
+class ActorSystemModule extends BaseTestbedModule {
 
   private[this] var loggerActor: ActorRef = _
   private[this] var messageTextField: VisTextArea = _
@@ -85,7 +85,7 @@ class ActorSystemModule extends BaseSample {
           """+messageTextField.getText
 
         val msg = Eval[Any](src)
-        SystemManager.getInstance()
+        SystemManager
           .getLocalActor(selectBox.getSelected).tell(msg, loggerActor)
       }
     })
@@ -94,23 +94,23 @@ class ActorSystemModule extends BaseSample {
   override def setup(f: (String) => Unit): Unit = {
     super.setup(f)
     f("Init actor system")
-    SystemManager.getInstance.createSystem("System", null)
+    SystemManager.createSystem("System", null)
 
     f("Deploy -> WorldActor")
-    SystemManager.getInstance().createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor")
+    SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor")
 
     f("Deploy -> MapActor")
-    SystemManager.getInstance.createActor(MapActor.props(), "mapActor")
+    SystemManager.createActor(MapActor.props(), "mapActor")
 
     f("Deploy -> GraphActor")
-    SystemManager.getInstance.createActor(GraphActor.props(), "graphActor")
+    SystemManager.createActor(GraphActor.props(), "graphActor")
 
     f("Deploy -> ProximityActor")
-    SystemManager.getInstance.createActor(QuadTreeActor.props(), "quadTreeActor")
+    SystemManager.createActor(QuadTreeActor.props(), "quadTreeActor")
 
     f("Deploy -> ProximityActor")
-    SystemManager.getInstance.createActor(LoggerActor.props(responseTextField), "loggerActor")
-    loggerActor = SystemManager.getInstance().getLocalActor("loggerActor")
+    SystemManager.createActor(LoggerActor.props(responseTextField), "loggerActor")
+    loggerActor = SystemManager.getLocalActor("loggerActor")
   }
 }
 

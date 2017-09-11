@@ -22,6 +22,9 @@ class CharacterActor(private[this] val character: BaseCharacter) extends Untyped
       println(log() + "Current node/destination: " + character.getCurrentNode.getOrElse("Not definied") + "," + character.getCurrentDestination)
       character.chooseBehaviour()
    /* case msg: SendNeighboursMsg =>
+      SystemManager.getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR).tell(AskNeighboursMsg(this.character), getSelf())
+
+    case msg: SendNeighboursMsg =>
       //refresha vicini
       character.refreshNeighbours()
       println("My neighbours are: " + msg.neighbours.filter(neighbour => !neighbour.equals(getSelf())))

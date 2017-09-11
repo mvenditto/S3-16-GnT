@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.{GL20, Texture}
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.World
-import com.unibo.s3.main_system.characters.{BaseCharacter}
-import com.unibo.s3.main_system.communication.Messages.{ActMsg, SendGraphMsg, SendNeighboursMsg}
+import com.unibo.s3.main_system.characters.BaseCharacter
+import com.unibo.s3.main_system.communication.Messages.{ActMsg, CreateCharacterMsg, SendGraphMsg, SendNeighboursMsg}
 import com.unibo.s3.main_system.world.actors.WorldActor
 import org.jgrapht.graph.{DefaultEdge, SimpleGraph}
 
@@ -32,18 +32,22 @@ class AgentsTest extends ApplicationAdapter{
     testGraph.addEdge(v3, v4)
     testGraph.addEdge(v5, v4)
     testGraph.addEdge(v2, v5)
-    SystemManager.getInstance.createSystem("System", null)
-    SystemManager.getInstance.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor")
-    SystemManager.getInstance.createActor(GraphActor.props(), "graphActor")
-    val mapActor = SystemManager.getInstance.createActor(MapActor.props(), "mapActor")
-    SystemManager.getInstance.createActor(QuadTreeActor.props(), "quadTreeActor")
-    val masterActor = SystemManager.getInstance.createActor(MasterActor.props(), "masterActor")
+    SystemManager.createSystem("System", null)
+    SystemManager.createGeneralActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR)
+    SystemManager.createGeneralActor(GraphActor.props(), GeneralActors.GRAPH_ACTOR)
+    val mapActor = SystemManager.createGeneralActor(MapActor.props(), GeneralActors.MAP_ACTOR)
+    SystemManager.createGeneralActor(QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)
+    val masterActor = SystemManager.createGeneralActor(MasterActor.props(), GeneralActors.MAP_ACTOR)
 
     masterActor ! ActMsg(0.016f)
 
-    var copOne = SystemManager.getInstance.createActor(CharacterActor.props(new BaseCharacter(new Vector2(7, 7), 1)), "cop1")
-    var copTwo = SystemManager.getInstance.createActor(CharacterActor.props(new BaseCharacter(new Vector2(7, 7), 2)), "cop2")
-    var copThree = SystemManager.getInstance.createActor(CharacterActor.props(new BaseCharacter(new Vector2(4, 4), 3)), "cop3")
+    masterActor.tell(Messages.CreateCharacterMsg(new Vector2(1, 1)), ActorRef.noSender)
+    masterActor.tell(Messages.CreateCharacterMsg(new Vector2(1, 1)), ActorRef.noSender)
+    masterActor.tell(Messages.CreateCharacterMsg(new Vector2(1, 1)), ActorRef.noSender)
+
+    var copOne = SystemManager.getLocalCharacterActor(CharacterActors.COP, 1)
+    var copTwo = SystemManager.getLocalCharacterActor(CharacterActors.COP, 2)
+    var copThree = SystemManager.getLocalCharacterActor(CharacterActors.COP, 3)
 
     copOne ! SendGraphMsg(testGraph)
     copTwo ! SendGraphMsg(testGraph)

@@ -6,6 +6,7 @@ import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory;
+import com.unibo.s3.main_system.communication.GeneralActors;
 import com.unibo.s3.main_system.communication.SystemManager;
 import com.unibo.s3.main_system.world.actors.Box2dRayCastCollisionDetectorProxy;
 import com.unibo.s3.main_system.world.actors.WorldActor;
@@ -37,7 +38,7 @@ public class GraphImpl implements Graph, GraphAdapter<Vector2> {
     }
 
     private void setWorldActor() {
-        ActorRef worldActor = SystemManager.getInstance().getLocalActor("worldActor");
+        ActorRef worldActor = SystemManager.getLocalGeneralActor(GeneralActors.GRAPH_ACTOR());
         this.collisionDetector = new Box2dProxyDetectorsFactory(worldActor).newRaycastCollisionDetector();
     }
 

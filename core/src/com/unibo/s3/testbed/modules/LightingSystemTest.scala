@@ -1,4 +1,4 @@
-package com.unibo.s3.testbed.samples
+package com.unibo.s3.testbed.modules
 
 import box2dLight.{ConeLight, PointLight, RayHandler}
 import com.badlogic.gdx.Input.Keys
@@ -13,7 +13,7 @@ import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.main_system.characters.steer.MovableEntity
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory
 import com.unibo.s3.main_system.util.ScaleUtils
-import com.unibo.s3.testbed.Testbed
+import com.unibo.s3.testbed.model.Testbed
 import com.unibo.s3.testbed.ui.LogMessage
 
 import scala.collection.JavaConversions._

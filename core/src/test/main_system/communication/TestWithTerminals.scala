@@ -27,8 +27,8 @@ object RemoteLauncher extends App {
       ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
       ",\"netty\":{\"tcp\":{\"hostname\":\""+ InetAddress.getLocalHost.getHostAddress+"\",\"port\":2727}}}}}"
   val customConf = ConfigFactory.parseString(confText)
-  SystemManager.getInstance().createSystem("RemoteSystem", customConf)
-  SystemManager.getInstance().createActor(TestActor.props(), "remoteActor")
+  SystemManager.createSystem("RemoteSystem", customConf)
+  SystemManager.createActor(TestActor.props(), "remoteActor")
   println("remote ready, ip: " + InetAddress.getLocalHost.getHostAddress)
 }
 
@@ -39,8 +39,8 @@ object LocalLauncher extends App {
       ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
       ",\"netty\":{\"tcp\":{\"hostname\":\""+ InetAddress.getLocalHost.getHostAddress+"\",\"port\":5050}}}}}"
   val customConf = ConfigFactory.parseString(confText)
-  SystemManager.getInstance().createSystem("LocalSystem", customConf)
-  val remoteActor = SystemManager.getInstance().getRemoteActor("RemoteSystem", "192.168.1.12", "2727", "/user/remoteActor")
-  val localActor = SystemManager.getInstance().createActor(TestActor.props(), "localActor")
+  SystemManager.createSystem("LocalSystem", customConf)
+  val remoteActor = SystemManager.getRemoteActor("RemoteSystem", "192.168.1.6", "2727", "/user/remoteActor")
+  val localActor = SystemManager.createActor(TestActor.props(), "localActor")
   remoteActor.tell(GenerateMapMsg(), localActor)
 }

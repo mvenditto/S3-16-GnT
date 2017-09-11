@@ -19,10 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 import static java.lang.Thread.sleep;
 
@@ -36,9 +33,12 @@ public class GraphGenerator {
         log("Griglia: ");
         for(int i = 0; i < grid.length; i++) {
             for(int j = 0; j < grid[0].length; j++) {
-                System.out.print(grid[i][j] + "  ");
+                if(grid[i][j] == null)
+                    System.out.print("x  ");
+                else
+                    System.out.print(grid[i][j] + "  ");
             }
-            log("");
+            System.out.println("");
         }
     }
 
@@ -47,10 +47,12 @@ public class GraphGenerator {
     }
 
     public static UndirectedGraph<Vector2, DefaultEdge> createGraph(int width, int height, String mapFilename) {
-        ActorRef worldActor = SystemManager.getInstance().getLocalActor("worldActor");
+        int dimWall = 2;
+
+        ActorRef worldActor = SystemManager.getLocalActor("worldActor");
         RaycastCollisionDetector<Vector2> collisionDetector = new Box2dProxyDetectorsFactory(worldActor).newRaycastCollisionDetector();
         HashMap<Vector2, Vector2> walls = new HashMap<>();
-        Integer[][] grid = new Integer[width+6][height+6];
+        Integer[][] grid = new Integer[width+(dimWall*2)][height+(dimWall*2)];
         log("genero il grafo di dimensione: " + width + ", " + height);
         Cronometer cron = new Cronometer();
 
@@ -65,15 +67,17 @@ public class GraphGenerator {
         //printGrid(grid);
 
         //UndirectedGraph<Vector2, DefaultEdge> graph = null;
-        UndirectedGraph<Vector2, DefaultEdge> graph = create(grid, walls, collisionDetector);
+        UndirectedGraph<Vector2, DefaultEdge> graph = create(grid, walls, collisionDetector, dimWall);
+
 
         log("Grafo creato: " + graph.toString());
         return graph;
     }
 
-    private static UndirectedGraph<Vector2, DefaultEdge> create(Integer[][] grid, HashMap<Vector2, Vector2> walls, RaycastCollisionDetector<Vector2> collisionDetector) {
+    private static UndirectedGraph<Vector2, DefaultEdge> create(Integer[][] grid, HashMap<Vector2, Vector2> walls,
+                                                                RaycastCollisionDetector<Vector2> collisionDetector, int dimWall) {
         UndirectedGraph<Vector2, DefaultEdge> graph = new SimpleGraph<>(DefaultEdge.class);
-        addNodes(grid, graph, walls);
+        addNodes(grid, graph, walls, dimWall);
         log("Finiti i nodi, sono " + graph.vertexSet().size());
         addEdges(graph, collisionDetector);
         return graph;
@@ -95,6 +99,7 @@ public class GraphGenerator {
 
     private static void concurrentCheckUnconnectedNodes(UndirectedGraph<Vector2, DefaultEdge> graph,
                                                         RaycastCollisionDetector<Vector2> collisionDetector) {
+        Semaphore semGraph = new Semaphore(1);
         int nProc = Runtime.getRuntime().availableProcessors()+1;
         ExecutorService executor = Executors.newFixedThreadPool(nProc);
         Set<Future<Void>> resultSet = new HashSet<>();
@@ -110,13 +115,13 @@ public class GraphGenerator {
             List<Vector2> nodesList = ntc.get(count);
             nodesList.add(node);
             if(nodesList.size() == vectToThread && count != (nTask-1)) {
-                Future<Void> res = executor.submit(new ConcurrentAddEdges(nodesList, graph, collisionDetector, (count+1)));
+                Future<Void> res = executor.submit(new ConcurrentAddEdges(nodesList, graph, collisionDetector, (count+1), semGraph));
                 resultSet.add(res);
                 count++;
                 ntc.put(count, new ArrayList<>());
             }
         }
-        Future<Void> res = executor.submit(new ConcurrentAddEdges(ntc.get(count), graph, collisionDetector, (count+1)));
+        Future<Void> res = executor.submit(new ConcurrentAddEdges(ntc.get(count), graph, collisionDetector, (count+1), semGraph));
         resultSet.add(res);
 
         for (Future<Void> future : resultSet) {
@@ -143,7 +148,7 @@ public class GraphGenerator {
                     if(graph.containsVertex(toCompare)) {
                         if (!toCompare.equals(node) && ksp.getPaths(node, toCompare).size() == 0) {
                             //log(node.toString() + " non arriva a " + toCompare.toString());
-                            if(checkEdgeRayCast(collisionDetector, node, toCompare, 0.5f, 16)) {
+                            if(checkEdgeRayCast(collisionDetector, node, toCompare)) {
                                 DefaultEdge edge = graph.addEdge(node, toCompare);
                                 log("Secondi archi: aggiunto " + edge.toString());
                             }
@@ -161,12 +166,15 @@ public class GraphGenerator {
      *
      * @param v1 vertice 1
      * @param v2 vertice 2
-     * @param vertexRadius raggio del vertice da considerare per castare il raggio
-     * @param numRays numero di raggi da utilizzare
      * @return true se almeno un raggio da v1 raggiunge v2 (non il punto v2 preciso,
      * ma un punto sulla circonferenza di centro v2 e raggio vertexRadius)
      */
-    private static boolean checkEdgeRayCast(RaycastCollisionDetector<Vector2> collisionDetector, Vector2 v1, Vector2 v2, float vertexRadius, int numRays) {
+    private static boolean checkEdgeRayCast(RaycastCollisionDetector<Vector2> collisionDetector, Vector2 v1, Vector2 v2) {
+
+        //raggio del vertice da considerare per castare il raggio
+        float vertexRadius = 0.5f;
+        //numero di raggi da utilizzare
+        int numRays = 16;
 
         final Vector2 tmp = new Vector2();
         final Vector2 tmp2 = new Vector2();
@@ -197,7 +205,7 @@ public class GraphGenerator {
             nodes.forEach(node -> {
                 //log("Controllo " + vertex.toString() + " - " + node.toString());
                 if(vertex != node && checkNodeProximity(vertex, node)
-                        && checkEdgeRayCast(collisionDetector, vertex, node, 0.5f, 16)) {
+                        && checkEdgeRayCast(collisionDetector, vertex, node)) {
                     DefaultEdge edge = graph.addEdge(vertex, node);
                     //log("Primi archi: aggiunto " + edge.toString());
                 }
@@ -265,39 +273,62 @@ public class GraphGenerator {
         FileHandle file = Gdx.files.internal(mapFilename);
         String text = file.readString();
         String[] lines = text.split("\\n");
+        boolean print = false;
         for(int l = 0; l < lines.length; l++) {
+            if(print) System.out.print("Riga: ");
             String[] toks = lines[l].split(":");
             float x = Float.parseFloat(toks[0]);
+            if(print) System.out.print("x = " + x);
             float y = Float.parseFloat(toks[1]);
+            if(print) System.out.print(", y = " + y);
             float w = Float.parseFloat(toks[2]);
+            if(print) System.out.print(", width = " + w);
             float h = Float.parseFloat(toks[3]);
+            if(print) System.out.print(", height = " + h);
 
             float halfw = w / 2;
             float halfh = h / 2;
             Vector2 bl = createVector((x - halfw), (y - halfh));
+            if(Float.compare(w, 2f) == 0) halfw = 0;
+            if(Float.compare(h, 2f) == 0) halfh = 0;
             Vector2 tr = createVector((x + halfw), (y + halfh));
 
-            //new Thread(new SetWall(bl, tr, grid)).start();
-            for(int i = (int) bl.x; i <= (int) tr.x && i < grid.length; i++) {
-                for(int j = (int) bl.y; j <= tr.y && j < grid[0].length; j++ ) {
+            int startX = 0, startY = 0;
+            if(bl.x >= 0)
+                startX = (int) bl.x;
+            if(bl.y >= 0)
+                startY = (int) bl.y;
+
+            if(print) log("=> metto a 1:");
+            for(int i = startX; i <= (int) tr.x && i < grid.length; i++) {
+                for(int j = startY; j <= tr.y && j < grid[0].length; j++ ) {
                     grid[i][j] = 1;
+                    if(print) System.out.print(i + ", " + j + " - ");
                 }
             }
+            if(print) log("");
             walls.put(createVector(x, y), createVector(w, h));
         }
     }
 
     private static void addNodes(Integer[][] grid,
                           UndirectedGraph<Vector2, DefaultEdge> graph,
-                          HashMap<Vector2, Vector2> walls) {
-        addFirstNodes(grid, graph);
-        addWallsNode(walls, grid, graph);
+                          HashMap<Vector2, Vector2> walls, int dimWall) {
+        addFirstNodes(grid, graph, dimWall);
+        addWallsNode(walls, grid, graph, dimWall);
     }
 
-    private static void addFirstNodes(Integer[][] grid, UndirectedGraph<Vector2, DefaultEdge> graph) {
-        int step = 3;
-        for(int row = (3); row < grid.length; row+=step) {
-            for(int col = (3); col < grid[0].length; col+=step) {
+    private static void addFirstNodes(Integer[][] grid, UndirectedGraph<Vector2, DefaultEdge> graph, int dimWall) {
+        int step = 0, start = 0;
+        if(dimWall == 3) {
+            step = 4;
+            start = 5;
+        } else if(dimWall == 2) {
+            step = 3;
+            start = 3;
+        }
+        for(int row = (start); row < grid.length; row+=step) {
+            for(int col = (start); col < grid[0].length; col+=step) {
                 if(checkGrid(row, col, grid)) {
                     Vector2 v = createVector(row, col);
                     graph.addVertex(v);
@@ -316,12 +347,13 @@ public class GraphGenerator {
      * @return true if cell of grid is empty
      * */
     private static boolean checkGrid(int row, int col, Integer[][] grid) {
-        return grid[row][col] == null;
+        return grid[row][col] == null && grid[row-1][col] == null && grid[row-1][col-1] == null && grid[row][col -1] == null;
     }
 
-    private static void addWallsNode(HashMap<Vector2, Vector2> walls, Integer[][] grid, UndirectedGraph<Vector2, DefaultEdge> graph) {
+    private static void addWallsNode(HashMap<Vector2, Vector2> walls, Integer[][] grid, UndirectedGraph<Vector2, DefaultEdge> graph, int dimWall) {
         walls.forEach((pos, size) -> {
-            float dist = 1f;
+            float dist = 2f;
+            if(dimWall == 2) dist = 1f;
             Vector2[] vertex = new Vector2[4];
             float halfWidth = size.x / 2;
             float halfHeight = size.y / 2;

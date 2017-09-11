@@ -18,8 +18,8 @@ class MasterActor extends UntypedAbstractActor with Stash {
   override def onReceive(message: Any): Unit = message match {
 
     case msg: ActMsg =>
-      SystemManager.getInstance().getLocalActor("worldActor").tell(msg, getSelf())
-      SystemManager.getInstance().getLocalActor("quadTreeActor").tell(RebuildQuadTreeMsg(), getSelf())
+      SystemManager.getLocalGeneralActor(GeneralActors.WORLD_ACTOR).tell(msg, getSelf())
+      SystemManager.getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR).tell(RebuildQuadTreeMsg(), getSelf())
       charactersList.foreach(cop => cop.tell(msg, getSelf()))
       //manca il ladro o i ladri
 
@@ -29,7 +29,7 @@ class MasterActor extends UntypedAbstractActor with Stash {
       newCharacter.setColor(Color.ORANGE)
 
       if (collisionDetector == null) {
-        val worldActorRef = SystemManager.getInstance().getLocalActor("worldActor")
+        val worldActorRef = SystemManager.getLocalGeneralActor(GeneralActors.WORLD_ACTOR)
         collisionDetector = new Box2dProxyDetectorsFactory(worldActorRef).newRaycastCollisionDetector()
       }
 
@@ -40,11 +40,11 @@ class MasterActor extends UntypedAbstractActor with Stash {
         .wander()
         .buildPriority(true)
 
-      val characterRef = SystemManager.getInstance().createActor(CharacterActor.props(newCharacter), "cop"+copID)
+      val characterRef = SystemManager.createCharacterActor(CharacterActor.props(newCharacter), CharacterActors.COP, copID)
       charactersList :+= characterRef
-      SystemManager.getInstance().getLocalActor("quadTreeActor")
+      SystemManager.getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR)
         .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
-      SystemManager.getInstance().getLocalActor("graphActor")
+      SystemManager.getLocalGeneralActor(GeneralActors.GRAPH_ACTOR)
         .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
 
     case _ => println("(worldActor) message unknown: " + message)

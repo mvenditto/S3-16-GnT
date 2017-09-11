@@ -1,9 +1,6 @@
-package com.unibo.s3.testbed
+package com.unibo.s3.testbed.view
 
-import com.badlogic.gdx.Input.Keys
-import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
-import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.scenes.scene2d.ui.Cell
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Tree.Node
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent
 import com.badlogic.gdx.scenes.scene2d.utils.{ChangeListener, ClickListener}
@@ -13,27 +10,11 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.{Gdx, InputMultiplexer}
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.util.ToastManager
+import com.kotcrab.vis.ui.widget._
 import com.kotcrab.vis.ui.widget.toast.Toast
-import com.kotcrab.vis.ui.widget.{VisLabel, VisTree, _}
-import com.unibo.s3.InputProcessorAdapter
-import com.unibo.s3.main_system.AbstractMainApplication
 import com.unibo.s3.main_system.util.GraphicsUtils
-import com.unibo.s3.testbed.samples._
-import com.unibo.s3.testbed.ui.{AdaptiveSizeActor, Anchorable, Console, FpsCounter, KeyHelpTable, LogMessage, Toggleable, TopLeft, TopRight, TransitionFunctions}
-
-import scala.util.{Failure, Success, Try}
-import scala.util.parsing.json.JSON
-
-trait Testbed {
-
-  def screenToWorld(screenPosition: Vector2): Vector2
-
-  def worldToScreen(worldPosition: Vector2): Vector2
-
-  def getCamera: OrthographicCamera
-
-  def getLogger: (LogMessage => Unit)
-}
+import com.unibo.s3.testbed.model.ModuleMetadata
+import com.unibo.s3.testbed.ui._
 
 trait TestbedListener {
 
@@ -63,7 +44,7 @@ case class TestbedView(listener: TestbedListener) {
 
   private val consolePadding = 50f
   private val customBlue = new Color(0f, 0.7f, 1f, 1f)
-
+  private val errorRed = new Color(1f, 0.41f, 0.38f, 1f)
 
   def resize(newWidth: Integer, newHeight: Integer): Unit = {
     stage.getViewport.update(newWidth, newHeight, true)
@@ -168,15 +149,15 @@ case class TestbedView(listener: TestbedListener) {
       .foreach(w => w.setPadding(0, -padY.toInt))
     consolePane.setSize(100, 20)
     samplePane.setSize(25, yPerc)
-    eastPane.setSize(20, yPerc)
+    eastPane.setSize(25, yPerc)
     consolePane.toggle(stage.getWidth, stage.getHeight)
   }
 
-  def addSampleEntry(node: Node, sample: ModuleMetadata): Unit = {
+  def addSampleEntry(node: Node, sample: ModuleMetadata, valid: Boolean): Unit = {
     val sampleNameLbl = new VisLabel(sample.name)
 
-    if (sample.clazz.isEmpty) {
-      sampleNameLbl.setColor(Color.RED)
+    if (!valid) {
+      sampleNameLbl.setColor(errorRed)
       new Tooltip.Builder("Wrong/Undefined 'class' attribute!")
         .target(sampleNameLbl).build()
     } else {
@@ -218,9 +199,9 @@ case class TestbedView(listener: TestbedListener) {
     currSampleShortcuts = None
     val st = new KeyHelpTable(true)
     shortcuts.foreach(k => {
-        if (!k._1.contains("+")) st.addKeyBinding(k._1, k._2)
-        else st.addKeyBinding(k._1.split("\\+"), k._2)
-      })
+      if (!k._1.contains("+")) st.addKeyBinding(k._1, k._2)
+      else st.addKeyBinding(k._1.split("\\+"), k._2)
+    })
     currSampleShortcuts = Option(st)
   }
 
@@ -295,183 +276,19 @@ case class TestbedView(listener: TestbedListener) {
     toast.getMainTable.setX((stage.getWidth / 2) - toast.getMainTable.getPrefWidth / 2 )
   }
 
-  def buildSamplesTree(modules: Iterable[ModuleMetadata]): Unit = {
+  def buildSamplesTree(modules: Iterable[(ModuleMetadata, Boolean)]): Unit = {
     var categories = Map[String, Node]()
 
     modules.foreach(m => {
-      val c = m.category
+      val c = m._1.category
       if(!categories.contains(c)) {
         val n = new Node(new VisLabel(c))
         categories += (c -> n)
-        addSampleEntry(n, m)
+        addSampleEntry(n, m._1, m._2)
       } else {
-        addSampleEntry(categories(c),m)
+        addSampleEntry(categories(c), m._1, m._2)
       }
     })
     categories.values.foreach(n => tree.add(n))
   }
-}
-
-case class FutureTestbed() extends AbstractMainApplication with Testbed {
-
-  private[this] var currentSample: Option[Sample] = None
-  private[this] var nextSample: Option[Sample] = None
-  private[this] var inputMultiplexer: InputMultiplexer = _
-  private[this] var loadingFinished = true
-  private[this] var currSampleName: String = _
-
-  private[this] val testbedPackage: String = "com.unibo.s3.testbed.samples."
-  private[this] val testbedModulesFile: String = "testbed/modules.json"
-
-  private[this] val gui = TestbedView(new TestbedListener {
-    override def onSampleSelection(metadata: ModuleMetadata): Unit = {
-      currSampleName = metadata.name
-      loadSample(metadata.clazz.get).foreach(s => setSample(s))
-    }
-
-    override def onPause(flag: Boolean): Unit = {
-      pause = flag
-    }
-  })
-
-  private def loadSample(sampleClass: String): Option[Sample] = {
-    Option(Class.forName(sampleClass).newInstance().asInstanceOf[Sample])
-  }
-
-  private def checkModuleClassExits(clazz: String): Option[String] = {
-    Try(Class.forName(testbedPackage + clazz)) match {
-      case Success(c) => Some(c.getName)
-      case Failure(_) => None
-    }
-  }
-
-  private def parseModulesFile(): Option[Iterable[ModuleMetadata]] = {
-    val modulesJson = Gdx.files.internal(testbedModulesFile).readString()
-    val modulesMap = JSON.parseFull(modulesJson)
-
-    modulesMap match {
-      case Some(m: Map[String, Map[String, Map[String, String]]]) =>
-        val modules =
-          m.keys.flatMap(cat =>
-            m(cat).map(mm => (cat, mm._1, mm._2)))
-          .map(md => {
-            val meta = md._3
-            var clazz = meta.get("class")
-            if (clazz.isDefined) clazz = checkModuleClassExits(clazz.get)
-            ModuleMetadata(md._2, meta.get("desc"), clazz, meta.get("version"), md._1)
-          })
-        Some(modules)
-      case _ => None
-    }
-  }
-
-  private def resetInputProcessor(sample: Sample): Unit = {
-    val this_ = this
-    Gdx.app.postRunnable(new Runnable {
-      override def run(): Unit = {
-        inputMultiplexer.clear()
-        sample.attachInputProcessors(inputMultiplexer)
-        inputMultiplexer.addProcessor(this_)
-        gui.attachInputProcessor(inputMultiplexer)
-        Gdx.input.setInputProcessor(inputMultiplexer)
-      }
-    })
-  }
-
-  private def setSample(sample: Sample): Unit = {
-    if (loadingFinished) {
-      loadingFinished = false
-
-      gui.resetProgressBar()
-      gui.resetSamplePane()
-      sample.init(this)
-      gui.setProgressBarValue(15)
-
-      resetInputProcessor(sample)
-      gui.setProgressBarValue(25)
-
-      sample.getKeyShortcuts.foreach(sc =>
-        gui.setCurrentSampleShortcuts(sc))
-      gui.setProgressBarValue(45)
-
-      currentSample.foreach(old => old.cleanup())
-      currentSample = Some(sample)
-      nextSample = None
-      gui.setProgressBarValue(65)
-
-      new Thread(new Runnable {
-        override def run(): Unit = {
-          sample.setup((msg: String) => {
-            gui.setLoadingLogText(msg)
-            gui.writeConsoleLog(LogMessage(currSampleName, msg, Color.GOLD))
-          })
-          gui.setProgressBarValue(85)
-
-          sample.initGui(gui.getSamplePane)
-          gui.setProgressBarValue(100)
-
-          gui.displayModuleLoadedToast(currSampleName)
-          gui.setLoadingLogText("")
-          loadingFinished = true
-        }
-      }).start()
-    }
-  }
-
-  override def create(): Unit = {
-    super.create()
-    gui.init()
-
-    inputMultiplexer = new InputMultiplexer()
-    inputMultiplexer.addProcessor(this)
-    gui.attachInputProcessor(inputMultiplexer)
-
-    currentSample.foreach(s => {
-      s.init(this)
-      s.attachInputProcessors(inputMultiplexer)
-    })
-
-    Gdx.input.setInputProcessor(inputMultiplexer)
-    pause = false
-    gui.writeConsoleLog(LogMessage("Testbed", "*** Welcome ***", Color.CYAN))
-    gui.writeConsoleLog(LogMessage("Testbed", "Version : 0.9fut", Color.CYAN))
-
-    parseModulesFile().foreach(modules => gui.buildSamplesTree(modules))
-  }
-
-  override def doRender(): Unit = {
-    if (loadingFinished) currentSample.foreach(s => s.render(shapeRenderer))
-    gui.render()
-  }
-
-  override def doUpdate(delta: Float): Unit = {
-    gui.update(delta)
-    nextSample.foreach(s => setSample(s))
-    if (loadingFinished) currentSample.foreach(s => s.update(delta))
-  }
-
-  override def resize(newWidth: Int, newHeight: Int): Unit = {
-    super.resize(newWidth, newHeight)
-    gui.resize(newWidth, newHeight)
-    currentSample.foreach(s => s.resize(newWidth, newHeight))
-  }
-
-  override def dispose(): Unit = {
-    super.dispose()
-    VisUI.dispose()
-  }
-
-  override def keyUp(keycode: Int): Boolean = {
-    keycode match {
-      case Keys.V => gui.toggleConsole()
-      case Keys.H => gui.toggleSamplePane()
-      case _ => ()
-    }
-    false
-  }
-
-  override def getCamera: OrthographicCamera = cam
-
-  override def getLogger: (LogMessage) => Unit = gui.writeConsoleLog
-
 }
