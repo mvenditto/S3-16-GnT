@@ -18,6 +18,25 @@
       "version": 1.0
     },
 
+
+    "Sprites Test": {
+      "desc":"",
+      "class":"TestCharacterSprites",
+      "version": 0.1
+    },
+
+    "QuadTree + FoV Test": {
+      "desc":"",
+      "class":"QuadTreeTest",
+      "version": 0.1
+    },
+
+    "SightLineTest": {
+      "desc":"",
+      "class":"TestObjectOnSightLine",
+      "version": 0.1
+    },
+
     "Map rooms identify": {
       "desc":"",
       "class":"TestMapRoomIdentify",

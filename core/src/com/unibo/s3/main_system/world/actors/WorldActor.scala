@@ -13,6 +13,8 @@ import com.unibo.s3.main_system.world.{BodyData, Exit, Hideout}
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.util.Box2dImplicits._
 import net.dermetfan.gdx.physics.box2d.WorldObserver
+import scala.util.Try
+
 
 case class RayCastCollidesQuery(ray: Ray[Vector2])
 case class RayCastCollidesResponse(collides: Boolean)
@@ -21,12 +23,14 @@ case class RayCastCollisionResponse(collided: Boolean, coll: Collision[Vector2])
 case class ProximityQuery(subject: Steerable[Vector2], detectionRadius: Float)
 case class ProximityQueryResponse(neighbors: Seq[Steerable[Vector2]])
 case class DeleteBodyAt(x: Float, y: Float)
-case class CreateBox(position: Vector2, size: Vector2)
+case class CreateBox(position: Vector2, size: Vector2, bodyData: Option[BodyData]=None)
 case class ResetWorld()
 case class GetAllBodies()
 case class RegisterAsWorldChangeObserver()
 case class WorldChangeMsg(b: Body)
 case class AskWorldMask(w:Int, h:Int, cellWidth: Float)
+case class AskObjectOnSightLineMsg(p: Vector2, lv: Vector2, rayLenght: Float)
+case class ObjectOnSightLineMsg(bd: Iterable[BodyData])
 
 
 class WorldActor(val world: World) extends UntypedAbstractActor {
@@ -85,7 +89,24 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
         override def reportFixture(f: Fixture): Boolean = {bodiesToDelete :+= f.getBody; true}
       }, x - AABBWidth, y - AABBWidth, x + AABBWidth, y + AABBWidth)
 
-    case CreateBox(pos, size) => world.createBox(pos, size)
+    case AskObjectOnSightLineMsg(p, lv, rl) =>
+      val oc = new Collision[Vector2](new Vector2(), new Vector2())
+      val end = lv.cpy().nor().scl(rl).add(p)
+      val collided = rayCastCollisionDetector.findCollision(oc, new Ray[Vector2](p, end))
+
+      if (collided) {
+        val cp = oc.point
+        val data = world.bodiesAtPoint(cp)
+          .map(c => Try(c.getUserData.asInstanceOf[BodyData]))
+          .filter(c => c.isSuccess)
+          .map(c => c.get)
+
+        sender ! ObjectOnSightLineMsg(data)
+      }
+
+    case CreateBox(pos, size, bdata) =>
+      val b = world.createBox(pos, size)
+      bdata.foreach(bd => b.setUserData(bd))
 
     case GetAllBodies() => sender() ! getBodies
 
