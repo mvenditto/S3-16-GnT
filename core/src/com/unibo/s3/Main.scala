@@ -1,8 +1,7 @@
 package com.unibo.s3
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.InputMultiplexer
-import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.{Gdx, InputMultiplexer, Preferences}
+import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.kotcrab.vis.ui.VisUI
@@ -17,9 +16,12 @@ class Main extends AbstractMainApplication {
 
   private var bootstrapModule: BootstrapModule = _
   private[this] var cm: MenuModule = _
+  private[this] val prefsName = "GntPreferences"
+  private[this] var prefs: Preferences =  _
 
   override def create(): Unit = {
     super.create()
+    prefs = Gdx.app.getPreferences(prefsName)
     inputMultiplexer = new InputMultiplexer
     VisUI.load()
 
@@ -39,6 +41,9 @@ class Main extends AbstractMainApplication {
     val master = new MasterModule()
     master.enable(false)
 
+    val lighting = new LightingSystemModule()
+    lighting.enable(false)
+
     var settings: Option[GameSettings] = None
     val cm = new MenuModule({
       case Start(guardsNum, thiefsNum, simulation, mapDimension, mazeTypeMap) =>
@@ -53,24 +58,26 @@ class Main extends AbstractMainApplication {
     })
     cm.enable(true)
 
-    var actorsMap: Option[Map[GameActors.Value, String]] = None
     bootstrapModule = new BootstrapModule({
-      case BootstrapOk(actors) =>
-        actorsMap = Option(actors)
+      case BootstrapOk() =>
 
       case BootstrapFailed(err) =>
         println(err)
 
-      case UserAck() if actorsMap.isDefined =>
-        master.initGame(actorsMap.get, settings.get)
+      case UserAck() if settings.isDefined =>
+        master.initGame(settings.get)
         master.enable(true)
+        lighting.setup()
+        lighting.enable(true)
         removeModule(bootstrapModule)
     })
     bootstrapModule.enable(false)
 
+
     modules :+= cm
     modules :+= bootstrapModule
     modules :+= master
+    modules :+= lighting
   }
 
   private def renderAxis(shapeRenderer: ShapeRenderer) = {
@@ -115,18 +122,28 @@ class Main extends AbstractMainApplication {
     })
   }
 
+  def getCamera: OrthographicCamera = cam
+
+  def getPrefs: Preferences = prefs
+
   override protected def doRender(): Unit = {
     renderAxis(shapeRenderer)
     val enabledModules = modules.filter(m => m.isEnabled)
     enabledModules.foreach(m => m.render(shapeRenderer))
+  }
+
+  override def doCustomRender(): Unit = {
+    val enabledModules = modules.filter(m => m.isEnabled)
+    enabledModules.foreach(m =>m.customRender())
     enabledModules.foreach(m => m.renderGui())
   }
 
-  override protected def doUpdate(delta: Float): Unit =
+  override def doUpdate(delta: Float): Unit =
     modules.filter(m => m.isEnabled).foreach(m => m.update(delta))
 
   override def resize(newWidth: Int, newHeight: Int): Unit = {
     super.resize(newWidth, newHeight)
     modules.foreach(m => m.resize(newWidth, newHeight))
   }
+
 }

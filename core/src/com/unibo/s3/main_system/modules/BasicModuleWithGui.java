@@ -55,6 +55,11 @@ public class BasicModuleWithGui implements BasicModule, InputProcessorAdapter {
     }
 
     @Override
+    public void customRender() {
+
+    }
+
+    @Override
     public void cleanup() {
         gui.dispose();
     }

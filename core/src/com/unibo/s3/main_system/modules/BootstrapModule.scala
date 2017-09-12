@@ -12,28 +12,17 @@ import com.unibo.s3.main_system.communication._
 import com.unibo.s3.main_system.world.actors.WorldActor
 
 
-object GameActors extends Enumeration {
-  val World, Graph, Map, QuadTree, Master = Value
-}
 
 sealed trait BootstrapEvent
-case class BootstrapOk(actorsMap: Map[GameActors.Value, String]) extends BootstrapEvent
+case class BootstrapOk() extends BootstrapEvent
 case class BootstrapFailed(error: String) extends BootstrapEvent
 case class UserAck() extends BootstrapEvent
 
 
 class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithGui {
+  import BootstrapModule._
 
   private[this] var loadingFinished = false
-  private[this] val actorSystemName = "System"
-  private[this] val gameActorsNames = Map(
-    GameActors.World -> "worldActor",
-    GameActors.Graph -> "graphActor",
-    GameActors.Map -> "mapActor",
-    GameActors.Master -> "masterActor",
-    GameActors.QuadTree -> "quadTreeActor")
-
-  private[this] val loadingDialogTitle = "System Initialization"
   private[this] var loadingBar: VisProgressBar = _
   private[this] var loadingLabel: VisLabel = _
   private[this] var startBtn: VisTextButton = _
@@ -59,7 +48,7 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
   }
 
   private def createGui(): Unit = {
-    val w = new VisWindow(loadingDialogTitle)
+    val w = new VisWindow(LoadingDialogTitle)
     w.setModal(true)
 
     startBtn = new VisTextButton("Start!", "blue")
@@ -91,7 +80,7 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
 
   private def initActorSystem(): Unit = {
     setProgress(0)
-    SystemManager.createSystem(actorSystemName, null)
+    SystemManager.createSystem(ActorSystemName, null)
 
     val world = new World(new Vector2(0, 0), true)
     setProgress(20)
@@ -132,7 +121,7 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
         try {
           initActorSystem()
           loadingFinished = true
-          listener(BootstrapOk(gameActorsNames))
+          listener(BootstrapOk())
         } catch {
           case err: Exception =>
             listener(BootstrapFailed(err.getMessage))
@@ -164,4 +153,12 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
     super.cleanup()
   }
 
+}
+
+object BootstrapModule {
+  private val ActorSystemName = "System"
+  private val LoadingDialogTitle = "System Initialization"
+
+  def apply(listener: BootstrapEvent => Unit): BootstrapModule =
+    new BootstrapModule(listener)
 }
