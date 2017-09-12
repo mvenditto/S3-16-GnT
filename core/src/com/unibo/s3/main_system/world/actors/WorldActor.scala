@@ -13,8 +13,8 @@ import com.unibo.s3.main_system.world.{BodyData, Exit, Hideout}
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.util.Box2dImplicits._
 import net.dermetfan.gdx.physics.box2d.WorldObserver
-
 import scala.util.Try
+
 
 case class RayCastCollidesQuery(ray: Ray[Vector2])
 case class RayCastCollidesResponse(collides: Boolean)
