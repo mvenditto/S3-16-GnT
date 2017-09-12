@@ -25,6 +25,12 @@
       "version": 0.1
     },
 
+    "QuadTree + FoV Test": {
+      "desc":"",
+      "class":"QuadTreeTest",
+      "version": 0.1
+    },
+
     "SightLineTest": {
       "desc":"",
       "class":"TestObjectOnSightLine",
