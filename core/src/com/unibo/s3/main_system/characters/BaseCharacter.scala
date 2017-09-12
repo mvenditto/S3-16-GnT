@@ -19,7 +19,17 @@ trait Character{
   //refresh neighbours
 
   //get info
+  def setGraph(g: UndirectedGraph[Vector2, DefaultEdge]): Unit
 
+  def addNeighbour(neighbour: ActorRef): Unit
+
+  def isNeighbour(possibleNeighbour : ActorRef) : Boolean
+
+  def getInformation: List[Vector2]
+
+  def updateGraph(colleagueList: List[Vector2]): Unit
+
+  def getSightLineLength : Float
 }
 
 class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector2) with Character{
@@ -60,8 +70,6 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
     this.nNeighbours += 1
   }
 
-  def refreshNeighbours() : Unit = this.neighbours = List()
-
   def isNeighbour(possibleNeighbour : ActorRef) : Boolean = neighbours.contains(possibleNeighbour)
 
   def getInformation: List[Vector2] = this.visited
@@ -82,6 +90,7 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
     this.setComplexSteeringBehavior.avoidCollisionsWithWorld.arriveTo(new CustomLocation(destination)).buildPriority(true)
   }
 
+  private def refreshNeighbours() : Unit = this.neighbours = List()
 
   private def computeInitialNearestNode = {
     var nearest = None: Option[Vector2]
@@ -122,16 +131,12 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
     this.visited :+= nearest.get
   }
 
-  private def log = "Agent " + id + ": "
+  private def getCurrentNode: Option[Vector2] = currentNode
 
-
-  def getCurrentNode: Option[Vector2] = currentNode
-
-  def getNeighbours: List[ActorRef] = neighbours
-
+  private def getNeighbours: List[ActorRef] = neighbours
 
   def chooseBehaviour(): Unit = {
-    this.currentNode = computeNearest
+    this.currentNode = computeNearestVertex
     System.out.println("Choose behaviour, current: " + currentNode.get + " | previous: " + previousNode.get +" | destination: " + currentDestination.get)
     if (currentNode == currentDestination) {
       System.out.println()
@@ -146,12 +151,10 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
     //ora scelgo destinazione casuale tra i vicini, potenzialmente torno indietro
   }
 
-  //should be private
-  def computeNeighbours: util.List[Vector2] = index.neighborListOf(currentNode.get)
-
+  private def computeNeighbours: util.List[Vector2] = index.neighborListOf(currentNode.get)
 
   //computo il mio nodo di riferimento
-  def computeNearest: Option[Vector2] = {
+  private def computeNearestVertex: Option[Vector2] = {
     var nearest = currentNode
     var minDistance = getPosition.dst2(new Vector2(nearest.get.x, nearest.get.y))
     val list = computeNeighbours
@@ -180,9 +183,9 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
     nearest
   }
 
+  private def getCurrentDestination: Vector2 = currentDestination.getOrElse(new Vector2())
 
-  def getCurrentDestination: Vector2 = currentDestination.getOrElse(new Vector2())
-
+  private def log = "Agent " + id + ": "
 }
 
 class Guard(vector2: Vector2, id : Int) extends BaseCharacter(vector2, id){

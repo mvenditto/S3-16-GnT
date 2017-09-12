@@ -203,7 +203,7 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
         }
         return false;
     }
-
+/**todo verifica no muro davanti a porta**/
     private Vector2 generateExit(){
         int wallWithDoor = new Random().nextInt(4);
         int y = 0;

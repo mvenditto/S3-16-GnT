@@ -44,7 +44,7 @@ public class CharacterTest {
         //character.computeNearest();
     }
 
-    @Test
+ /*   @Test
     public void testCharacter(){
         System.out.println("Initial position: " + character.getPosition());
         System.out.println("Graph: " + testGraph.toString());
@@ -103,7 +103,7 @@ public class CharacterTest {
     //    assertEquals(character.getInformations(), Arrays.asList(v1, v2, v5));
       //  assertEquals(secondCharacter.getInformations(), Arrays.asList(v5, v2, v1));
     }
-    /**todo correggi test con util.list**/
+
 
     @Test
     public void testNeighbours(){
@@ -135,5 +135,6 @@ public class CharacterTest {
             assertTrue(character.computeNeighbours().contains(character.getCurrentDestination()));
         }
     }
-
+*/
+    /**todo correggi test con util.list**/
 }
