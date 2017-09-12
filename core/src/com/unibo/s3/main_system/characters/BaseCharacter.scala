@@ -3,8 +3,10 @@ package com.unibo.s3.main_system.characters
 import java.util
 
 import akka.actor.ActorRef
+import com.badlogic.gdx.ai.steer.Steerable
+import com.badlogic.gdx.ai.steer.proximities.FieldOfViewProximity
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.unibo.s3.main_system.characters.steer.{BaseMovableEntity, CustomLocation}
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.alg.NeighborIndex
@@ -37,6 +39,35 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
   private var visited = List[Vector2]()
   private var index : NeighborIndex[Vector2,DefaultEdge] = _
   private var currentDestination : Option[Vector2] = None
+
+  /*fov stuff*/
+  private val fovAngle = 120f //degrees
+  private val fovRadius = 5f
+  private var coneOfView: FieldOfViewProximity[Vector2] = _
+
+  /*init fov*/
+  coneOfView  = new FieldOfViewProximity[Vector2](
+    this, null, fovRadius, MathUtils.degreesToRadians * fovAngle)
+
+  /*
+  usage:
+   import com.unibo.s3.main_system.util.GdxImplicits._ //for ..gdx.utils.Array -> Iterable[T]
+
+   /*not filtered neighbors received from QuadTree*/
+   val a: List[Steerable[Vector2]]().asGdxArray = ???
+   // or
+   val a2: com.badlogic.gdx.utils.Array[Steerable[Vector2]] = ???
+
+   coneOfView.setAgents(a) //or a2
+   val neighborsInFov = List[Steerable[Vector2]]()
+
+   coneOfView.findNeighbors(new Proximity.ProximityCallback[Vector2] {
+     override def reportNeighbor(n: Steerable[Vector2]): Boolean = {
+       neighborsInFov :+= n
+       true
+      }
+   })
+  */
 
 
   def getId: Int = id
@@ -74,12 +105,10 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
     if (nNeighbours == 0) chooseBehaviour()
   }
 
-
   private def setNewDestination(destination: Vector2) = { //setta destinazione
     println(log + "Going to " + destination)
     this.setComplexSteeringBehavior.avoidCollisionsWithWorld.arriveTo(new CustomLocation(destination)).buildPriority(true)
   }
-
 
   private def computeInitialNearestNode = {
     var nearest = None: Option[Vector2]
@@ -122,11 +151,9 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
 
   private def log = "Agent " + id + ": "
 
-
   def getCurrentNode: Option[Vector2] = currentNode
 
   def getNeighbours: List[ActorRef] = neighbours
-
 
   def chooseBehaviour(): Unit = {
     this.currentNode = computeNearest
