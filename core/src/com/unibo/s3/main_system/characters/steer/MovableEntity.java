@@ -38,6 +38,9 @@ public interface MovableEntity<T extends Vector<T>> extends SteeringEntity<T>{
      * @return An Array of {@link Ray},
      * used by the {@link RaycastCollisionDetector} used by this entity, if present.
      */
+
+    Boolean hasCollisionDetector();
+
     Ray<T>[] getRays();
 
     Color getColor();
