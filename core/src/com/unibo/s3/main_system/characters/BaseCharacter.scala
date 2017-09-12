@@ -14,16 +14,22 @@ import scala.util.Random
 
 trait Character{
 
+  /**initial graph setting*/
   def setGraph(g: UndirectedGraph[Vector2, DefaultEdge]): Unit
 
+  /**adding a character to neighbours*/
   def addNeighbour(neighbour: ActorRef): Unit
 
+  /**verify il a character is already neighbour (maybe not public)*/
   def isNeighbour(possibleNeighbour : ActorRef) : Boolean
 
+  /**getting character infos (maybe guard exclusive)*/
   def getInformation: List[Vector2]
 
+  /**graph update (maybe guard exclusive)*/
   def updateGraph(colleagueList: List[Vector2]): Unit
 
+  /**getting sight line lenght (maybe thief exclusive)*/
   def getSightLineLength : Float
 }
 
