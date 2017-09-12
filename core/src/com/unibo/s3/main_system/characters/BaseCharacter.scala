@@ -14,11 +14,6 @@ import scala.util.Random
 
 trait Character{
 
-  //add neighbours
-
-  //refresh neighbours
-
-  //get info
   def setGraph(g: UndirectedGraph[Vector2, DefaultEdge]): Unit
 
   def addNeighbour(neighbour: ActorRef): Unit
@@ -32,17 +27,17 @@ trait Character{
   def getSightLineLength : Float
 }
 
-class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector2) with Character{
+abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector2) with Character{
 
   private var color : Color = _
 
-  private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _ //char
+  private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _
 
-  private var nNeighbours = 0 //guard
+  private var nNeighbours = 0
 
   private var currentNode : Option[Vector2] = Option[Vector2](new Vector2())
   private var previousNode : Option[Vector2] = Option[Vector2](new Vector2()) /**Nodo precedente**/
-  private var neighbours = List[ActorRef]() //char?
+  private var neighbours = List[ActorRef]()
 
   private var visited = List[Vector2]()
   private var index : NeighborIndex[Vector2,DefaultEdge] = _
@@ -188,10 +183,18 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
   private def log = "Agent " + id + ": "
 }
 
-class Guard(vector2: Vector2, id : Int) extends BaseCharacter(vector2, id){
+object Guard {
+  def apply(vector2: Vector2, id: Int): Guard = new Guard(vector2, id)
 
+  case class Guard(vector2: Vector2, id : Int) extends BaseCharacter(vector2, id){
+
+  }
 }
 
-class Thief(vector2: Vector2, id : Int) extends BaseCharacter(vector2, id){
+object Thief {
+  def apply(vector2: Vector2, id: Int): Thief = new Thief(vector2, id)
 
+  case class Thief(vector2: Vector2, id : Int) extends BaseCharacter(vector2, id){
+
+  }
 }

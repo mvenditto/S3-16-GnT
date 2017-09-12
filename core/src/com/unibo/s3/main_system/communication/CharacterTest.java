@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 public class CharacterTest {
-    private BaseCharacter character = new BaseCharacter(new Vector2(1,1), 0);
+   /* private BaseCharacter character = new BaseCharacter(new Vector2(1,1), 0);
     private UndirectedGraph<Vector2, DefaultEdge> testGraph = new SimpleGraph<>(DefaultEdge.class);
     private Vector2 v1 = new Vector2(3f,3f);
     private Vector2 v2 = new Vector2(7f,3f);
