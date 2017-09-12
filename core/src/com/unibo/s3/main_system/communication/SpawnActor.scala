@@ -15,11 +15,11 @@ class SpawnActor extends UntypedAbstractActor {
   override def onReceive(message: Any): Unit = message match {
     case msg: MapSettingsMsg =>
       this.map = Array.ofDim[Int](msg.width, msg.height)
-      this.wall_thickness = 3
 
     case msg: MapElementMsg =>
       val lineElements = msg.line.split(":").map(_.toFloat)
       if (lineElements.forall(value => value != 0.0 && value != this.map.length*this.wall_thickness+this.wall_thickness)) {
+        this.wall_thickness = lineElements(2).toInt
         val x = lineElements(0).toInt
         val y = lineElements(1).toInt
         def translation(start: Int): Int = {
