@@ -11,17 +11,19 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
 
     public static final int BASE_UNIT = 2;
     private static final float HALF_BASE_UNIT = BASE_UNIT/2;
-   // private static final int MAP_WIDTH = 60;
-   // private static final int MAP_HEIGHT = 60;
+    private static final int LEFT_WALL = 0;
+    private static final int RIGHT_WALL = 1;
+    private static final int LOWER_WALL = 2;
+    private static final int UPPER_WALL = 3;
 
     private int widthSplits;// = (int) (MAP_WIDTH / BASE_UNIT);
     private int heightSplits;// = (int) (MAP_HEIGHT / BASE_UNIT);
-    private boolean perimeterGenerated = false;
+    private boolean stringMapGenerated = false;
     private static final String END_OF_FILE = "0.0:0.0:0.0:0.0";
     private static final String SEPARATOR = ":";
 
     private int[][] generatedMap;// = new int[widthSplits][heightSplits];
-
+    private List<String> map = new ArrayList<>();
 
     public void initialSetup(int width, int height){
         this.widthSplits = width;
@@ -32,7 +34,13 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
     }
 
     public List<String> getMap(){
-        ArrayList<String> map = new ArrayList<>();
+        if(!stringMapGenerated){
+            buildStringMap();
+        }
+        return map;
+    }
+
+    private void buildStringMap(){
         for(int i = 0; i < widthSplits; i++){
             for (int j = 0; j < heightSplits; j++){
                 if(generatedMap[i][j] == 1){
@@ -40,38 +48,24 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
                 }
             }
         }
-        if(!perimeterGenerated){
-            map.addAll(generatePerimeterWalls());
-        }
+        map.addAll(generatePerimeterWalls());
         map.add(END_OF_FILE);
-        return map;
+        this.stringMapGenerated = true;
     }
 
     private ArrayList<String> generatePerimeterWalls(){
-        perimeterGenerated = true;
         ArrayList<String> perimeter = new ArrayList<>();
-        //perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((heightSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * heightSplits + BASE_UNIT));
-        perimeter.add(((widthSplits * BASE_UNIT) + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + ((heightSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + (BASE_UNIT * heightSplits + BASE_UNIT));
+        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((heightSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * heightSplits + BASE_UNIT * 2));
+        perimeter.add(((widthSplits * BASE_UNIT) + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + ((heightSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + (BASE_UNIT * heightSplits + BASE_UNIT * 2));
         perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + HALF_BASE_UNIT + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
         perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + (heightSplits * BASE_UNIT + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
 
-        //float doorCoord = generateExit().y;
-        float doorCoord = 10;
-
-        double firstSplit = 5;
-        //double firstSplit = doorCoord/2;
-
-        double secondSplit = 20.5;
-        //double secondSplit = (heightSplits - doorCoord)/2 + 0.5;
-
-
+        Vector2 exit = generateExit();
         System.out.println("DOOR:");
-        System.out.println("coord: " + doorCoord);
-        System.out.println("under: " + firstSplit);
-        System.out.println("over: " + secondSplit);
-        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((firstSplit * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * 5 * 2));
-        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((doorCoord * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT) + SEPARATOR + "E");
-        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((secondSplit * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT* 20));
+        System.out.println("coord: " + exit.x + " " + exit.y);
+        //perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((firstSplit * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * 5 * 2));
+        perimeter.add(((exit.x * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + ((exit.y * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT) + SEPARATOR + "E");
+        //perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((secondSplit * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT* 20));
 
         return perimeter;
     }
@@ -211,12 +205,46 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
     }
 
     private Vector2 generateExit(){
+        int wallWithDoor = new Random().nextInt(4);
+        int y = 0;
         int x = 0;
-        int y = generateInRange(1, heightSplits);
-        if(generatedMap[1][y] == 1){
-            System.out.println("La porta non va bene");
+        switch (wallWithDoor){
+            case LEFT_WALL:
+                y = generateInRange(1, heightSplits - 1);
+                if(generatedMap[0][y] == 1){
+                    System.out.println("La porta non va bene");
+                }
+                y += BASE_UNIT;
+                break;
+            case RIGHT_WALL:
+                y = generateInRange(1, heightSplits - 1);
+                x = widthSplits - 1;
+                if(generatedMap[x][y] == 1){
+                    System.out.println("La porta non va bene");
+                }
+                x += BASE_UNIT;
+                y += BASE_UNIT;
+                break;
+            case UPPER_WALL:
+                x = generateInRange(1, widthSplits - 1);
+                y = heightSplits - 1;
+                if(generatedMap[x][y] == 1){
+                    System.out.println("La porta non va bene");
+                }
+                x += BASE_UNIT;
+                y += BASE_UNIT;
+                break;
+            case LOWER_WALL:
+                x = generateInRange(1, widthSplits - 1);
+                if(generatedMap[x][0] == 1){
+                    System.out.println("La porta non va bene");
+                }
+                x += BASE_UNIT;
+                break;
+            default:
+                break;
         }
-        System.out.println("Door: " + x + "," +y);
+        System.out.println("Door: " + wallWithDoor + " " + x + "," +y);
         return new Vector2(x, y);
     }
 

@@ -38,6 +38,7 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
   private var index : NeighborIndex[Vector2,DefaultEdge] = _
   private var currentDestination : Option[Vector2] = None
 
+  private val sightLineLength : Float = 15
 
   def getId: Int = id
 
@@ -74,6 +75,7 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
     if (nNeighbours == 0) chooseBehaviour()
   }
 
+  def getSightLineLength : Float = this.sightLineLength
 
   private def setNewDestination(destination: Vector2) = { //setta destinazione
     println(log + "Going to " + destination)
@@ -180,5 +182,13 @@ class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector
 
 
   def getCurrentDestination: Vector2 = currentDestination.getOrElse(new Vector2())
+
+}
+
+class Guard(vector2: Vector2, id : Int) extends BaseCharacter(vector2, id){
+
+}
+
+class Thief(vector2: Vector2, id : Int) extends BaseCharacter(vector2, id){
 
 }
