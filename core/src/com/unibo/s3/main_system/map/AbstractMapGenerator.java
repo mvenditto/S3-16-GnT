@@ -210,42 +210,42 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
         int x = 0;
         switch (wallWithDoor){
             case LEFT_WALL:
-                y = generateInRange(1, heightSplits - 1);
-                if(generatedMap[0][y] == 1){
+                do{
+                    y = generateInRange(1, heightSplits - 1);
                     System.out.println("La porta non va bene");
-                }
-                y += BASE_UNIT;
+                }while(generatedMap[0][y] == 1);
+                y += HALF_BASE_UNIT;
                 break;
             case RIGHT_WALL:
-                y = generateInRange(1, heightSplits - 1);
-                x = widthSplits - 1;
-                if(generatedMap[x][y] == 1){
+                do {
+                    y = generateInRange(1, heightSplits - 1);
+                    x = widthSplits - 1;
                     System.out.println("La porta non va bene");
-                }
+                }while(generatedMap[x][y] == 1);
                 x += BASE_UNIT;
-                y += BASE_UNIT;
+                y += HALF_BASE_UNIT;
                 break;
             case UPPER_WALL:
-                x = generateInRange(1, widthSplits - 1);
-                y = heightSplits - 1;
-                if(generatedMap[x][y] == 1){
+                do {
+                    x = generateInRange(1, widthSplits - 1);
+                    y = heightSplits - 1;
                     System.out.println("La porta non va bene");
-                }
-                x += BASE_UNIT;
+                }while(generatedMap[x][y] == 1);
+                x += HALF_BASE_UNIT;
                 y += BASE_UNIT;
                 break;
             case LOWER_WALL:
-                x = generateInRange(1, widthSplits - 1);
-                if(generatedMap[x][0] == 1){
+                do {
+                    x = generateInRange(1, widthSplits - 1);
                     System.out.println("La porta non va bene");
-                }
-                x += BASE_UNIT;
+                }while(generatedMap[x][0] == 1);
+                x += HALF_BASE_UNIT;
                 break;
             default:
                 break;
         }
         System.out.println("Door: " + wallWithDoor + " " + x + "," +y);
-        return new Vector2(x, y);
+        return new Vector2(x,y);
     }
 
 }
