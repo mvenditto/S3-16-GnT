@@ -113,15 +113,15 @@ class LightingSystemModule extends BasicModuleWithGui {
       characters.foreach(c => {
         val angle = (c.getOrientation * MathUtils.radiansToDegrees) + 90
         val id = c.getId
-
+        val lv = c.getLinearVelocity.cpy().nor().scl(1.0f).add(c.getPosition)
         if (torches.contains(id)) {
           val t = torches(id)
-          t.setPosition(c.getPosition)
+          t.setPosition(lv)
           t.setDirection(angle)
         } else {
           torches(id) = new ConeLight(
             rayHandler, TorchRaysNum, BrightWhiteColor, TorchDistance,
-            c.getPosition.x, c.getPosition.y, angle, TorchDegrees)
+            lv.x, lv.y, angle, TorchDegrees)
         }
       })
     }
@@ -173,7 +173,7 @@ class LightingSystemModule extends BasicModuleWithGui {
 }
 
 object LightingSystemModule {
-  private val WhiteAmbientLightColor = new Color(.1f, .1f, .1f, .1f)
+  private val WhiteAmbientLightColor = new Color(.2f, .2f, .2f, .2f)
   private val BrightWhiteColor = new Color(1.0f, 1.0f, 1.0f, 1.0f)
 
   private val TorchRaysNum = 64
