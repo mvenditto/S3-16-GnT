@@ -18,9 +18,9 @@
       "version": 1.0
     },
 
-    "Wall Trap Test": {
-      "desc":"Test agent movement near/overlapping trajectory to wall edge.",
-      "class":"WallTrapTest",
+    "Map rooms identify": {
+      "desc":"",
+      "class":"TestMapRoomIdentify",
       "version": 0.1
     }
   },

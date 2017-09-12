@@ -21,12 +21,12 @@ import scala.collection.JavaConversions._
 class LightingSystemTest extends EntitySystemModule {
 
 
-  private var rayHandler: RayHandler = _
+  protected var rayHandler: RayHandler = _
   private var cam: OrthographicCamera = _
   private var torches = List[ConeLight]()
-  private var lights = List[PointLight]()
+  protected var lights = List[PointLight]()
 
-  private val LIGHT_WHITE = new Color(1.0f, 1.0f, 1.0f, 1.0f)
+  protected val LIGHT_WHITE = new Color(1.0f, 1.0f, 1.0f, 1.0f)
   private var lightEditorEnabled = false
   private var renderLightsAfterBodies = true
 

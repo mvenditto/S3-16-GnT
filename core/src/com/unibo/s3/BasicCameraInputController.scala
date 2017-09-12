@@ -34,3 +34,11 @@ class BasicCameraInputController(
     if (isPressed(keymap.up)) cam.translate(0, translationSpeed, 0)
   }
 }
+
+object BasicCameraInputController {
+  def apply(cam: OrthographicCamera,
+    translationSpeed: Float, zoomSpeed: Float,
+    minZoom: Float = 1.5f, maxZoom: Float = 50f,
+    keymap: CameraInputControllerKeymap): BasicCameraInputController =
+    new BasicCameraInputController(cam, translationSpeed, zoomSpeed, minZoom, maxZoom, keymap)
+}
