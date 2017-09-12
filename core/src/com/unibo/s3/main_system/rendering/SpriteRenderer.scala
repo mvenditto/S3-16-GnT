@@ -1,6 +1,7 @@
 package com.unibo.s3.main_system.rendering
 
-import com.badlogic.gdx.graphics.{Camera, Color}
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.{Camera, Color, Texture}
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode
 import com.badlogic.gdx.graphics.g2d._
 import com.badlogic.gdx.math.{MathUtils, Vector2}
@@ -40,6 +41,20 @@ class SpriteRenderer {
     batch.begin()
     getSpriteFor(c, feet).draw(batch)
     getSpriteFor(c, body).draw(batch)
+    batch.end()
+  }
+
+  def renderFloor(w: Float, h: Float, cam: Camera): Unit = {
+    val f = new Texture(Gdx.files.internal("sprites/floor3.png"))
+    val iw = f.getWidth
+    val ih = f.getHeight
+    val s = ScaleUtils.getPixelsPerMeter
+    f.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
+    val tr = new TextureRegion(f)
+    tr.setRegion(0, 0, (w * s) / iw, (h * s) / ih)
+    batch.setProjectionMatrix(cam.combined)
+    batch.begin()
+    batch.draw(tr, 0, 0)
     batch.end()
   }
 

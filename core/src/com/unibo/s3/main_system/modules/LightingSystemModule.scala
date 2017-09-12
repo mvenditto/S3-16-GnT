@@ -41,6 +41,7 @@ class LightingSystemModule extends BasicModuleWithGui {
   private[this] val torches = mutable.Map[Int, ConeLight]()
   private[this] var charactersUpdate: Option[Iterable[BaseCharacter]] = None
   private[this] var worldShadowCopy: World = _
+  private[this] var ambientLightIntensity = 0.2f
 
   private class LightingActor extends UntypedAbstractActor {
     override def onReceive(msg: Any): Unit = msg match {
@@ -144,9 +145,16 @@ class LightingSystemModule extends BasicModuleWithGui {
       val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
       mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
       new PointLight(
-        rayHandler, PointLightRaysNum, BrightWhiteColor,
+        rayHandler, PointLightRaysNum, SoftWhiteColor,
         PointLightRadius, mouseWorldPos.x, mouseWorldPos.y)
     }
+    false
+  }
+
+  override def scrolled(amount: Int): Boolean = {
+    ambientLightIntensity = keepInRange(ambientLightIntensity + (0.1f * amount), 0.0f, 1.0f)
+    val al = ambientLightIntensity
+    rayHandler.setAmbientLight(al, al, al, al)
     false
   }
 
@@ -175,6 +183,7 @@ class LightingSystemModule extends BasicModuleWithGui {
 object LightingSystemModule {
   private val WhiteAmbientLightColor = new Color(.2f, .2f, .2f, .2f)
   private val BrightWhiteColor = new Color(1.0f, 1.0f, 1.0f, 1.0f)
+  private val SoftWhiteColor = new Color(1.0f, 1.0f, 1.0f, 0.7f)
 
   private val TorchRaysNum = 64
   private val TorchDistance = 15f
@@ -205,7 +214,7 @@ object LightingSystemModule {
       p.getBoolean(EnableShadows, true),
       keepInRange(p.getFloat(LightQualityModifier, 0.25f), 0.25f, 4f),
       keepInRange(p.getInteger(BlurLevel, 2).toFloat, 1f, 4f).toInt,
-      keepInRange(p.getInteger(BlendingFunction, 2).toFloat, 0f, 3f).toInt
+      keepInRange(p.getInteger(BlendingFunction, 1).toFloat, 0f, 3f).toInt
     )
   }
 }

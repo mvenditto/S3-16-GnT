@@ -116,6 +116,9 @@ class MasterModule extends BasicModuleWithGui {
 
   override def render(shapeRenderer: ShapeRenderer): Unit = {
     super.render(shapeRenderer)
+
+    spriteRenderer.renderFloor(64, 64, owner.getCamera)
+
     graph.foreach(g =>
       renderer.renderGraph(shapeRenderer, g, DefaultGraphRenderingConfig))
 
@@ -147,7 +150,7 @@ class MasterModule extends BasicModuleWithGui {
 }
 
 object MasterModule {
-  private val DefaultGraphRenderingConfig = GraphRenderingConfig(GREEN, YELLOW, 0.5f)
+  private val DefaultGraphRenderingConfig = GraphRenderingConfig(GREEN, BLUE, 0.5f)
   private val MapFilePath = "maps/map.txt"
 
   def apply: MasterModule = new MasterModule()

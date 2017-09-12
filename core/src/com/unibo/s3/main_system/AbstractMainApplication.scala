@@ -49,7 +49,7 @@ abstract class AbstractMainApplication extends ApplicationAdapter with InputProc
   override def render(): Unit = { //handleCameraInput();
     camController.handleInput()
     cam.update()
-    Gdx.graphics.setTitle("camera@" + cam.position + "(" + cam.zoom + ")")
+    Gdx.graphics.setTitle("camera@" + cam.position + "(" + cam.zoom + ") - FPS -" + Gdx.graphics.getFramesPerSecond)
 
     /*clear screen & opengl buffers*/
     Gdx.gl.glClearColor(0.25f, 0.25f, 0.25f, 0.8f)
