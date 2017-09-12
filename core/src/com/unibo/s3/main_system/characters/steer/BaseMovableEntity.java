@@ -126,6 +126,11 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
     }
 
     @Override
+    public Boolean hasCollisionDetector() {
+        return rayConfiguration != null;
+    }
+
+    @Override
     public void setCollisionDetector(RaycastCollisionDetector<Vector2> raycastCollisionDetector) {
 
         rayConfiguration = new CentralRayWithWhiskersConfiguration<>(this,

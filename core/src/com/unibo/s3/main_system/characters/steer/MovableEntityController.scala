@@ -40,7 +40,7 @@ class MovableEntityController (
 
     val t = new CustomLocation(keyboard)
     val csb = entity.setComplexSteeringBehavior()
-      .avoidCollisionsWithWorld()
+    if (entity.hasCollisionDetector) csb.avoidCollisionsWithWorld()
 
     if (!controls.values.forall(_ == false)) csb.seek(t) else csb.arriveTo(t)
 

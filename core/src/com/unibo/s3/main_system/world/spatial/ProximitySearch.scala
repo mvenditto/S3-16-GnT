@@ -23,6 +23,8 @@ class QuadTreeNode[T <: Steerable[Vector2]](bounds: Bounds){
   private var se: QuadTreeNode[T] = _
   private var sw: QuadTreeNode[T] = _
 
+  def getBounds: Bounds = bounds
+
   private def split(): Unit = {
 
     val hw = bounds.w / 2
