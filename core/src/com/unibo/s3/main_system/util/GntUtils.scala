@@ -17,11 +17,8 @@ object GntUtils {
       if (e.indices.contains(4)) Option(e(4)) else None)
   }
 
-
-  def parseMap(map: String): Iterable[MapEntry] = {
-    map.split(newline)
-      .map(b => parseMapEntry(b))
-  }
+  def parseMap(map: String): Iterable[MapEntry] =
+    map.split(newline).map(b => parseMapEntry(b))
 
   def parseMapToRectangles(map: String): Iterable[Rectangle] =
     parseMap(map)
