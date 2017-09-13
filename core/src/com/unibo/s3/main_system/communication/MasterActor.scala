@@ -27,41 +27,46 @@ class MasterActor extends UntypedAbstractActor with Stash {
       //manca il ladro o i ladri
 
     case msg: CreateCharacterMsg =>
-      var newCharacter: BaseCharacter = null
-      if(msg.characterType.equals(CharacterActors.GUARD)) {
-        guardID = guardID + 1
-        newCharacter = entitiesSystem.spawnEntityAt(msg.characterType, msg.position, guardID)
-      } else {
-        thiefID = thiefID + 1
-        newCharacter = entitiesSystem.spawnEntityAt(msg.characterType, msg.position, thiefID)
+
+      def createCharacter(msg: CreateCharacterMsg): Unit = msg.characterType match {
+        case CharacterActors.GUARD =>
+          guardID = guardID + 1
+          val newCharacter = entitiesSystem.spawnEntityAt(msg.characterType, msg.position, guardID).asInstanceOf[Guard]
+          newCharacter.setColor(Color.BLUE)
+          val characterRef = SystemManager.createCharacterActor(
+            GuardActor.props(newCharacter), CharacterActors.GUARD, guardID)
+          characterSettings(newCharacter, characterRef)
+        case CharacterActors.THIEF =>
+          thiefID = thiefID + 1
+          val newCharacter = entitiesSystem.spawnEntityAt(msg.characterType, msg.position, thiefID).asInstanceOf[Thief]
+          newCharacter.setColor(Color.RED)
+          val characterRef = SystemManager.createCharacterActor(
+            ThiefActor.props(newCharacter), CharacterActors.THIEF, thiefID)
+          characterSettings(newCharacter, characterRef)
       }
-      newCharacter.setColor(Color.ORANGE)
 
-      if (collisionDetector == null) {
-        val worldActorRef = SystemManager.getLocalGeneralActor(GeneralActors.WORLD_ACTOR)
-        collisionDetector = new Box2dProxyDetectorsFactory(worldActorRef).newRaycastCollisionDetector()
+      def characterSettings(newCharacter: BaseCharacter, characterRef: ActorRef): Unit = {
+        if (collisionDetector == null) {
+          val worldActorRef = SystemManager.getLocalGeneralActor(GeneralActors.WORLD_ACTOR)
+          collisionDetector = new Box2dProxyDetectorsFactory(worldActorRef).newRaycastCollisionDetector()
+        }
+
+        newCharacter.setCollisionDetector(collisionDetector)
+        newCharacter
+          .setComplexSteeringBehavior()
+          .avoidCollisionsWithWorld()
+          .wander()
+          .buildPriority(true)
+
+        charactersList :+= characterRef
+
+        SystemManager.getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR)
+          .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
+        SystemManager.getLocalGeneralActor(GeneralActors.GRAPH_ACTOR)
+          .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
       }
 
-      newCharacter.setCollisionDetector(collisionDetector)
-      newCharacter
-        .setComplexSteeringBehavior()
-        .avoidCollisionsWithWorld()
-        .wander()
-        .buildPriority(true)
-
-      var characterRef: ActorRef = null
-      if(msg.characterType.equals(CharacterActors.GUARD))
-        characterRef = SystemManager.createCharacterActor(
-          GuardActor.props(newCharacter.asInstanceOf[Guard]), CharacterActors.GUARD, guardID)
-      else
-        characterRef = SystemManager.createCharacterActor(
-          ThiefActor.props(newCharacter.asInstanceOf[Thief]), CharacterActors.THIEF, thiefID)
-      charactersList :+= characterRef
-      SystemManager.getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR)
-        .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
-      SystemManager.getLocalGeneralActor(GeneralActors.GRAPH_ACTOR)
-        .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
-
+      createCharacter(msg)
     case _ => println("(masterActor) message unknown: " + message)
   }
 }
