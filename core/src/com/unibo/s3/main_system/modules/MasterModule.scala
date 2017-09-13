@@ -5,15 +5,15 @@ import com.badlogic.gdx.graphics.Color._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.{Gdx, InputMultiplexer}
+import com.badlogic.gdx.{Gdx, Input, InputMultiplexer}
 import com.kotcrab.vis.ui.widget.{BusyBar, VisWindow}
 import com.unibo.s3.Main
 import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.communication.Messages._
-import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
+import com.unibo.s3.main_system.communication.{CharacterActors, GeneralActors, SystemManager}
 import com.unibo.s3.main_system.game.GameSettings
 import com.unibo.s3.main_system.graph.GraphAdapter
-import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig, SpriteRenderer}
+import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig}
 import com.unibo.s3.main_system.util.ImplicitConversions._
 import com.unibo.s3.main_system.util.{GntUtils, ScaleUtils}
 
@@ -152,6 +152,13 @@ class MasterModule extends BasicModuleWithGui {
       mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
       SystemManager.getLocalGeneralActor(GeneralActors.SPAWN_ACTOR) ! GenerateNewCharacterPositionMsg()
       //masterActor ! CreateCharacterMsg(mouseWorldPos)
+    }
+    false
+  }
+
+  override def keyUp(keycode: Int): Boolean = {
+    if(keycode == Input.Keys.T) {
+      masterActor ! CreateCharacterMsg(new Vector2(32, 32), CharacterActors.THIEF)
     }
     false
   }
