@@ -7,6 +7,7 @@ import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
 object Messages {
+  type CharacterActors = CharacterActors.Value
   //message for synchronize
   case class ActMsg(dt: Float)
 
@@ -29,9 +30,9 @@ object Messages {
 
   //message for MasterActor
   case class RebuildQuadTreeMsg()
-  case class CreateCharacterMsg(position: Vector2, characterType: CharacterActors.Value)
+  case class CreateCharacterMsg(position: Vector2, characterType: CharacterActors)
   case class InitialSavingCharacterMsg(newCharacter: BaseCharacter, characterRef: ActorRef)
 
   //message for SpawnActor
-  case class GenerateNewCharacterPositionMsg() //forse ci andrebbe indicato anche se è ladro o guardia ?
+  case class GenerateNewCharacterPositionMsg(characterType: CharacterActors)
 }

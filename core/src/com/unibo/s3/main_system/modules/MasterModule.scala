@@ -150,7 +150,7 @@ class MasterModule extends BasicModuleWithGui {
     if (button != 1){
       val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
       mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
-      SystemManager.getLocalGeneralActor(GeneralActors.SPAWN_ACTOR) ! GenerateNewCharacterPositionMsg()
+      spawnActor ! GenerateNewCharacterPositionMsg(CharacterActors.GUARD)
       //masterActor ! CreateCharacterMsg(mouseWorldPos)
     }
     false
@@ -158,7 +158,7 @@ class MasterModule extends BasicModuleWithGui {
 
   override def keyUp(keycode: Int): Boolean = {
     if(keycode == Input.Keys.T) {
-      masterActor ! CreateCharacterMsg(new Vector2(32, 32), CharacterActors.THIEF)
+      spawnActor ! GenerateNewCharacterPositionMsg(CharacterActors.THIEF)
     }
     false
   }

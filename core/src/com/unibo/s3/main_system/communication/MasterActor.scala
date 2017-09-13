@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.Guard.Guard
 import com.unibo.s3.main_system.characters.Thief.Thief
-import com.unibo.s3.main_system.characters.EntitiesSystemImpl
+import com.unibo.s3.main_system.characters.{BaseCharacter, EntitiesSystemImpl}
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory
 import com.unibo.s3.main_system.communication.Messages._
 
@@ -27,9 +27,14 @@ class MasterActor extends UntypedAbstractActor with Stash {
       //manca il ladro o i ladri
 
     case msg: CreateCharacterMsg =>
-      if(msg.characterType.equals(CharacterActors.GUARD)) guardID = guardID + 1 else thiefID = thiefID + 1
-
-      val newCharacter = entitiesSystem.spawnEntityAt(msg.characterType, msg.position, guardID)
+      var newCharacter: BaseCharacter = null
+      if(msg.characterType.equals(CharacterActors.GUARD)) {
+        guardID = guardID + 1
+        newCharacter = entitiesSystem.spawnEntityAt(msg.characterType, msg.position, guardID)
+      } else {
+        thiefID = thiefID + 1
+        newCharacter = entitiesSystem.spawnEntityAt(msg.characterType, msg.position, thiefID)
+      }
       newCharacter.setColor(Color.ORANGE)
 
       if (collisionDetector == null) {
