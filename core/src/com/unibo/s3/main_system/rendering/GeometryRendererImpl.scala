@@ -74,17 +74,23 @@ class GeometryRendererImpl extends GeometryRenderer[Vector2] {
     val scale = getPixelsPerMeter
     val vertexRadiusPixel = config.vertexRadius * scale
     val backupColor = shapeRenderer.getColor
+    val t = shapeRenderer.getCurrentType
 
+    shapeRenderer.setAutoShapeType(true)
     graph.getVertices.toIterable.foreach(v => {
       val scaledX = v.x * scale
       val scaledY = v.y * scale
+      shapeRenderer.set(ShapeType.Line)
       shapeRenderer.setColor(vertexColor)
       shapeRenderer.circle(scaledX, scaledY, vertexRadiusPixel)
       shapeRenderer.setColor(edgeColor)
-      graph.getNeighbors(v).toIterable.foreach(n =>
-        shapeRenderer.line(scaledX, scaledY, n.x * scale, n.y * scale))
+      graph.getNeighbors(v).toIterable.foreach(n => {
+        shapeRenderer.set(ShapeType.Filled)
+        shapeRenderer.rectLine(scaledX, scaledY, n.x * scale, n.y * scale, 4f)
+      })
     })
     shapeRenderer.setColor(backupColor)
+    shapeRenderer.set(t)
   }
 
   override def renderMap(shapeRenderer: ShapeRenderer , map: Iterable[Rectangle]): Unit = {
