@@ -53,6 +53,7 @@ class MasterModule extends BasicModuleWithGui {
   private[this] var graphActor: ActorRef = _
   private[this] var quadTreeActor: ActorRef = _
   private[this] var dummyReceiverActor: ActorRef = _
+  private[this] var spawnActor: ActorRef = _
 
   private[this] val renderer = GeometryRendererImpl()
   //private[this] val spriteRenderer = SpriteRenderer()
@@ -93,6 +94,7 @@ class MasterModule extends BasicModuleWithGui {
     graphActor = getActor(GeneralActors.GRAPH_ACTOR)
     dummyReceiverActor = SystemManager
       .createActor(DummyReceiverActor.props(), "graphReceiver")
+    spawnActor = getActor(GeneralActors.SPAWN_ACTOR)
 
     List(graphActor, quadTreeActor).foreach(a =>
       a ! MapSettingsMsg(w, h))
@@ -101,6 +103,8 @@ class MasterModule extends BasicModuleWithGui {
 
     mapActor ! GenerateMapMsg()
     graphActor tell(AskForGraphMsg, dummyReceiverActor)
+
+    spawnActor ! MapSettingsMsg(30, 30)
   }
 
   override def update(dt: Float): Unit = {
@@ -146,7 +150,8 @@ class MasterModule extends BasicModuleWithGui {
     if (button != 1){
       val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
       mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
-      masterActor ! CreateCharacterMsg(mouseWorldPos)
+      SystemManager.getLocalGeneralActor(GeneralActors.SPAWN_ACTOR) ! GenerateNewCharacterPositionMsg()
+      //masterActor ! CreateCharacterMsg(mouseWorldPos)
     }
     false
   }

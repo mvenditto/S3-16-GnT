@@ -18,7 +18,8 @@ public class SpawnPointGenerator {
             while(!checkAllowedPosition(map, (int) spawnQuadrant.x, (int) spawnQuadrant.y)){
                 spawnQuadrant = spawnStrategy.generateSpawnQuadrant(map.length, map[0].length);
             }
-            spawnPoints.add(spawnQuadrant);
+           // spawnPoints.add(spawnQuadrant);
+            spawnPoints.add(new Vector2(spawnQuadrant.x * 2, spawnQuadrant.y * 2));
             nSpawnPoints--;
         }
         //System.out.println("SpawnPoints " + spawnPoints);
