@@ -31,12 +31,6 @@ class SpawnActor extends UntypedAbstractActor {
         }
         this.map(translation(x))(translation(y)) = 1
       }
-      else {
-        this.map.foreach(line => {
-          line.foreach(elem => print(elem))
-          println()
-        })
-      }
 
     case _: GenerateNewCharacterPositionMsg =>
       //generare la posizione del nuovo agente
