@@ -1,6 +1,7 @@
 package com.unibo.s3.main_system.communication
 
 import akka.actor.{Props, UntypedAbstractActor}
+import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.map.{RandomSpawnPointGenerator, SpawnPointGenerator}
 import com.unibo.s3.main_system.util.GntUtils
@@ -19,17 +20,23 @@ class SpawnActor extends UntypedAbstractActor {
 
     case msg: MapElementMsg =>
       val lineElements = GntUtils.parseMapEntry(msg.line)
-      if (lineElements._1.forall(value => value != 0.0 && value != this.map.length*this.wall_thickness+this.wall_thickness)) {
+      if (lineElements._1.forall(value => value != 0.0
+        && value != (this.map.length*this.wall_thickness+2*this.wall_thickness)
+        && lineElements._2.isEmpty)) {
         this.wall_thickness = lineElements._1(2).toInt
         val x = lineElements._1(0).toInt
         val y = lineElements._1(1).toInt
+        println("msg: " + msg.line)
+        println("x: " + x)
+        println("y: " + y)
+        println("translation(x): " + translation(x))
+        println("translation(y): " + translation(y))
         def translation(start: Int): Int = {
           (start - (this.wall_thickness / 2) - this.wall_thickness) / this.wall_thickness
         }
         this.map(translation(x))(translation(y)) = 1
       }
       else {
-        println()
         this.map.foreach(line => {
           line.foreach(elem => print(elem))
           println()
@@ -38,8 +45,10 @@ class SpawnActor extends UntypedAbstractActor {
 
     case _: GenerateNewCharacterPositionMsg =>
       //generare la posizione del nuovo agente
+      val spawnPoint = this.spawnGenerator.generateSpawnPoints(this.map, 1).get(0)
       SystemManager.getLocalGeneralActor(GeneralActors.MASTER_ACTOR)
-        .tell(CreateCharacterMsg(this.spawnGenerator.generateSpawnPoints(this.map, 1).get(0)), getSelf())
+        //todo: traslazione
+        .tell(CreateCharacterMsg(new Vector2(spawnPoint.x + 2, spawnPoint.y + 2)), getSelf())
         //.tell(CreateCharacterMsg(new Vector2(3, 3)), getSelf())
 
     case _ => println("(spawnActor) message unknown:" + message)
