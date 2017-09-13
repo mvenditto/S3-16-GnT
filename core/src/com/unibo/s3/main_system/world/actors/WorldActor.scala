@@ -53,8 +53,8 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       bodiesToDelete.foreach(b => world.destroyBody(b))
       bodiesToDelete = List()
     }
-    world.step(dt, VelocityIterations, PositionIterations)
-    worldObserver.update(world, dt)
+    //world.step(dt, VelocityIterations, PositionIterations)
+    //worldObserver.update(world, dt)
   }
 
   private def getBodies: com.badlogic.gdx.utils.Array[Body] = {
@@ -107,6 +107,7 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
     case CreateBox(pos, size, bdata) =>
       val b = world.createBox(pos, size)
       bdata.foreach(bd => b.setUserData(bd))
+      worldObserver.getListener.created(b)
 
     case GetAllBodies() => sender() ! getBodies
 
@@ -127,6 +128,7 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       val newBody = world.createBox(new Vector2(body(0), body(1)), new Vector2(body(2), body(3)))
       bodyData.foreach(bodyData =>
           parseBodyData(bodyData).foreach(bd => newBody.setUserData(bd)))
+      worldObserver.getListener.created(newBody)
 
     case ResetWorld =>
       getBodies.asScalaIterable.foreach( b => bodiesToDelete :+= b)
