@@ -31,6 +31,12 @@
       "version": 0.1
     },
 
+    "Remote Akka Jar": {
+      "desc":"",
+      "class":"TestRemoteAkkaJar",
+      "version": 0.1
+    },
+
     "SightLineTest": {
       "desc":"",
       "class":"TestObjectOnSightLine",
