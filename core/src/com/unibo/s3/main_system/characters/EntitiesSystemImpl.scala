@@ -7,7 +7,8 @@ class EntitiesSystemImpl extends EntitiesSystem {
   private[this] var charactersList = List[BaseCharacter]()
 
   override def spawnEntityAt(position: Vector2, ID: Int): BaseCharacter = {
-    val newEntity = new BaseCharacter(position, ID)
+    //val newEntity = new BaseCharacter(position, ID)
+    val newEntity = Guard(position, ID)
     charactersList :+= newEntity
     newEntity
   }
