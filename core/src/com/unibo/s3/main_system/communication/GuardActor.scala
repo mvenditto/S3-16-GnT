@@ -10,7 +10,7 @@ import org.jgrapht.graph.DefaultEdge
 import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConverters._
 
-class CharacterActor(private[this] val character: BaseCharacter) extends UntypedAbstractActor {
+class GuardActor(private[this] val character: BaseCharacter) extends UntypedAbstractActor {
 
   private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _
 
@@ -50,7 +50,7 @@ class CharacterActor(private[this] val character: BaseCharacter) extends Untyped
   def log() : String = "[CHARACTER " + character.getId + "]: "
 }
 
-object CharacterActor {
-  def props(baseCharacter: BaseCharacter): Props = Props(new CharacterActor(baseCharacter))
+object GuardActor {
+  def props(baseCharacter: BaseCharacter): Props = Props(new GuardActor(baseCharacter))
 }
 

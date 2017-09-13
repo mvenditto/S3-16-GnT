@@ -40,7 +40,7 @@ class MasterActor extends UntypedAbstractActor with Stash {
         .wander()
         .buildPriority(true)
 
-      val characterRef = SystemManager.createCharacterActor(CharacterActor.props(newCharacter), CharacterActors.GUARD, copID)
+      val characterRef = SystemManager.createCharacterActor(GuardActor.props(newCharacter), CharacterActors.GUARD, copID)
       charactersList :+= characterRef
       SystemManager.getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR)
         .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
