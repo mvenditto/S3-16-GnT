@@ -42,7 +42,7 @@ class SpawnActor extends UntypedAbstractActor {
       //generare la posizione del nuovo agente
       val spawnPoint = this.spawnGenerator.generateSpawnPoints(this.map, 1).get(0)
       SystemManager.getLocalGeneralActor(GeneralActors.MASTER_ACTOR)
-        .tell(CreateCharacterMsg(new Vector2(spawnPoint.x + 2, spawnPoint.y + 2)), getSelf())
+        .tell(CreateCharacterMsg(new Vector2(spawnPoint.x + 2, spawnPoint.y + 2), CharacterActors.GUARD), getSelf())
     case _ => println("(spawnActor) message unknown:" + message)
   }
 }

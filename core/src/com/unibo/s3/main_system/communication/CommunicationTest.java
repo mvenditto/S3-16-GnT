@@ -63,9 +63,9 @@ public class CommunicationTest extends ApplicationAdapter {
             e.printStackTrace();
         }
 
-        masterActor.tell(new CreateCharacterMsg(new Vector2(3,3)), ActorRef.noSender());
-        masterActor.tell(new CreateCharacterMsg(new Vector2(2,2)), ActorRef.noSender());
-        masterActor.tell(new CreateCharacterMsg(new Vector2(6.5f,3)), ActorRef.noSender());
+        masterActor.tell(new CreateCharacterMsg(new Vector2(3,3), CharacterActors.GUARD()), ActorRef.noSender());
+        masterActor.tell(new CreateCharacterMsg(new Vector2(2,2), CharacterActors.GUARD()), ActorRef.noSender());
+        masterActor.tell(new CreateCharacterMsg(new Vector2(6.5f,3), CharacterActors.GUARD()), ActorRef.noSender());
 
         try {
             Thread.sleep(500);

@@ -2,12 +2,10 @@ package com.unibo.s3.main_system.communication
 
 import akka.actor.ActorRef
 import com.badlogic.gdx.{ApplicationAdapter, Gdx}
-import com.badlogic.gdx.graphics.{GL20, Texture}
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.World
-import com.unibo.s3.main_system.characters.BaseCharacter
-import com.unibo.s3.main_system.communication.Messages.{ActMsg, CreateCharacterMsg, SendGraphMsg, SendNeighboursMsg}
+import com.unibo.s3.main_system.communication.Messages.{ActMsg, SendGraphMsg, SendNeighboursMsg}
 import com.unibo.s3.main_system.world.actors.WorldActor
 import org.jgrapht.graph.{DefaultEdge, SimpleGraph}
 
@@ -41,9 +39,9 @@ class AgentsTest extends ApplicationAdapter{
 
     masterActor ! ActMsg(0.016f)
 
-    masterActor.tell(Messages.CreateCharacterMsg(new Vector2(1, 1)), ActorRef.noSender)
-    masterActor.tell(Messages.CreateCharacterMsg(new Vector2(1, 1)), ActorRef.noSender)
-    masterActor.tell(Messages.CreateCharacterMsg(new Vector2(1, 1)), ActorRef.noSender)
+    masterActor.tell(Messages.CreateCharacterMsg(new Vector2(1, 1), CharacterActors.GUARD), ActorRef.noSender)
+    masterActor.tell(Messages.CreateCharacterMsg(new Vector2(1, 1), CharacterActors.GUARD), ActorRef.noSender)
+    masterActor.tell(Messages.CreateCharacterMsg(new Vector2(1, 1), CharacterActors.GUARD), ActorRef.noSender)
 
     var copOne = SystemManager.getLocalCharacterActor(CharacterActors.GUARD, 1)
     var copTwo = SystemManager.getLocalCharacterActor(CharacterActors.GUARD, 2)

@@ -2,7 +2,7 @@ package com.unibo.s3.main_system.communication
 
 import akka.actor.ActorRef
 import com.badlogic.gdx.math.Vector2
-import com.unibo.s3.main_system.characters.{BaseCharacter}
+import com.unibo.s3.main_system.characters.BaseCharacter
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
@@ -29,7 +29,7 @@ object Messages {
 
   //message for MasterActor
   case class RebuildQuadTreeMsg()
-  case class CreateCharacterMsg(position: Vector2)
+  case class CreateCharacterMsg(position: Vector2, characterType: CharacterActors.Value)
   case class InitialSavingCharacterMsg(newCharacter: BaseCharacter, characterRef: ActorRef)
 
   //message for SpawnActor
