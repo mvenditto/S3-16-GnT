@@ -57,7 +57,17 @@ task afterEclipseImport(description: "Post processing after project generation",
 }
 
 shadowJar {
+    from files(sourceSets.main.output.classesDir)
+    println(sourceSets.main.output.classesDir)
+    from files(sourceSets.main.output.resourcesDir)
+    from files(project.assetsDir);
+    manifest {
+        attributes 'Implementation-Title': 'GeT',
+                'Implementation-Version': version,
+                'Main-Class': 'com.unibo.s3.desktop.TestbedLauncher'
+    }
     transform(AppendingTransformer) {
         resource = 'reference.conf'
     }
+
 }
