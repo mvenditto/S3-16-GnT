@@ -73,9 +73,9 @@ public class CommunicationTest extends ApplicationAdapter {
             e.printStackTrace();
         }
 
-        ActorRef cop1 = SystemManager.getLocalCharacterActor(CharacterActors.COP(), 1);
-        ActorRef cop2 = SystemManager.getLocalCharacterActor(CharacterActors.COP(), 2);
-        ActorRef cop3 = SystemManager.getLocalCharacterActor(CharacterActors.COP(), 3);
+        ActorRef cop1 = SystemManager.getLocalCharacterActor(CharacterActors.GUARD(), 1);
+        ActorRef cop2 = SystemManager.getLocalCharacterActor(CharacterActors.GUARD(), 2);
+        ActorRef cop3 = SystemManager.getLocalCharacterActor(CharacterActors.GUARD(), 3);
 
         cop1.tell(new Messages.SendGraphMsg(graph), ActorRef.noSender());
         cop2.tell(new Messages.SendGraphMsg(graph), ActorRef.noSender());
