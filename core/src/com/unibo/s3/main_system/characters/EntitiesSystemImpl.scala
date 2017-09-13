@@ -9,15 +9,17 @@ class EntitiesSystemImpl extends EntitiesSystem {
 
 
   override def spawnEntityAt(character: CharacterActors, position: Vector2, Id: Int): BaseCharacter = character match {
-    //val newEntity = new BaseCharacter(position, ID)
     case CharacterActors.GUARD =>
       val newEntity = Guard(position, Id)
-      charactersList :+= newEntity
-      newEntity
+      this.addAndReturn(newEntity)
     case CharacterActors.THIEF =>
       val newEntity = Thief(position, Id)
-      charactersList :+= newEntity
-      newEntity
+      this.addAndReturn(newEntity)
+  }
+
+  private def addAndReturn(elem: BaseCharacter): BaseCharacter = {
+    charactersList :+= elem
+    elem
   }
 
   override def getEntities: Iterable[BaseCharacter] = {
