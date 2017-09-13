@@ -45,7 +45,7 @@ class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor {
       println("cop: " + getSelf() + "| received graph")
       guard.setGraph(msg.graph)
 
-    case _ => //println("(characterActor) message unknown:" + message)
+    case _ => //println("(guardActor) message unknown:" + message)
   }
 
   def log() : String = "[CHARACTER " + guard.getId + "]: "
