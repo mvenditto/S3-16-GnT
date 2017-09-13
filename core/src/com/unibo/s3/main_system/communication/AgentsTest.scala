@@ -45,9 +45,9 @@ class AgentsTest extends ApplicationAdapter{
     masterActor.tell(Messages.CreateCharacterMsg(new Vector2(1, 1)), ActorRef.noSender)
     masterActor.tell(Messages.CreateCharacterMsg(new Vector2(1, 1)), ActorRef.noSender)
 
-    var copOne = SystemManager.getLocalCharacterActor(CharacterActors.COP, 1)
-    var copTwo = SystemManager.getLocalCharacterActor(CharacterActors.COP, 2)
-    var copThree = SystemManager.getLocalCharacterActor(CharacterActors.COP, 3)
+    var copOne = SystemManager.getLocalCharacterActor(CharacterActors.GUARD, 1)
+    var copTwo = SystemManager.getLocalCharacterActor(CharacterActors.GUARD, 2)
+    var copThree = SystemManager.getLocalCharacterActor(CharacterActors.GUARD, 3)
 
     copOne ! SendGraphMsg(testGraph)
     copTwo ! SendGraphMsg(testGraph)
