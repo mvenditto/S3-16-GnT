@@ -3,8 +3,10 @@ package com.unibo.s3.main_system.characters
 import java.util
 
 import akka.actor.ActorRef
+import com.badlogic.gdx.ai.steer.Steerable
+import com.badlogic.gdx.ai.steer.proximities.FieldOfViewProximity
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.unibo.s3.main_system.characters.steer.{BaseMovableEntity, CustomLocation}
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.alg.NeighborIndex
@@ -50,6 +52,35 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   private var currentDestination : Option[Vector2] = None
 
   private val sightLineLength : Float = 15
+
+  /*fov stuff*/
+  private val fovAngle = 120f //degrees
+  private val fovRadius = 5f
+  private var coneOfView: FieldOfViewProximity[Vector2] = _
+
+  /*init fov*/
+  coneOfView  = new FieldOfViewProximity[Vector2](
+    this, null, fovRadius, MathUtils.degreesToRadians * fovAngle)
+
+  /*
+  usage:
+   import com.unibo.s3.main_system.util.GdxImplicits._ //for ..gdx.utils.Array -> Iterable[T]
+
+   /*not filtered neighbors received from QuadTree*/
+   val a: List[Steerable[Vector2]]().asGdxArray = ???
+   // or
+   val a2: com.badlogic.gdx.utils.Array[Steerable[Vector2]] = ???
+
+   coneOfView.setAgents(a) //or a2
+   val neighborsInFov = List[Steerable[Vector2]]()
+
+   coneOfView.findNeighbors(new Proximity.ProximityCallback[Vector2] {
+     override def reportNeighbor(n: Steerable[Vector2]): Boolean = {
+       neighborsInFov :+= n
+       true
+      }
+   })
+  */
 
   def getId: Int = id
 
@@ -121,9 +152,9 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
     }else{
       out = Option[Vector2](scala.util.Random.shuffle(list.filter(node => !node.equals(previousNode.get))).get(0))
     }
-   // println(log + "previous/current " + previousNode + " " + currentNode)
-   // println(log + "OUT pre : " + list)
-   // println(log + "OUT post : " + list.filter(node => !node.equals(previousNode.get)))
+    // println(log + "previous/current " + previousNode + " " + currentNode)
+    // println(log + "OUT pre : " + list)
+    // println(log + "OUT post : " + list.filter(node => !node.equals(previousNode.get)))
 
     out
   }
@@ -132,21 +163,17 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
     this.visited :+= nearest.get
   }
 
-  private def getCurrentNode: Option[Vector2] = currentNode
+  def getCurrentNode: Option[Vector2] = currentNode
 
-  private def getNeighbours: List[ActorRef] = neighbours
+  def getNeighbours: List[ActorRef] = neighbours
 
   def chooseBehaviour(): Unit = {
     this.currentNode = computeNearestVertex
     System.out.println("Choose behaviour, current: " + currentNode.get + " | previous: " + previousNode.get +" | destination: " + currentDestination.get)
     if (currentNode == currentDestination) {
-      System.out.println()
-      System.out.println()
-      System.out.println()
+
       System.out.println(log + "Destination " + currentDestination + " = " + currentNode + " achieved! Choose the next one")
-      System.out.println()
-      System.out.println()
-      System.out.println()
+
       currentDestination = selectRandomDestination
     }
     //ora scelgo destinazione casuale tra i vicini, potenzialmente torno indietro
