@@ -26,11 +26,6 @@ class SpawnActor extends UntypedAbstractActor {
         this.wall_thickness = lineElements._1(2).toInt
         val x = lineElements._1(0).toInt
         val y = lineElements._1(1).toInt
-        println("msg: " + msg.line)
-        println("x: " + x)
-        println("y: " + y)
-        println("translation(x): " + translation(x))
-        println("translation(y): " + translation(y))
         def translation(start: Int): Int = {
           (start - (this.wall_thickness / 2) - this.wall_thickness) / this.wall_thickness
         }
@@ -47,10 +42,7 @@ class SpawnActor extends UntypedAbstractActor {
       //generare la posizione del nuovo agente
       val spawnPoint = this.spawnGenerator.generateSpawnPoints(this.map, 1).get(0)
       SystemManager.getLocalGeneralActor(GeneralActors.MASTER_ACTOR)
-        //todo: traslazione
         .tell(CreateCharacterMsg(new Vector2(spawnPoint.x + 2, spawnPoint.y + 2)), getSelf())
-        //.tell(CreateCharacterMsg(new Vector2(3, 3)), getSelf())
-
     case _ => println("(spawnActor) message unknown:" + message)
   }
 }
