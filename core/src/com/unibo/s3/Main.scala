@@ -10,7 +10,7 @@ import com.unibo.s3.main_system.game.GameSettings
 import com.unibo.s3.main_system.modules._
 import com.unibo.s3.main_system.util.ScaleUtils._
 
-class Main extends AbstractMainApplication {
+class Main(ipCalc: String) extends AbstractMainApplication {
   private var modules = List[BasicModule]()
   private var inputMultiplexer: InputMultiplexer = _
 
