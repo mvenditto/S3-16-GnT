@@ -100,10 +100,9 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       if (collided) {
         val cp = oc.point
         val data = world.bodiesAtPoint(cp)
-          .map(c => Try(c.getUserData.asInstanceOf[BodyData]))
-          .filter(c => c.isSuccess)
-          .map(c => c.get)
-
+          .map(b => b.getUserData)
+          .filter(b => b != null)
+          .map { case b:BodyData => b}
         sender ! ObjectOnSightLineMsg(data)
       }
 
