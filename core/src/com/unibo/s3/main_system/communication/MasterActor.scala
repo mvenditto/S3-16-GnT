@@ -63,7 +63,7 @@ class MasterActor extends UntypedAbstractActor with Stash {
         SystemManager.getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR)
           .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
         SystemManager.getLocalGeneralActor(GeneralActors.GRAPH_ACTOR)
-          .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
+          .tell(AskForGraphMsg, characterRef)
       }
 
       createCharacter(msg)
