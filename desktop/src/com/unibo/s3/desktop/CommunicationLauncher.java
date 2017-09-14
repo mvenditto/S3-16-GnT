@@ -15,7 +15,7 @@ public class CommunicationLauncher {
         config.samples = 4;
         config.vSyncEnabled = true;
         new LwjglApplication(new CommunicationTest(), config);
-        //new LwjglApplication(new AgentsTest(), config); //test sugli agenti
-        //new LwjglApplication(new GraphTest(), config); //test sugli agenti
+        new LwjglApplication(new AgentsTest(), config); //test sugli agenti
+        new LwjglApplication(new GraphTest(), config); //test sugli agenti
     }
 }

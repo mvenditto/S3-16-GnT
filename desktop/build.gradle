@@ -64,7 +64,7 @@ shadowJar {
     manifest {
         attributes 'Implementation-Title': 'GeT',
                 'Implementation-Version': version,
-                'Main-Class': 'com.unibo.s3.desktop.TestbedLauncher'
+                'Main-Class': 'com.unibo.s3.desktop.ok.ComputeLauncher'
     }
     transform(AppendingTransformer) {
         resource = 'reference.conf'

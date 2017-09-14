@@ -8,6 +8,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory;
 import com.unibo.s3.main_system.communication.SystemManager;
+import com.unibo.s3.main_system.map.AbstractMapGenerator;
 import org.jgrapht.GraphPath;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.alg.shortestpath.KShortestPaths;
@@ -47,7 +48,7 @@ public class GraphGenerator {
     }
 
     public static UndirectedGraph<Vector2, DefaultEdge> createGraph(int width, int height, String mapFilename) {
-        int dimWall = 2;
+        int dimWall = AbstractMapGenerator.BASE_UNIT;
 
         ActorRef worldActor = SystemManager.getLocalActor("worldActor");
         RaycastCollisionDetector<Vector2> collisionDetector = new Box2dProxyDetectorsFactory(worldActor).newRaycastCollisionDetector();
@@ -332,7 +333,7 @@ public class GraphGenerator {
                 if(checkGrid(row, col, grid)) {
                     Vector2 v = createVector(row, col);
                     graph.addVertex(v);
-                    //log("Primi nodi: " + v.toString());
+                    log("Primi nodi: " + v.toString());
                 }
             }
         }
@@ -369,7 +370,7 @@ public class GraphGenerator {
                 if(checkForAddingNode(x, y, grid, graph)) {
                     Vector2 v = createVector(x, y);
                     graph.addVertex(v);
-                    //log("Secondi nodi: " + v.toString());
+                    log("Secondi nodi: " + v.toString());
                 }
 
                 boolean modified = false;

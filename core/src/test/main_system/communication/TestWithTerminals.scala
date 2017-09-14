@@ -40,7 +40,7 @@ object LocalLauncher extends App {
       ",\"netty\":{\"tcp\":{\"hostname\":\""+ InetAddress.getLocalHost.getHostAddress+"\",\"port\":5050}}}}}"
   val customConf = ConfigFactory.parseString(confText)
   SystemManager.createSystem("LocalSystem", customConf)
-  val remoteActor = SystemManager.getRemoteActor("RemoteSystem", "192.168.1.6", "2727", "/user/remoteActor")
+  val remoteActor = SystemManager.getRemoteActor("RemoteSystem", args(0), "2727", "/user/remoteActor")
   val localActor = SystemManager.createActor(TestActor.props(), "localActor")
   remoteActor.tell(GenerateMapMsg(), localActor)
 }
