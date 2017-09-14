@@ -5,9 +5,10 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.badlogic.gdx.ai.utils.Ray
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.physics.box2d.{Body, World}
 import com.unibo.s3.main_system.characters.Guard
+import com.unibo.s3.main_system.characters.steer.BaseMovableEntity
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
 import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
 import com.unibo.s3.main_system.util.Box2dImplicits._
@@ -82,6 +83,27 @@ class WorldTest {
     val collides = blockingWaitForResponse(future)
     collides match {
       case RayCastCollidesResponse(r) => assert(r)
+      case _ => failedToRetrieveFutureResult()
+    }
+  }
+
+  @Test def testRayShouldCollideAtPointAndNormal() = {
+    val boxCenter = new Vector2(0, 0)
+    worldActor ! CreateBox(boxCenter, new Vector2(10, 10))
+    val ray = new Ray[Vector2](boxCenter.cpy().sub(0, 10), boxCenter)
+    val future: Future[Any] = worldActor ? RayCastCollisionQuery(ray)
+    val collides = blockingWaitForResponse(future)
+
+    val expectedCollisionPoint = new Vector2(0.0f, -5.0f)
+    val expectedCollisionNormal = new Vector2(0.0f, -1.0f)
+    val epsilon = MathUtils.FLOAT_ROUNDING_ERROR
+
+    collides match {
+      case RayCastCollisionResponse(hasCollided, cp) =>
+        assert(hasCollided
+          && cp.point.epsilonEquals(expectedCollisionPoint, epsilon)
+          && cp.normal.epsilonEquals(expectedCollisionNormal, epsilon)
+        )
       case _ => failedToRetrieveFutureResult()
     }
   }
@@ -161,6 +183,22 @@ class WorldTest {
     val bodies = blockingWaitForResponse(future)
     bodies match {
       case b: Iterable[Body] => assert(b.size == 1)
+      case _ => failedToRetrieveFutureResult()
+    }
+  }
+
+  @Test def testShouldDetectedObjectsInProximity() = {
+    val boxes = List(new Vector2(-10, 0), new Vector2(0, 0), new Vector2(8, 0))
+    val boxSize = new Vector2(4, 4)
+    val observer = new BaseMovableEntity(new Vector2(4f, 0))
+    val radius = 2f
+    boxes.foreach(boxCenter => worldActor ! CreateBox(boxCenter, boxSize))
+    val future = worldActor ? ProximityQuery(observer, radius)
+    val nearbyBoxes = blockingWaitForResponse(future)
+    nearbyBoxes match {
+      case ProximityQueryResponse(b) =>
+        val toPoints = b.map(n => n.getPosition)
+        assert(toPoints.contains(boxes(1)) && toPoints.contains(boxes(2)))
       case _ => failedToRetrieveFutureResult()
     }
   }

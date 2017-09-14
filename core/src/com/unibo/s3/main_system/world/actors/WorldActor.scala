@@ -118,6 +118,7 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
 
     case ProximityQuery(owner, radius) =>
       proximityDetector.setOwner(owner)
+      proximityDetector.setDetectionRadius(radius)
       var neighbors: Seq[Steerable[Vector2]] = List()
       proximityDetector.findNeighbors(new ProximityCallback[Vector2] {
         override def reportNeighbor(n: Steerable[Vector2]): Boolean = {neighbors :+= n; true}
