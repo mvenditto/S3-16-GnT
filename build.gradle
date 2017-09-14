@@ -45,7 +45,6 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-
     }
 }
 
@@ -69,8 +68,10 @@ project(":core") {
         compile group: 'org.scala-lang', name: 'scala-compiler', version: '2.11.7'
         compile group: 'com.typesafe.akka', name: 'akka-testkit_2.11', version: '2.5.4'
         compile 'net.dermetfan.libgdx-utils:libgdx-utils-box2d:0.13.4'
-        compile 'junit:junit:4.12'
-
+        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        compile 'com.badlogicgames.gdx:gdx-box2d-platform:1.9.6'
+        compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+        compile 'junit:junit:4.+'
     }
 }
 
