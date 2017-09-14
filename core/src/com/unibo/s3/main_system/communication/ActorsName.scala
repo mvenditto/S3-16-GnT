@@ -15,7 +15,7 @@ object GeneralActors extends Enumeration {
 
 object CharacterActors extends Enumeration {
 
-  val COP = EnumerationType("cop")
+  val GUARD = EnumerationType("guard")
   val THIEF = EnumerationType("thief")
 
   protected case class EnumerationType(name: String) extends Val(name)
