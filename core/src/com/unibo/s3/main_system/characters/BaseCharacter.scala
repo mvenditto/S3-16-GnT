@@ -102,34 +102,6 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   def addNeighbour(neighbour: ActorRef): Unit = {
     this.neighbours :+= neighbour
     this.nNeighbours += 1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   }
 
   def isNeighbour(possibleNeighbour : ActorRef) : Boolean = neighbours.contains(possibleNeighbour)
@@ -210,13 +182,13 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   }
 
 
-  private def computeNeighbours: Option[util.List[Vector2]] = Option[util.List[Vector2]](index.neighborListOf(currentNode.get))
+  private def computeNeighbours: Option[util.List[Vector2]] = Option(index.neighborListOf(currentNode.getOrElse(new Vector2())))
 
   //computo il mio nodo di riferimento
   private def computeNearestVertex: Option[Vector2] = {
     var nearest = currentNode
     var minDistance = getPosition.dst2(new Vector2(nearest.get.x, nearest.get.y))
-    val list = computeNeighbours.get
+    var list = computeNeighbours.get
     import scala.collection.JavaConversions._
     for (v <- list) {
       val distance = v.dst2(getPosition)
