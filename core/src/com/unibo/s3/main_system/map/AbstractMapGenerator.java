@@ -1,6 +1,8 @@
 package com.unibo.s3.main_system.map;
 
 import com.badlogic.gdx.math.Vector2;
+import com.unibo.s3.main_system.game.GameSettings;
+import com.unibo.s3.main_system.game.GameSettings$;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +11,8 @@ import java.util.Random;
 public abstract class AbstractMapGenerator implements GenerationStrategy{
 
 
-    public static final int BASE_UNIT = 2;
-    private static final float HALF_BASE_UNIT = BASE_UNIT/2;
+    private int BASE_UNIT = GameSettings.apply$default$6();
+    private static final float HALF_BASE_UNIT = GameSettings.apply$default$6()/2;
     private static final int LEFT_WALL = 0;
     private static final int RIGHT_WALL = 1;
     private static final int LOWER_WALL = 2;
