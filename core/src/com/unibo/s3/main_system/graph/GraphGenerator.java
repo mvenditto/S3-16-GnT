@@ -8,6 +8,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory;
 import com.unibo.s3.main_system.communication.SystemManager;
+import com.unibo.s3.main_system.game.GameSettings;
 import com.unibo.s3.main_system.map.AbstractMapGenerator;
 import org.jgrapht.GraphPath;
 import org.jgrapht.UndirectedGraph;
@@ -48,7 +49,7 @@ public class GraphGenerator {
     }
 
     public static UndirectedGraph<Vector2, DefaultEdge> createGraph(int width, int height, String mapFilename) {
-        int dimWall = AbstractMapGenerator.BASE_UNIT;
+        int dimWall = GameSettings.apply$default$6();
 
         ActorRef worldActor = SystemManager.getLocalActor("worldActor");
         RaycastCollisionDetector<Vector2> collisionDetector = new Box2dProxyDetectorsFactory(worldActor).newRaycastCollisionDetector();
