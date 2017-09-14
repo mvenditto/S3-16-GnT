@@ -2,7 +2,6 @@ package com.unibo.s3.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.unibo.s3.main_system.tests.RemoteLauncher;
 import com.unibo.s3.main_system.tests.Tests;
 
 public class TestsLauncher {

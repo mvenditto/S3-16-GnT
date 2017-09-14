@@ -1,4 +1,4 @@
-package com.unibo.s3.desktop.ok;
+package com.unibo.s3.desktop;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.*;
