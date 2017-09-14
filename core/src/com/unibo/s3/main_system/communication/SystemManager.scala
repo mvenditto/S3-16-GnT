@@ -53,6 +53,9 @@ object SystemManager {
     getLocalActor(actorCode.toString)
   }
 
+  def getRemoteActor(systemName: String, portNumber: String, path: String): ActorSelection = {
+    this.getRemoteActor(systemName, this.ipToConnect, portNumber, path)
+  }
 
   def getRemoteActor(systemName: String, ip: String, portNumber: String, path: String): ActorSelection = {
     val tmp = new StringBuilder(60)
