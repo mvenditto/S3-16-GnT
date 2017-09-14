@@ -56,13 +56,33 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   /*fov stuff*/
   private val fovAngle = 120f //degrees
   private val fovRadius = 5f
+  private var coneOfView: FieldOfViewProximity[Vector2] = _
+
   /*init fov*/
-  private val coneOfView  = new FieldOfViewProximity[Vector2](
+  coneOfView  = new FieldOfViewProximity[Vector2](
     this, null, fovRadius, MathUtils.degreesToRadians * fovAngle)
 
   private val randomGenerator = Random
 
-  def getFieldOfView: FieldOfViewProximity[Vector2] = coneOfView
+  /*
+  usage:
+   import com.unibo.s3.main_system.util.GdxImplicits._ //for ..gdx.utils.Array -> Iterable[T]
+
+   /*not filtered neighbors received from QuadTree*/
+   val a: List[Steerable[Vector2]]().asGdxArray = ???
+   // or
+   val a2: com.badlogic.gdx.utils.Array[Steerable[Vector2]] = ???
+
+   coneOfView.setAgents(a) //or a2
+   val neighborsInFov = List[Steerable[Vector2]]()
+
+   coneOfView.findNeighbors(new Proximity.ProximityCallback[Vector2] {
+     override def reportNeighbor(n: Steerable[Vector2]): Boolean = {
+       neighborsInFov :+= n
+       true
+      }
+   })
+  */
 
   def getId: Int = id
 
@@ -107,7 +127,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   private def refreshNeighbours() : Unit = this.neighbours = List()
 
   private def computeInitialNearestNode = {
-    var nearest: Option[Vector2] = None
+    var nearest = None: Option[Vector2]
     var minDistance = Float.MaxValue
     import scala.collection.JavaConversions._
     for (v <- graph.vertexSet) {
@@ -126,7 +146,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   private def selectPriorityDestination : Option[Vector2] = {
     import scala.collection.JavaConversions._
 
-    var list = index.neighborListOf(currentNode.get)
+    var list = index.neighborListOf(currentNode.get).toList
     var out : Option[Vector2] = None
     list = list.filter(node => !node.equals(previousNode.get))
     if(list.isEmpty){

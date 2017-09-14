@@ -56,7 +56,7 @@ task afterEclipseImport(description: "Post processing after project generation",
     printer.print(classpath)
   }
 }
-
+/*
 shadowJar {
     from files(sourceSets.main.output.classesDir)
     println(sourceSets.main.output.classesDir)
