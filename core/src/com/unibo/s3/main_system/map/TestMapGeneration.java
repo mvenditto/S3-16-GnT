@@ -1,6 +1,8 @@
 package com.unibo.s3.main_system.map;
 
 import com.badlogic.gdx.math.Vector2;
+import com.unibo.s3.main_system.spawn.RandomSpawnPointGenerator;
+import com.unibo.s3.main_system.spawn.SpawnPointGenerator;
 import org.junit.*;
 
 import java.util.List;
