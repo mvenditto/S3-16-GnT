@@ -1,12 +1,14 @@
 package com.unibo.s3.main_system.spawn;
 
 import com.badlogic.gdx.math.Vector2;
+import com.unibo.s3.main_system.game.GameSettings;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SpawnPointGenerator {
 
+    private static final int WALL_THICKNESS = GameSettings.apply$default$6();
     private SpawnStrategy spawnStrategy;
 
     public List<Vector2> generateSpawnPoints(int[][] map, int nSpawnPoints){
@@ -20,7 +22,8 @@ public class SpawnPointGenerator {
                 spawnQuadrant = spawnStrategy.generateSpawnQuadrant(map);
             }*/
            // spawnPoints.add(spawnQuadrant);
-            spawnPoints.add(new Vector2(spawnQuadrant.x * 2 + 2, spawnQuadrant.y * 2 + 2));
+            spawnPoints.add(new Vector2(spawnQuadrant.x * 2 + WALL_THICKNESS,
+                    spawnQuadrant.y * 2 + WALL_THICKNESS));
             nSpawnPoints--;
         }
         //System.out.println("SpawnPoints " + spawnPoints);

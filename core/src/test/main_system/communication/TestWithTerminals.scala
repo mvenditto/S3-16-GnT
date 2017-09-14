@@ -6,6 +6,7 @@ import akka.actor.{Props, UntypedAbstractActor}
 import com.typesafe.config.ConfigFactory
 import com.unibo.s3.main_system.communication.Messages.{GenerateMapMsg, MapElementMsg}
 import com.unibo.s3.main_system.communication.SystemManager
+import com.unibo.s3.main_system.game.AkkaSettings
 
 class TestActor extends UntypedAbstractActor {
 
@@ -25,7 +26,7 @@ object RemoteLauncher extends App {
     "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," +
       "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" +
       ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
-      ",\"netty\":{\"tcp\":{\"hostname\":\""+ InetAddress.getLocalHost.getHostAddress+"\",\"port\":2727}}}}}"
+      ",\"netty\":{\"tcp\":{\"hostname\":\""+ InetAddress.getLocalHost.getHostAddress+"\",\"port\":"+AkkaSettings.ComputeSystemPort+"}}}}}"
   val customConf = ConfigFactory.parseString(confText)
   SystemManager.createSystem("RemoteSystem", customConf)
   SystemManager.createActor(TestActor.props(), "remoteActor")
@@ -37,10 +38,11 @@ object LocalLauncher extends App {
     "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," +
       "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" +
       ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
-      ",\"netty\":{\"tcp\":{\"hostname\":\""+ InetAddress.getLocalHost.getHostAddress+"\",\"port\":5050}}}}}"
+      ",\"netty\":{\"tcp\":{\"hostname\":\""+ InetAddress.getLocalHost.getHostAddress+"\",\"port\":"+AkkaSettings.GUISystemPort+"}}}}}"
   val customConf = ConfigFactory.parseString(confText)
   SystemManager.createSystem("LocalSystem", customConf)
-  val remoteActor = SystemManager.getRemoteActor("RemoteSystem", args(0), "2727", "/user/remoteActor")
+  SystemManager.setIPForRemoting(InetAddress.getLocalHost.getHostAddress)
+  val remoteActor = SystemManager.getRemoteActor("RemoteSystem", "/user/", "remoteActor")
   val localActor = SystemManager.createActor(TestActor.props(), "localActor")
   remoteActor.tell(GenerateMapMsg(), localActor)
 }
