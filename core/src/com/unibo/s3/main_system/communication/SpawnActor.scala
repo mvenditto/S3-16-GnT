@@ -1,14 +1,14 @@
 package com.unibo.s3.main_system.communication
 
 import akka.actor.{Props, UntypedAbstractActor}
-import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.communication.Messages._
-import com.unibo.s3.main_system.map.AbstractMapGenerator
+import com.unibo.s3.main_system.game.GameSettings
 import com.unibo.s3.main_system.spawn.{GuardStrategy, SpawnPointGenerator, ThiefStrategy}
 import com.unibo.s3.main_system.util.GntUtils
 
 class SpawnActor extends UntypedAbstractActor {
 
+  private val WALL_THICKNESS = GameSettings.apply().wall_thickness
   private val WALL_NUMBER = 2
   private[this] val spawnGenerator = new SpawnPointGenerator
   private[this] var map: Array[Array[Int]] = _
@@ -22,13 +22,13 @@ class SpawnActor extends UntypedAbstractActor {
     case msg: MapElementMsg =>
       val lineElements = GntUtils.parseMapEntry(msg.line)
       if (lineElements._1.forall(value => value != 0.0
-        && value != (this.map.length * AbstractMapGenerator.BASE_UNIT + WALL_NUMBER * AbstractMapGenerator.BASE_UNIT)
+        && value != (this.map.length * WALL_THICKNESS + WALL_NUMBER * WALL_THICKNESS)
         && lineElements._2.isEmpty)) {
         val x = lineElements._1(0).toInt
         val y = lineElements._1(1).toInt
 
         def translation(start: Int): Int = {
-          (start - (AbstractMapGenerator.BASE_UNIT / 2) - AbstractMapGenerator.BASE_UNIT) / AbstractMapGenerator.BASE_UNIT
+          (start - (WALL_THICKNESS / 2) - WALL_THICKNESS) / WALL_THICKNESS
         }
 
         this.map(translation(x))(translation(y)) = 1

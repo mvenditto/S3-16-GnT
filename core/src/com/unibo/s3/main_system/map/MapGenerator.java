@@ -1,16 +1,19 @@
 package com.unibo.s3.main_system.map;
 
+import com.unibo.s3.main_system.game.GameSettings;
+
 import java.util.List;
 
 public class MapGenerator {
 
+    private static final int BASE_UNIT = GameSettings.apply$default$6();
     private GenerationStrategy strategy;
 
     public void generateMap(int width, int height) {
         System.out.println("generator: " + width + " " + height);
-        System.out.println("generator: " + AbstractMapGenerator.BASE_UNIT);
-        strategy.initialSetup(width/AbstractMapGenerator.BASE_UNIT, height/AbstractMapGenerator.BASE_UNIT);
-        strategy.generate(8, width/AbstractMapGenerator.BASE_UNIT, height/AbstractMapGenerator.BASE_UNIT, 0, 0); }/**todo eliminare primo parametro**/
+        System.out.println("generator: " + BASE_UNIT);
+        strategy.initialSetup(width/BASE_UNIT, height/BASE_UNIT);
+        strategy.generate(8, width/BASE_UNIT, height/BASE_UNIT, 0, 0); }/**todo eliminare primo parametro**/
 
     public List<String> getMap() { return strategy.getMap(); }
 
