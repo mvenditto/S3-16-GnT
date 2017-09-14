@@ -6,6 +6,7 @@ import com.badlogic.gdx.ai.steer.Steerable
 import com.badlogic.gdx.ai.utils.{Collision, Ray}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
+import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.characters.steer.collisions.{Box2dRaycastCollisionDetector, Box2dSquareAABBProximity}
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
 import com.unibo.s3.main_system.util.GntUtils
@@ -13,6 +14,7 @@ import com.unibo.s3.main_system.world.{BodyData, Exit, Hideout}
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.util.Box2dImplicits._
 import net.dermetfan.gdx.physics.box2d.WorldObserver
+
 import scala.util.Try
 
 
@@ -31,7 +33,8 @@ case class WorldChangeMsg(b: Body)
 case class AskWorldMask(w:Int, h:Int, cellWidth: Float)
 case class AskObjectOnSightLineMsg(p: Vector2, lv: Vector2, rayLenght: Float)
 case class ObjectOnSightLineMsg(bd: Iterable[BodyData])
-
+case class FilterReachableByRay(op: BaseCharacter, n: Iterable[Vector2])
+case class SendFilterReachableByRay(f: Iterable[Boolean], reqId: Int)
 
 class WorldActor(val world: World) extends UntypedAbstractActor {
   import WorldActor._
@@ -108,6 +111,15 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       val b = world.createBox(pos, size)
       bdata.foreach(bd => b.setUserData(bd))
       worldObserver.getListener.created(b)
+
+    case FilterReachableByRay(op, n) =>
+      val ray = new Ray[Vector2](n.head, n.head)
+      sender ! SendFilterReachableByRay(
+        n.map(p => {
+          ray.start = op.getPosition; ray.end = p
+          !rayCastCollisionDetector.collides(ray)
+        }), op.getId
+      )
 
     case GetAllBodies() => sender() ! getBodies
 

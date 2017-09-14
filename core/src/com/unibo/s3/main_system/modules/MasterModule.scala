@@ -13,7 +13,7 @@ import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.communication.{CharacterActors, GeneralActors, SystemManager}
 import com.unibo.s3.main_system.game.GameSettings
 import com.unibo.s3.main_system.graph.GraphAdapter
-import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig}
+import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig, SpriteRenderer}
 import com.unibo.s3.main_system.util.ImplicitConversions._
 import com.unibo.s3.main_system.util.{GntUtils, ScaleUtils}
 
