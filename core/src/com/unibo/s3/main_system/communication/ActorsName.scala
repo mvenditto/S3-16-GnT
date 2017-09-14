@@ -8,13 +8,14 @@ object GeneralActors extends Enumeration {
   val QUAD_TREE_ACTOR = EnumerationType("quadTreeActor")
   val MAP_ACTOR = EnumerationType("mapActor")
   val GRAPH_ACTOR = EnumerationType("graphActor")
+  val SPAWN_ACTOR = EnumerationType("spawnActor")
 
   protected case class EnumerationType(name: String) extends Val(name)
 }
 
 object CharacterActors extends Enumeration {
 
-  val COP = EnumerationType("cop")
+  val GUARD = EnumerationType("guard")
   val THIEF = EnumerationType("thief")
 
   protected case class EnumerationType(name: String) extends Val(name)

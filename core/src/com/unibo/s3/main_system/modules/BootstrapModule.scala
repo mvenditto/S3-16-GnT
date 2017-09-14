@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.Main
+import com.unibo.s3.main_system.communication.Messages.MapSettingsMsg
 import com.unibo.s3.main_system.communication._
 import com.unibo.s3.main_system.world.actors.WorldActor
 
@@ -95,6 +96,9 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
 
     SystemManager.createGeneralActor(
       QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)
+
+    SystemManager.createGeneralActor(SpawnActor.props(), GeneralActors.SPAWN_ACTOR)
+    setProgress(60)
 
     SystemManager.createGeneralActor(
       MapActor.props(), GeneralActors.MAP_ACTOR)

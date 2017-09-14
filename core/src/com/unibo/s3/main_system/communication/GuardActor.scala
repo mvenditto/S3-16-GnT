@@ -2,7 +2,8 @@ package com.unibo.s3.main_system.communication
 
 import akka.actor.{Props, UntypedAbstractActor}
 import com.badlogic.gdx.math.Vector2
-import com.unibo.s3.main_system.characters.{BaseCharacter}
+import com.unibo.s3.main_system.characters.BaseCharacter
+import com.unibo.s3.main_system.characters.Guard.Guard
 import com.unibo.s3.main_system.communication.Messages._
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
@@ -10,17 +11,17 @@ import org.jgrapht.graph.DefaultEdge
 import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConverters._
 
-class CharacterActor(private[this] val character: BaseCharacter) extends UntypedAbstractActor {
+class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor {
 
   private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _
 
   override def onReceive(message: Any): Unit = message match {
     case ActMsg(dt) =>
-      character.act(dt)
-      SystemManager.getLocalActor("quadTreeActor").tell(AskNeighboursMsg(this.character), getSelf())
+      guard.act(dt)
+      SystemManager.getLocalActor("quadTreeActor").tell(AskNeighboursMsg(this.guard), getSelf())
       println(log() + "Act received")
       //println(log() + "Current node/destination: " + character.getCurrentNode.getOrElse("Not definied") + "," + character.getCurrentDestination)
-      character.chooseBehaviour()
+      guard.chooseBehaviour()
    /* case msg: SendNeighboursMsg =>
       //refresha vicini
       character.refreshNeighbours()
@@ -42,15 +43,15 @@ class CharacterActor(private[this] val character: BaseCharacter) extends Untyped
     case msg: SendGraphMsg=>
       System.out.println(log() + "Initial graph received")
       println("cop: " + getSelf() + "| received graph")
-      character.setGraph(msg.graph)
+      guard.setGraph(msg.graph)
 
-    case _ => //println("(characterActor) message unknown:" + message)
+    case _ => //println("(guardActor) message unknown:" + message)
   }
 
-  def log() : String = "[CHARACTER " + character.getId + "]: "
+  def log() : String = "[CHARACTER " + guard.getId + "]: "
 }
 
-object CharacterActor {
-  def props(baseCharacter: BaseCharacter): Props = Props(new CharacterActor(baseCharacter))
+object GuardActor {
+  def props(guard: Guard): Props = Props(new GuardActor(guard))
 }
 
