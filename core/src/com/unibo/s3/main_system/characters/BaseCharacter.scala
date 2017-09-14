@@ -119,6 +119,8 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
 
   def getSightLineLength : Float = this.sightLineLength
 
+  def getFieldOfView = coneOfView
+
   private def setNewDestination(destination: Vector2) = { //setta destinazione
     println(log + "Going to " + destination)
     this.setComplexSteeringBehavior.avoidCollisionsWithWorld.arriveTo(new CustomLocation(destination)).buildPriority(true)
