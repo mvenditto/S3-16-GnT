@@ -56,8 +56,8 @@ task afterEclipseImport(description: "Post processing after project generation",
   }
 }
 
-shadowJar {
+/*shadowJar {
     transform(AppendingTransformer) {
         resource = 'reference.conf'
     }
-}
+}*/

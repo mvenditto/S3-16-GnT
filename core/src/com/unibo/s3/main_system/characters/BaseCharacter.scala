@@ -100,6 +100,34 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   def addNeighbour(neighbour: ActorRef): Unit = {
     this.neighbours :+= neighbour
     this.nNeighbours += 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   }
 
   def isNeighbour(possibleNeighbour : ActorRef) : Boolean = neighbours.contains(possibleNeighbour)
