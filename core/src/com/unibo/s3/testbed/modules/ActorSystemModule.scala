@@ -108,7 +108,7 @@ class ActorSystemModule extends BaseTestbedModule {
     f("Deploy -> ProximityActor")
     SystemManager.createActor(QuadTreeActor.props(), "quadTreeActor")
 
-    f("Deploy -> ProximityActor")
+    f("Deploy -> LoggerActor")
     SystemManager.createActor(LoggerActor.props(responseTextField), "loggerActor")
     loggerActor = SystemManager.getLocalActor("loggerActor")
   }

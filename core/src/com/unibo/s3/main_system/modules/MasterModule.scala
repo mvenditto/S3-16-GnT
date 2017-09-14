@@ -13,7 +13,7 @@ import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.communication.{CharacterActors, GeneralActors, SystemManager}
 import com.unibo.s3.main_system.game.GameSettings
 import com.unibo.s3.main_system.graph.GraphAdapter
-import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig}
+import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig, SpriteRenderer}
 import com.unibo.s3.main_system.util.ImplicitConversions._
 import com.unibo.s3.main_system.util.{GntUtils, ScaleUtils}
 
@@ -56,7 +56,7 @@ class MasterModule extends BasicModuleWithGui {
   private[this] var spawnActor: ActorRef = _
 
   private[this] val renderer = GeometryRendererImpl()
-  //private[this] val spriteRenderer = SpriteRenderer()
+  private[this] val spriteRenderer = SpriteRenderer()
   private[this] var worldMap = List[Rectangle]()
   private[this] var busyBarWindow: VisWindow = _
 
@@ -78,7 +78,7 @@ class MasterModule extends BasicModuleWithGui {
     busyBarWindow.pack()
     gui.addActor(busyBarWindow)
     busyBarWindow.centerWindow()
-    //spriteRenderer.init()
+    spriteRenderer.init()
   }
 
   def initGame(config: GameSettings): Unit = {
@@ -110,12 +110,13 @@ class MasterModule extends BasicModuleWithGui {
   override def update(dt: Float): Unit = {
     super.update(dt)
     masterActor ! ActMsg(dt)
-    //spriteRenderer.update(dt)
+    spriteRenderer.update(dt)
   }
 
   override def cleanup(): Unit = {
     super.cleanup()
     SystemManager.shutdownSystem()
+    spriteRenderer.dispose()
   }
 
   override def render(shapeRenderer: ShapeRenderer): Unit = {
@@ -128,11 +129,12 @@ class MasterModule extends BasicModuleWithGui {
 
     renderer.renderMap(shapeRenderer, worldMap)
 
+    /*
     characters.foreach(characters =>
-      characters.foreach(c => renderer.renderCharacter(shapeRenderer, c)))
+      characters.foreach(c => renderer.renderCharacter(shapeRenderer, c)))*/
 
-    //characters.foreach(characters =>
-    //  characters.foreach(c => spriteRenderer.render(c, owner.getCamera)))
+    characters.foreach(characters =>
+      characters.foreach(c => spriteRenderer.render(c, owner.getCamera)))
   }
 
   override def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit = {

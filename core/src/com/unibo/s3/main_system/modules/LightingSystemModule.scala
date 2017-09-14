@@ -144,9 +144,10 @@ class LightingSystemModule extends BasicModuleWithGui {
     if (button == 1) {
       val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
       mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
-      new PointLight(
+      val pl = new PointLight(
         rayHandler, PointLightRaysNum, SoftWhiteColor,
         PointLightRadius, mouseWorldPos.x, mouseWorldPos.y)
+      pl.setStaticLight(true)
     }
     false
   }
@@ -185,7 +186,7 @@ object LightingSystemModule {
   private val BrightWhiteColor = new Color(1.0f, 1.0f, 1.0f, 1.0f)
   private val SoftWhiteColor = new Color(1.0f, 1.0f, 1.0f, 0.7f)
 
-  private val TorchRaysNum = 64
+  private val TorchRaysNum = 32
   private val TorchDistance = 15f
   private val TorchDegrees = 25f
 
