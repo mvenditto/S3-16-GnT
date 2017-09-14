@@ -62,6 +62,8 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   coneOfView  = new FieldOfViewProximity[Vector2](
     this, null, fovRadius, MathUtils.degreesToRadians * fovAngle)
 
+  private val randomGenerator = Random
+
   /*
   usage:
    import com.unibo.s3.main_system.util.GdxImplicits._ //for ..gdx.utils.Array -> Iterable[T]
@@ -179,13 +181,14 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
     //ora scelgo destinazione casuale tra i vicini, potenzialmente torno indietro
   }
 
-  private def computeNeighbours: util.List[Vector2] = index.neighborListOf(currentNode.get)
+
+  private def computeNeighbours: Option[util.List[Vector2]] = Option[util.List[Vector2]](index.neighborListOf(currentNode.get))
 
   //computo il mio nodo di riferimento
   private def computeNearestVertex: Option[Vector2] = {
     var nearest = currentNode
     var minDistance = getPosition.dst2(new Vector2(nearest.get.x, nearest.get.y))
-    val list = computeNeighbours
+    val list = computeNeighbours.get
     import scala.collection.JavaConversions._
     for (v <- list) {
       val distance = v.dst2(getPosition)
