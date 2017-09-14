@@ -18,6 +18,7 @@ public class DesktopLauncher {
 		config.samples = 4;
 		config.vSyncEnabled = false;
 		//config.fullscreen = true;
-		new LwjglApplication(new Main(arg[0]), config);
+		String ip = arg.length == 0 ? "" : arg[0];
+		new LwjglApplication(new Main(ip), config);
 	}
 }
