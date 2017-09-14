@@ -1,6 +1,7 @@
 package com.unibo.s3.main_system.spawn;
 
 import com.badlogic.gdx.math.Vector2;
+import com.unibo.s3.main_system.map.AbstractMapGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,8 @@ public class SpawnPointGenerator {
                 spawnQuadrant = spawnStrategy.generateSpawnQuadrant(map);
             }*/
            // spawnPoints.add(spawnQuadrant);
-            spawnPoints.add(new Vector2(spawnQuadrant.x * 2 + 2, spawnQuadrant.y * 2 + 2));
+            spawnPoints.add(new Vector2(spawnQuadrant.x * 2 + AbstractMapGenerator.BASE_UNIT,
+                    spawnQuadrant.y * 2 + AbstractMapGenerator.BASE_UNIT));
             nSpawnPoints--;
         }
         //System.out.println("SpawnPoints " + spawnPoints);
