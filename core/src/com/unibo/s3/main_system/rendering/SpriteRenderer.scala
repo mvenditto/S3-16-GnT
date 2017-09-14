@@ -3,9 +3,10 @@ package com.unibo.s3.main_system.rendering
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode
 import com.badlogic.gdx.graphics.g2d._
-import com.badlogic.gdx.graphics.{Camera, Texture}
+import com.badlogic.gdx.graphics.{Camera, Color, Texture}
 import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.utils.Disposable
+import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.characters.steer.MovableEntity
 import com.unibo.s3.main_system.util.ScaleUtils
 
@@ -19,11 +20,18 @@ class SpriteRenderer extends Disposable {
   private var guardAtlas: TextureAtlas = _
   private var stateTime = 0f
   private var floorTexture: TextureRegion = _
+  private var font: BitmapFont = _
+  private var debugDraw = false
 
   def init(): Unit = {
     batch = new SpriteBatch()
+    font = new BitmapFont()
+    font.setColor(Color.YELLOW)
+    font.getData.setScale(2f, 2f)
     guardAtlas = new TextureAtlas(guardAtlasFile)
   }
+
+  def setDebugDraw(flag: Boolean): Unit = debugDraw = flag
 
   def update(dt: Float): Unit = stateTime += dt
 
@@ -36,7 +44,15 @@ class SpriteRenderer extends Disposable {
     batch.begin()
     renderKeyFrame(c, feet)
     renderKeyFrame(c, body)
+    if (debugDraw) drawDebugInfo(c)
     batch.end()
+  }
+
+  private def drawDebugInfo(c: MovableEntity[Vector2]) = {
+    val s = ScaleUtils.getPixelsPerMeter
+    c match {
+      case bc: BaseCharacter =>
+        font.draw(batch, "id: " + bc.getId.toString, c.getPosition.x * s, c.getPosition.y * s)}
   }
 
   def renderFloor(w: Float, h: Float, cam: Camera): Unit = {
@@ -108,6 +124,7 @@ class SpriteRenderer extends Disposable {
   override def dispose(): Unit = {
     batch.dispose()
     guardAtlas.dispose()
+    font.dispose()
   }
 }
 

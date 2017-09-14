@@ -79,6 +79,7 @@ class MasterModule extends BasicModuleWithGui {
     gui.addActor(busyBarWindow)
     busyBarWindow.centerWindow()
     spriteRenderer.init()
+    spriteRenderer.setDebugDraw(true)
   }
 
   def initGame(config: GameSettings): Unit = {
@@ -134,7 +135,11 @@ class MasterModule extends BasicModuleWithGui {
       characters.foreach(c => renderer.renderCharacter(shapeRenderer, c)))*/
 
     characters.foreach(characters =>
-      characters.foreach(c => spriteRenderer.render(c, owner.getCamera)))
+      characters.foreach(c => {
+        spriteRenderer.render(c, owner.getCamera)
+        renderer.renderCharacterDebugInfo(shapeRenderer, c)
+      }))
+
   }
 
   override def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit = {
