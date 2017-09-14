@@ -6,6 +6,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.unibo.s3.main_system.communication.Messages;
 import com.unibo.s3.main_system.communication.SystemManager;
+import com.unibo.s3.main_system.game.AkkaSettings;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -58,16 +59,19 @@ public class SimulatedRemoteSystemTest {
                 String confText = "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," +
                         "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" +
                         ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
-                        ",\"netty\":{\"tcp\":{\"hostname\":\""+ Inet4Address.getLocalHost().getHostAddress() +"\",\"port\":2727}}}}}";
+                        ",\"netty\":{\"tcp\":{\"hostname\":\""+ Inet4Address.getLocalHost().getHostAddress() +"\",\"port\":"+
+                        AkkaSettings.GUISystemPort()+"}}}}}";
                 Config customConf = ConfigFactory.parseString(confText);
                 SystemManager.createSystem("LocalSystem", customConf);
                 ActorRef localActor = SystemManager.createActor(Props.create(TestActor.class), "localActor");
-                customConf = ConfigFactory.parseString(confText.replace("2727", "5050"));
+                customConf = ConfigFactory.parseString(confText.replace(AkkaSettings.GUISystemPort(),
+                        AkkaSettings.ComputeSystemPort()));
                 ActorSystem remoteSystem = ActorSystem.create("RemoteSystem", customConf);
                 remoteSystem.actorOf(Props.create(TestActor.class), "remoteActor");
 
+                SystemManager.setIPForRemoting(Inet4Address.getLocalHost().getHostAddress());
                 ActorSelection remoteActor = SystemManager.getRemoteActor
-                        ("RemoteSystem",Inet4Address.getLocalHost().getHostAddress(),"5050","/user/remoteActor");
+                        ("RemoteSystem","/user/", "remoteActor");
 
                 TestKit probe = new TestKit(testSystem);
 

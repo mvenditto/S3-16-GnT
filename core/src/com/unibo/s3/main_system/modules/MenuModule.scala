@@ -8,9 +8,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.{ButtonGroup, Label}
 import com.badlogic.gdx.scenes.scene2d.utils.{ChangeListener, ClickListener}
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Align
+import com.kotcrab.vis.ui.util.ToastManager
 import com.kotcrab.vis.ui.widget._
+import com.kotcrab.vis.ui.widget.toast.Toast
 import com.unibo.s3.Main
 import com.unibo.s3.testbed.ui.{AdaptiveSizeActor, Anchorable, TopLeft}
+import com.unibo.s3.testbed.ui.KeyHelpTable
 
 sealed trait MenuEvent
 case class Start(guardsNum: Int, thiefsNum: Int, simulation: Boolean, mapDimension: Vector2, mazeTypeMap: Boolean) extends MenuEvent
@@ -180,12 +183,46 @@ class MenuModule(listener: MenuEvent => Unit) extends BasicModuleWithGui{
     })
 
     val debugView = new VisCheckBox(" View debug")
-    windowMenu.add(debugView).padTop(10).padBottom(10).padLeft(10).padRight(10).row()
+    windowMenu.add(debugView).padTop(10).padLeft(10).padRight(10).row()
     debugView.addListener(new ChangeListener {
       override def changed(event: ChangeListener.ChangeEvent, actor: Actor): Unit = {
         if(debugView.isChecked) viewDebug = true
         else viewDebug = false
         listener(ViewDebug(viewDebug))
+      }
+    })
+
+    val shortButton = new VisTextButton("Shortcut")
+    windowMenu.add(shortButton).padTop(10).padBottom(10)
+    shortButton.addListener(new ClickListener() {
+
+      def centerToast(toast: Toast, toastManager: ToastManager): Unit = {
+        toast.getMainTable.setY(
+          gui.getHeight - toast.getMainTable.getPrefHeight - toastManager.getScreenPadding)
+        toast.getMainTable.setX((gui.getWidth / 2) - toast.getMainTable.getPrefWidth / 2 )
+      }
+
+      def openShortcut(): Unit = {
+        val toastManager = new ToastManager(gui)
+        toastManager.setAlignment(Align.center)
+
+        val keys = new KeyHelpTable(true)
+        keys.addKeyBinding("p", "pause.")
+        keys.addKeyBinding("q", "zoom in")
+        keys.addKeyBinding("r", "zoom out")
+        keys.addKeyBinding("arrow-left", "move camera left")
+        keys.addKeyBinding("arrow-right", "move camera right")
+        keys.addKeyBinding("arrow-up", "move camera up")
+        keys.addKeyBinding("arrow-down", "move camera down")
+        keys.align(Align.center)
+
+        val t = new Toast("dark", keys)
+        toastManager.show(t)
+        centerToast(t, toastManager)
+      }
+
+      override def clicked(event: InputEvent, x: Float, y: Float): Unit = {
+        openShortcut()
       }
     })
 

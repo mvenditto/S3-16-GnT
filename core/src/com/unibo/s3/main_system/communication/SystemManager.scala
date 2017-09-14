@@ -2,6 +2,7 @@ package com.unibo.s3.main_system.communication
 
 import akka.actor.{ActorRef, ActorSelection, ActorSystem, Props}
 import com.typesafe.config.Config
+import com.unibo.s3.main_system.game.AkkaSettings
 
 object SystemManager {
   private[this] type GeneralActors = GeneralActors.Value
@@ -10,8 +11,18 @@ object SystemManager {
   private[this] var system: ActorSystem = _
   private[this] var actorList: Map[String, ActorRef] = _
 
-  def createSystem(systemName: String, config: Config): Unit = {
+  private[this] var ipToConnect: String = _
+
+   def createSystem(systemName: String, config: Config): Unit = {
     this.system = ActorSystem.create(systemName, config)
+  }
+
+  def setIPForRemoting(ip: String): Unit = {
+    this.ipToConnect = ip
+  }
+
+  def getIP: Option[String] = {
+    Option(this.ipToConnect)
   }
 
   def createActor(props: Props, actorCode: String): ActorRef = {
@@ -43,16 +54,16 @@ object SystemManager {
     getLocalActor(actorCode.toString)
   }
 
-
-  def getRemoteActor(systemName: String, ip: String, portNumber: String, path: String): ActorSelection = {
+  def getRemoteActor(systemName: String, path: String, actorName: String): ActorSelection = {
     val tmp = new StringBuilder(60)
     tmp.append("akka.tcp://")
     tmp.append(systemName)
     tmp.append("@")
-    tmp.append(ip)
+    tmp.append(this.ipToConnect)
     tmp.append(":")
-    tmp.append(portNumber)
+    tmp.append(AkkaSettings.ComputeSystemPort)
     tmp.append(path)
+    tmp.append(actorName)
     this.system.actorSelection(tmp.toString())
   }
 

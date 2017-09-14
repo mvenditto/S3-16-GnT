@@ -52,7 +52,7 @@ class GuardStrategy extends SpawnStrategy {
   }
 
   private def spawnRight(map: Array[Array[Int]]): Vector2 = {
-    val x = Random.nextInt(this.width_shift) + (WIDTH_PARTS_NUMBER - 1)
+    val x = Random.nextInt(this.width_shift) + (this.width_shift * (WIDTH_PARTS_NUMBER - 1))
     val y = Random.nextInt(this.height_shift) * (HEIGHT_PARTS_PARTS - 1)
     val newGuards = new Vector2(x, y)
     this.guards :+= newGuards
