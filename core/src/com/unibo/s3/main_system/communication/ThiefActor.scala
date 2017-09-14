@@ -11,7 +11,7 @@ class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor {
   override def onReceive(message: Any): Unit = message match {
     case msg: ActMsg =>
       this.thief.act(msg.dt)
-      this.thief.chooseBehaviour()
+      //this.thief.chooseBehaviour()
 
     case msg: SendGraphMsg =>
       this.thief.setGraph(msg.graph)
