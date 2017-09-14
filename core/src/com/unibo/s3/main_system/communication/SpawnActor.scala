@@ -9,6 +9,7 @@ import com.unibo.s3.main_system.util.GntUtils
 
 class SpawnActor extends UntypedAbstractActor {
 
+  private val WALL_NUMBER = 2
   private[this] val spawnGenerator = new SpawnPointGenerator
   private[this] var map: Array[Array[Int]] = _
 
@@ -21,7 +22,7 @@ class SpawnActor extends UntypedAbstractActor {
     case msg: MapElementMsg =>
       val lineElements = GntUtils.parseMapEntry(msg.line)
       if (lineElements._1.forall(value => value != 0.0
-        && value != (this.map.length * AbstractMapGenerator.BASE_UNIT + 2 * AbstractMapGenerator.BASE_UNIT)
+        && value != (this.map.length * AbstractMapGenerator.BASE_UNIT + WALL_NUMBER * AbstractMapGenerator.BASE_UNIT)
         && lineElements._2.isEmpty)) {
         val x = lineElements._1(0).toInt
         val y = lineElements._1(1).toInt
