@@ -10,10 +10,10 @@ class ThiefStrategy extends SpawnStrategy {
   private[this] var height_shift: Int = _
 
   override def generateSpawnQuadrant(map: Array[Array[Int]]): Vector2 = {
-    this.width_shift = map.length / 3
-    this.height_shift = map(0).length / 3
-    val x = Random.nextInt(map.length / 2) + this.width_shift
-    val y = Random.nextInt(map(0).length / 2) + this.height_shift
+    this.width_shift = map.length / 5
+    this.height_shift = map(0).length / 5
+    val x = Random.nextInt(width_shift) + (map.length / 2) + 2
+    val y = Random.nextInt(height_shift) +  (map(0).length / 2) + 2
     new Vector2(x, y)
   }
 

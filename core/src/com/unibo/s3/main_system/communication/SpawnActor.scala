@@ -12,6 +12,8 @@ class SpawnActor extends UntypedAbstractActor {
   private[this] val spawnGenerator = new SpawnPointGenerator
   private[this] var map: Array[Array[Int]] = _
 
+  private[this] val guardStrategy = GuardStrategy()
+
   override def onReceive(message: Any): Unit = message match {
     case msg: MapSettingsMsg =>
       this.map = Array.ofDim[Int](msg.width, msg.height)
@@ -34,7 +36,7 @@ class SpawnActor extends UntypedAbstractActor {
 
     case msg: GenerateNewCharacterPositionMsg =>
       if (msg.characterType.equals(CharacterActors.GUARD))
-        this.spawnGenerator.setSpawnStrategy(GuardStrategy())
+        this.spawnGenerator.setSpawnStrategy(guardStrategy)
       else
         this.spawnGenerator.setSpawnStrategy(ThiefStrategy())
       SystemManager.getLocalGeneralActor(GeneralActors.MASTER_ACTOR)
