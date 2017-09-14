@@ -44,10 +44,7 @@ class GraphActor extends  UntypedAbstractActor with Stash {
       this.graph = Option(graphManager.createGraph(this.width, this.height, FILEPATH))
       unstashAll()
 
-    case msg: InitialSavingCharacterMsg =>
-      msg.characterRef.tell(SendGraphMsg(graph.get), getSelf())
-
-    case _ => println("(graph actor) message unknown: " + message)
+    case _ => println("(graphActor) message unknown: " + message)
   }
 }
 

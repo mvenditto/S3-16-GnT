@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.{MathUtils, Polygon, Rectangle, Vector2}
+import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.characters.steer.MovableEntity
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.util.ScaleUtils
@@ -49,6 +50,10 @@ class GeometryRendererImpl extends GeometryRenderer[Vector2] {
 
   override def renderCharacterDebugInfo(shapeRenderer: ShapeRenderer, character: MovableEntity[Vector2]): Unit = {
     val backupColor = shapeRenderer.getColor
+    val s = ScaleUtils.getPixelsPerMeter
+    val t = shapeRenderer.getCurrentType
+
+    shapeRenderer.set(ShapeType.Line)
     shapeRenderer.setColor(Color.RED)
 
     val rays = character.getRays
@@ -56,13 +61,26 @@ class GeometryRendererImpl extends GeometryRenderer[Vector2] {
     val tmp2 = new Vector2()
     for (ray <- rays) {
       tmp.set(ray.start)
-      tmp.x = metersToPixels(tmp.x).toFloat
-      tmp.y = metersToPixels(tmp.y).toFloat
+      tmp.x = tmp.x * s
+      tmp.y = tmp.y * s
       tmp2.set(ray.end)
-      tmp2.x = metersToPixels(tmp2.x).toFloat
-      tmp2.y = metersToPixels(tmp2.y).toFloat
+      tmp2.x = tmp2.x * s
+      tmp2.y = tmp2.y * s
       shapeRenderer.line(tmp, tmp2)
     }
+
+    character match {
+      case bc: BaseCharacter =>
+        val fovAngle = bc.getFieldOfView.getAngle * MathUtils.radDeg
+        val fovRadius = bc.getFieldOfView.getRadius
+        shapeRenderer.setColor(Color.CYAN)
+        val pos = character.getPosition
+        shapeRenderer.arc(pos.x * s, pos.y * s, fovRadius * s,
+          bc.getOrientation * MathUtils.radiansToDegrees - fovAngle / 2f + 90f,
+          fovAngle)
+    }
+
+    shapeRenderer.set(t)
     shapeRenderer.setColor(backupColor)
   }
 
