@@ -3,6 +3,7 @@ package com.unibo.s3.main_system.util
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 import GdxImplicits._
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 
 object Box2dImplicits {
 
@@ -29,6 +30,7 @@ object Box2dImplicits {
     def createBox(position: Vector2, size: Vector2): Body = {
       val bodyDef = new BodyDef
       bodyDef.position.set(position)
+      bodyDef.`type` = BodyType.StaticBody
       val body = world.createBody(bodyDef)
       val box = new PolygonShape
       box.setAsBox(Math.abs(size.x / 2), Math.abs(size.y / 2))

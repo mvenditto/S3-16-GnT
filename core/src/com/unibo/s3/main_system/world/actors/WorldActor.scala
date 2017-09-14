@@ -6,6 +6,7 @@ import com.badlogic.gdx.ai.steer.Steerable
 import com.badlogic.gdx.ai.utils.{Collision, Ray}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
+import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.characters.steer.collisions.{Box2dRaycastCollisionDetector, Box2dSquareAABBProximity}
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
 import com.unibo.s3.main_system.util.GntUtils
@@ -13,6 +14,7 @@ import com.unibo.s3.main_system.world.{BodyData, Exit, Hideout}
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.util.Box2dImplicits._
 import net.dermetfan.gdx.physics.box2d.WorldObserver
+
 import scala.util.Try
 
 
@@ -31,7 +33,8 @@ case class WorldChangeMsg(b: Body)
 case class AskWorldMask(w:Int, h:Int, cellWidth: Float)
 case class AskObjectOnSightLineMsg(p: Vector2, lv: Vector2, rayLenght: Float)
 case class ObjectOnSightLineMsg(bd: Iterable[BodyData])
-
+case class FilterReachableByRay(op: BaseCharacter, n: Iterable[Vector2])
+case class SendFilterReachableByRay(f: Iterable[Boolean], reqId: Int)
 
 class WorldActor(val world: World) extends UntypedAbstractActor {
   import WorldActor._
@@ -53,8 +56,8 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       bodiesToDelete.foreach(b => world.destroyBody(b))
       bodiesToDelete = List()
     }
-    world.step(dt, VelocityIterations, PositionIterations)
-    worldObserver.update(world, dt)
+    //world.step(dt, VelocityIterations, PositionIterations)
+    //worldObserver.update(world, dt)
   }
 
   private def getBodies: com.badlogic.gdx.utils.Array[Body] = {
@@ -97,16 +100,25 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       if (collided) {
         val cp = oc.point
         val data = world.bodiesAtPoint(cp)
-          .map(c => Try(c.getUserData.asInstanceOf[BodyData]))
-          .filter(c => c.isSuccess)
-          .map(c => c.get)
-
+          .map(b => b.getUserData)
+          .filter(b => b != null)
+          .map { case b:BodyData => b}
         sender ! ObjectOnSightLineMsg(data)
       }
 
     case CreateBox(pos, size, bdata) =>
       val b = world.createBox(pos, size)
       bdata.foreach(bd => b.setUserData(bd))
+      worldObserver.getListener.created(b)
+
+    case FilterReachableByRay(op, n) =>
+      val ray = new Ray[Vector2](n.head, n.head)
+      sender ! SendFilterReachableByRay(
+        n.map(p => {
+          ray.start = op.getPosition; ray.end = p
+          !rayCastCollisionDetector.collides(ray)
+        }), op.getId
+      )
 
     case GetAllBodies() => sender() ! getBodies
 
@@ -127,6 +139,7 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       val newBody = world.createBox(new Vector2(body(0), body(1)), new Vector2(body(2), body(3)))
       bodyData.foreach(bodyData =>
           parseBodyData(bodyData).foreach(bd => newBody.setUserData(bd)))
+      worldObserver.getListener.created(newBody)
 
     case ResetWorld =>
       getBodies.asScalaIterable.foreach( b => bodiesToDelete :+= b)

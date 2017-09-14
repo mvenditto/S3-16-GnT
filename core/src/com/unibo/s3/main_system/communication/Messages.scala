@@ -23,7 +23,7 @@ object Messages {
 
   //message for CharacterActor
   case class AskNeighboursMsg(character: BaseCharacter)
-  case class SendNeighboursMsg(neighbours: List[ActorRef])
+  case class SendNeighboursMsg(neighbours: Iterable[ActorRef])
   case class AskAllCharactersMsg()
   case class SendAllCharactersMsg(characters: Iterable[BaseCharacter])
   case class SendCopInfoMsg(visitedVertices: List[Vector2])

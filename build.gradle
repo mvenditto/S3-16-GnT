@@ -57,6 +57,7 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+        compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
         compile 'org.jgrapht:jgrapht-core:1.0.1'
         compile "com.kotcrab.vis:vis-ui:$visuiVersion"
         compile "org.scala-lang:scala-library:2.11.7"
