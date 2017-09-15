@@ -56,6 +56,10 @@ public class Box2dSquareAABBProximity implements Proximity<Vector2>, QueryCallba
         this.owner = owner;
     }
 
+    public void setDetectionRadius(Float newDetectionRadius) {
+        detectionRadius = newDetectionRadius;
+    }
+
     @Override
     public int findNeighbors (Proximity.ProximityCallback<Vector2> behaviorCallback) {
         this.behaviorCallback = behaviorCallback;

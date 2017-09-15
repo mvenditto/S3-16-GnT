@@ -12,19 +12,25 @@ class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor {
   override def onReceive(message: Any): Unit = message match {
     case msg: ActMsg =>
       this.thief.act(msg.dt)
-      this.thief.chooseBehaviour()
+      if (!thief.hasTarget) this.thief.chooseBehaviour()
       val wa = SystemManager.getLocalGeneralActor(GeneralActors.WORLD_ACTOR)
       wa ! AskObjectOnSightLineMsg(
         thief.getPosition, thief.getLinearVelocity, thief.getSightLineLength)
+
+    case SendGuardsInProximityMsg(guards) => {
+      thief.chooseTarget(guards)
+    }
 
     case msg: SendGraphMsg =>
       this.thief.setGraph(msg.graph)
 
     case  ObjectOnSightLineMsg(bd) =>
-      bd.foreach(b => if (b.bodyType.contains(Exit)) println("Thief won!"))
+      bd.foreach(b => if (b.bodyType.contains(Exit)) println(log() + "Thief won!"))
 
     case _ => println("(thiefActor) message unknown:" + message)
   }
+
+  def log() : String = "[CHARACTER " + thief.getId + "]: "
 }
 
 object ThiefActor {

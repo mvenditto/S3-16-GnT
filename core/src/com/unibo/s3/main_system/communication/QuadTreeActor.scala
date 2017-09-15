@@ -5,6 +5,8 @@ import com.badlogic.gdx.ai.steer.{Proximity, Steerable}
 import com.badlogic.gdx.ai.steer.proximities.FieldOfViewProximity
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.BaseCharacter
+import com.unibo.s3.main_system.characters.Guard.Guard
+import com.unibo.s3.main_system.characters.Thief.Thief
 import com.unibo.s3.main_system.communication.Messages.{AskNeighboursMsg, InitialSavingCharacterMsg, RebuildQuadTreeMsg, SendNeighboursMsg}
 import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
 import com.unibo.s3.main_system.communication.Messages._
@@ -12,6 +14,8 @@ import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.world.actors.{FilterReachableByRay, SendFilterReachableByRay}
 
 case class AskNeighboursWithFovMsg(character: BaseCharacter)
+case class SendThievesInProximityMsg(thieves: Iterable[BaseCharacter])
+case class SendGuardsInProximityMsg(thieves: Iterable[BaseCharacter])
 
 class QuadTreeActor extends UntypedAbstractActor {
 
@@ -77,8 +81,16 @@ class QuadTreeActor extends UntypedAbstractActor {
         .collect{case (x, true) => x}
 
       nearbyRequestCache -= reqId
-      val requester = agentsTable(agentsTable.keys.filter(a => a.getId == reqId).head)
-      requester ! SendAllCharactersMsg(onlyVisible)//.map(a => agentsTable(a)))
+      val reqCharacter = agentsTable.keys.filter(a => a.getId == reqId).head
+      val requester = agentsTable(reqCharacter)
+      requester ! SendNeighboursMsg(onlyVisible.filter(a => a match {
+        case _ : Guard => true; case _ => false}).map(a => agentsTable(a)))
+      val thievesInProximity = onlyVisible.filter(a => a match {case _ : Thief => true; case _ => false})
+
+      if(thievesInProximity.nonEmpty) {
+        requester ! SendThievesInProximityMsg(thievesInProximity)
+        thievesInProximity.foreach(t => agentsTable(t) ! SendGuardsInProximityMsg(List(reqCharacter)))
+      }
 
 
     case AskAllCharactersMsg =>

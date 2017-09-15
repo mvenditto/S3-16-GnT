@@ -3,7 +3,6 @@ package com.unibo.s3.main_system.characters
 import java.util
 
 import akka.actor.ActorRef
-import com.badlogic.gdx.ai.steer.{Proximity, Steerable}
 import com.badlogic.gdx.ai.steer.proximities.FieldOfViewProximity
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.{MathUtils, Vector2}
@@ -13,6 +12,7 @@ import org.jgrapht.alg.NeighborIndex
 import org.jgrapht.graph.DefaultEdge
 
 import scala.util.Random
+import com.unibo.s3.main_system.util.GdxImplicits._
 
 trait Character{
 
@@ -64,26 +64,6 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
 
   private val randomGenerator = Random
 
-  /*
-  usage:
-   import com.unibo.s3.main_system.util.GdxImplicits._ //for ..gdx.utils.Array -> Iterable[T]
-
-   /*not filtered neighbors received from QuadTree*/
-   val a: List[Steerable[Vector2]]().asGdxArray = ???
-   // or
-   val a2: com.badlogic.gdx.utils.Array[Steerable[Vector2]] = ???
-
-   coneOfView.setAgents(a) //or a2
-   val neighborsInFov = List[Steerable[Vector2]]()
-
-   coneOfView.findNeighbors(new Proximity.ProximityCallback[Vector2] {
-     override def reportNeighbor(n: Steerable[Vector2]): Boolean = {
-       neighborsInFov :+= n
-       true
-      }
-   })
-  */
-
   def getId: Int = id
 
   override def setColor(color: Color): Unit = { this.color = color }
@@ -122,7 +102,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   def getFieldOfView = coneOfView
 
   private def setNewDestination(destination: Vector2) = { //setta destinazione
-    println(log + "Going to " + destination)
+    //println(log + "Going to " + destination)
     this.setComplexSteeringBehavior.avoidCollisionsWithWorld.arriveTo(new CustomLocation(destination)).buildPriority(true)
   }
 
@@ -143,7 +123,13 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
     nearest
   }
 
-  private def selectRandomDestination = Option[Vector2](index.neighborListOf(currentNode.get).get(new Random().nextInt(index.neighborListOf(currentNode.get).size)))
+  protected def selectRandomDestination = {
+    if (index == null){
+      Option(new Vector2())
+    }else{
+      Option[Vector2](index.neighborListOf(currentNode.get).get(new Random().nextInt(index.neighborListOf(currentNode.get).size)))
+    }
+  }
 
   private def selectPriorityDestination : Option[Vector2] = {
     import scala.collection.JavaConversions._
@@ -173,10 +159,10 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
 
   def chooseBehaviour(): Unit = {
     this.currentNode = computeNearestVertex
-    System.out.println("Choose behaviour, current: " + currentNode.get + " | previous: " + previousNode.get +" | destination: " + currentDestination.get)
+    //System.out.println("Choose behaviour, current: " + currentNode.get + " | previous: " + previousNode.get +" | destination: " + currentDestination.get)
     if (currentNode == currentDestination) {
 
-      System.out.println(log + "Destination " + currentDestination + " = " + currentNode + " achieved! Choose the next one")
+      //System.out.println(log + "Destination " + currentDestination + " = " + currentNode + " achieved! Choose the next one")
 
       currentDestination = selectRandomDestination
     }
@@ -184,7 +170,15 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   }
 
 
-  private def computeNeighbours: Option[util.List[Vector2]] = Option(index.neighborListOf(currentNode.getOrElse(new Vector2())))
+  private def computeNeighbours: Option[util.List[Vector2]] = {
+    import scala.collection.JavaConversions._
+    if (index == null){
+      Option(List())
+    }else{
+      Option(index.neighborListOf(currentNode.get))
+    }
+  }
+
 
   //computo il mio nodo di riferimento
   private def computeNearestVertex: Option[Vector2] = {
@@ -201,7 +195,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
     }
     if (currentNode ne nearest){
       discoverNewVertex(nearest)
-      System.out.println(log + "Cambio nodo di riferimento " + currentNode + " to " + nearest)
+      //System.out.println(log + "Cambio nodo di riferimento " + currentNode + " to " + nearest)
       previousNode = currentNode
       currentNode = nearest
 
@@ -210,13 +204,13 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
       setNewDestination(currentDestination.get)
     }
     if (!computeNeighbours.contains(getCurrentDestination)) { //se ho cambiato nodo di riferimento e questo non è collegato alla destinazione la ricalcolo
-      println(log + " current node NOT connected to destination")
+      //println(log + " current node NOT connected to destination")
       currentDestination = selectRandomDestination
     }
     nearest
   }
 
-  private def getCurrentDestination: Vector2 = currentDestination.getOrElse(new Vector2())
+  def getCurrentDestination: Vector2 = currentDestination.getOrElse(new Vector2())
 
   private def log = "Agent " + id + ": "
 }
@@ -226,6 +220,54 @@ object Guard {
 
   case class Guard(vector2: Vector2, id : Int) extends BaseCharacter(vector2, id){
 
+    private[this] var target: Option[BaseCharacter] = None
+
+    def hasTarget: Boolean = target.isDefined
+
+    private def getNearestTarget(possibleTargets: Iterable[BaseCharacter]): BaseCharacter = {
+      val thisPos = getPosition
+      possibleTargets.toList.sortWith(_.getPosition.dst2(thisPos) < _.getPosition.dst2(thisPos)).head
+    }
+
+    def chooseTarget(possibleTargets: Iterable[BaseCharacter]): Unit = {
+
+      if (possibleTargets.isEmpty) {
+        if (target.isDefined) {
+        val patrol = setComplexSteeringBehavior()
+          .avoidCollisionsWithWorld()
+          selectRandomDestination.foreach(d => patrol.arriveTo(d))
+          patrol.buildPriority(true)
+          target = None
+        }
+      }
+
+      if (target.isEmpty && possibleTargets.nonEmpty) {
+        pursueTarget(getNearestTarget(possibleTargets))
+      }
+
+      if (target.isDefined && !possibleTargets.exists(t => t.getId == target.get.getId)) {
+        if (possibleTargets.nonEmpty)
+          pursueTarget(getNearestTarget(possibleTargets))
+      }
+
+    }
+
+    private def pursueTarget(t: BaseCharacter): Unit = {
+
+      val pursue = this.setComplexSteeringBehavior()
+        .pursue(t)
+        .arriveTo(getCurrentDestination)
+        .buildBlended(Array(1.0f, 0.5f), false)
+
+      this.setComplexSteeringBehavior()
+        .avoidCollisionsWithWorld()
+        .add(pursue)
+        .buildPriority(true)
+
+      target = Option(t)
+
+    }
+
   }
 }
 
@@ -233,6 +275,49 @@ object Thief {
   def apply(vector2: Vector2, id: Int): Thief = new Thief(vector2, id)
 
   case class Thief(vector2: Vector2, id : Int) extends BaseCharacter(vector2, id){
+
+    private var target: Option[BaseCharacter] = None
+
+    def hasTarget: Boolean = target.isDefined
+
+    def chooseTarget(possibleTargets: Iterable[BaseCharacter]): Unit = {
+
+
+      if (possibleTargets.isEmpty) {
+        if (target.isDefined) {
+          val patrol = setComplexSteeringBehavior()
+            .avoidCollisionsWithWorld()
+          selectRandomDestination.foreach(d => patrol.arriveTo(d))
+          patrol.buildPriority(true)
+          target = None
+        }
+      }
+
+      if (target.isEmpty && possibleTargets.nonEmpty) evadeTarget(possibleTargets.head)
+
+      if (target.nonEmpty && possibleTargets.nonEmpty) {
+        if (target.head.getPosition.dst2(getPosition) > possibleTargets.head.getPosition.dst2(getPosition)) {
+          evadeTarget(possibleTargets.head)
+        }
+      }
+
+
+    }
+
+    private def evadeTarget(t: BaseCharacter): Unit = {
+
+      val evade = this.setComplexSteeringBehavior()
+        .evadeFrom(t)
+        .arriveTo(getCurrentDestination)
+        .buildBlended(Array(2.0f, 0.5f), false)
+
+      this.setComplexSteeringBehavior()
+        .avoidCollisionsWithWorld()
+        .add(evade)
+        .buildPriority(true)
+
+      target = Option(t)
+    }
 
   }
 }
