@@ -40,6 +40,8 @@ class MasterActor extends UntypedAbstractActor with Stash {
           thiefID = thiefID + 1
           val newCharacter = entitiesSystem.spawnEntityAt(msg.characterType, msg.position, thiefID).asInstanceOf[Thief]
           newCharacter.setColor(Color.RED)
+          newCharacter.setMaxLinearAcceleration(8f)
+          newCharacter.setMaxLinearSpeed(2.5f)
           val characterRef = SystemManager.createCharacterActor(
             ThiefActor.props(newCharacter), CharacterActors.THIEF, thiefID)
           characterSettings(newCharacter, characterRef)
