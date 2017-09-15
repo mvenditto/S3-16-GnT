@@ -2,13 +2,13 @@ package com.unibo.s3.main_system.communication
 
 import akka.actor.{Props, UntypedAbstractActor}
 import com.unibo.s3.main_system.communication.Messages._
-import com.unibo.s3.main_system.game.GameSettings
+import com.unibo.s3.main_system.game.{GameSettings, Wall}
 import com.unibo.s3.main_system.spawn.{GuardStrategy, SpawnPointGenerator, ThiefStrategy}
 import com.unibo.s3.main_system.util.GntUtils
 
 class SpawnActor extends UntypedAbstractActor {
 
-  private val WALL_THICKNESS = GameSettings.apply().wall_thickness
+  private val WALL_THICKNESS = Wall.WALL_THICKNESS
   private val WALL_NUMBER = 2
   private[this] val spawnGenerator = new SpawnPointGenerator
   private[this] var map: Array[Array[Int]] = _

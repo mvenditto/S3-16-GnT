@@ -9,6 +9,7 @@ import com.unibo.s3.main_system.world.actors.WorldActor;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.junit.Test;
+import scala.Option;
 
 import java.util.Vector;
 
@@ -25,7 +26,7 @@ public class GraphTest extends ApplicationAdapter {
     }
 
     public void doTest() {
-        SystemManager.createSystem("System", null);
+        SystemManager.createSystem("System", Option.empty());
         SystemManager.createGeneralActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR());
         log("Actor system creato");
 

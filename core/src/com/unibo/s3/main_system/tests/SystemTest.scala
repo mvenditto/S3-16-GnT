@@ -9,7 +9,7 @@ import com.unibo.s3.main_system.world.actors.WorldActor
 class SystemTest extends TestClass{
 
   def createSistem(): lang.Boolean = {
-    SystemManager.createSystem("System", null)
+    SystemManager.createSystem("System", None)
     SystemManager.createGeneralActor(MasterActor.props, GeneralActors.MASTER_ACTOR)
     SystemManager.createGeneralActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR)
     SystemManager.createGeneralActor(QuadTreeActor.props, GeneralActors.QUAD_TREE_ACTOR)
