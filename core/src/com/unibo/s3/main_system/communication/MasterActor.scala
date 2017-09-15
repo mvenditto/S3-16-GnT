@@ -15,8 +15,7 @@ class MasterActor extends UntypedAbstractActor with Stash {
   private[this] var charactersList = List[ActorRef]()
   private[this] val entitiesSystem = new EntitiesSystemImpl()
   private[this] var collisionDetector: RaycastCollisionDetector[Vector2] = _
-  private[this] var guardID = 0
-  private[this] var thiefID = 0
+  private[this] var characterID = 0
 
   override def onReceive(message: Any): Unit = message match {
 
@@ -30,20 +29,20 @@ class MasterActor extends UntypedAbstractActor with Stash {
 
       def createCharacter(msg: CreateCharacterMsg): Unit = msg.characterType match {
         case CharacterActors.GUARD =>
-          guardID = guardID + 1
-          val newCharacter = entitiesSystem.spawnEntityAt(msg.characterType, msg.position, guardID).asInstanceOf[Guard]
+          this.characterID = this.characterID + 1
+          val newCharacter = entitiesSystem.spawnEntityAt(msg.characterType, msg.position, this.characterID).asInstanceOf[Guard]
           newCharacter.setColor(Color.BLUE)
           val characterRef = SystemManager.createCharacterActor(
-            GuardActor.props(newCharacter), CharacterActors.GUARD, guardID)
+            GuardActor.props(newCharacter), CharacterActors.GUARD, this.characterID)
           characterSettings(newCharacter, characterRef)
         case CharacterActors.THIEF =>
-          thiefID = thiefID + 1
-          val newCharacter = entitiesSystem.spawnEntityAt(msg.characterType, msg.position, thiefID).asInstanceOf[Thief]
+          this.characterID = this.characterID + 1
+          val newCharacter = entitiesSystem.spawnEntityAt(msg.characterType, msg.position, this.characterID).asInstanceOf[Thief]
           newCharacter.setColor(Color.RED)
           newCharacter.setMaxLinearAcceleration(8f)
           newCharacter.setMaxLinearSpeed(2.5f)
           val characterRef = SystemManager.createCharacterActor(
-            ThiefActor.props(newCharacter), CharacterActors.THIEF, thiefID)
+            ThiefActor.props(newCharacter), CharacterActors.THIEF, this.characterID)
           characterSettings(newCharacter, characterRef)
       }
 
