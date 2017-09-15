@@ -1,14 +1,14 @@
 package com.unibo.s3.main_system.spawn;
 
 import com.badlogic.gdx.math.Vector2;
-import com.unibo.s3.main_system.game.GameSettings;
+import com.unibo.s3.main_system.game.Wall;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SpawnPointGenerator {
 
-    private static final int WALL_THICKNESS = GameSettings.apply$default$6();
+    private static final int WALL_THICKNESS = Wall.WALL_THICKNESS();
     private SpawnStrategy spawnStrategy;
 
     public List<Vector2> generateSpawnPoints(int[][] map, int nSpawnPoints){
