@@ -9,6 +9,7 @@ object GeneralActors extends Enumeration {
   val MAP_ACTOR = EnumerationType("mapActor")
   val GRAPH_ACTOR = EnumerationType("graphActor")
   val SPAWN_ACTOR = EnumerationType("spawnActor")
+  val GAME_ACTOR = EnumerationType("gameActor")
 
   protected case class EnumerationType(name: String) extends Val(name)
 }
