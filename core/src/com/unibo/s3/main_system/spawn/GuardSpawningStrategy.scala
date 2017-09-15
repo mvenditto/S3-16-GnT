@@ -47,8 +47,8 @@ class GuardSpawningStrategy extends SpawnStrategy {
     var x = 0
     var y = 0
     do{
-      x = Random.nextInt(this.width_shift * (WIDTH_PARTS_NUMBER - 1)) + this.width_shift
-      y = map(0).length - Random.nextInt(this.height_shift)
+      x = Random.nextInt(this.width_shift * (WIDTH_PARTS_NUMBER - 1)) + this.width_shift -1
+      y = map(0).length - Random.nextInt(this.height_shift) -1
     }while(!checkAllowedPosition(map, x, y))
 
     val newGuards = new Vector2(x, y)
