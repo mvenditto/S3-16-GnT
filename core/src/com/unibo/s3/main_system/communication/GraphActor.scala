@@ -5,7 +5,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.communication.Messages._
-import com.unibo.s3.main_system.graph.GraphManagerImpl
+import com.unibo.s3.main_system.graph.GraphGenerator
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
@@ -14,7 +14,6 @@ class GraphActor extends  UntypedAbstractActor with Stash {
 
   private[this] val FILEPATH = "maps/map.txt" //ci va il percorso del file dove salvare la mappa(Sara)
   private[this] var graph: Option[UndirectedGraph[Vector2, DefaultEdge]] = None
-  private[this] val graphManager = new GraphManagerImpl()
   private[this] var width, height: Int = _
 
   private[this] val file: FileHandle = Gdx.files.local(FILEPATH)
@@ -41,7 +40,7 @@ class GraphActor extends  UntypedAbstractActor with Stash {
       else stash()
 
     case _: GenerateGraphMsg =>
-      this.graph = Option(graphManager.createGraph(this.width, this.height, FILEPATH))
+      this.graph = Option(GraphGenerator.createGraph(this.width, this.height, FILEPATH))
       unstashAll()
 
     case _ => println("(graphActor) message unknown: " + message)
