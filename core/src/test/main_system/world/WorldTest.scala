@@ -126,7 +126,7 @@ class WorldTest {
     val expected = List(true, true, false)
     val observer = Guard(new Vector2(0, -15), 0)
     worldActor ! CreateBox(new Vector2(0, 0), new Vector2(10, 10))
-    val future: Future[Any] = worldActor ? FilterReachableByRay(observer, points)
+    val future: Future[Any] = worldActor ? FilterReachableByRay(observer, points, (0, 0))
     val onlyVisible = blockingWaitForResponse(future)
     onlyVisible match {
       case SendFilterReachableByRay(mask, _) => assert(mask.equals(expected))
