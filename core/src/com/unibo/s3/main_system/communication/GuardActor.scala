@@ -42,7 +42,7 @@ class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor {
       character.updateGraph(msg.visitedVertices)
 */
     case SendThievesInProximityMsg(thieves) =>
-      thieves.foreach(t => println(log() + "Ladro! " + t))
+      //thieves.foreach(t => println(log() + "Ladro! " + t))
       guard.chooseTarget(thieves)
 
 
