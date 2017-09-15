@@ -15,6 +15,9 @@ case class GameSettings(
    thievesNumber: Int = 5,
    mapSize: Vector2 = new Vector2(60, 60),
    gameMode: GameMode = Simulated,
-   mapType: MapType = Maze,
-   wall_thickness: Int = 2
+   mapType: MapType = Maze
 )
+
+object Wall {
+  val WALL_THICKNESS: Int = 2
+}

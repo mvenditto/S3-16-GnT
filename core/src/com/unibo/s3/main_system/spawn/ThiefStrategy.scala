@@ -1,13 +1,11 @@
 package com.unibo.s3.main_system.spawn
 
 import com.badlogic.gdx.math.Vector2
-import com.unibo.s3.main_system.game.GameSettings
+import com.unibo.s3.main_system.game.{GameSettings, Wall}
 
 import scala.util.Random
 
 class ThiefStrategy extends SpawnStrategy {
-
-  private val WALL_THICKNESS = GameSettings.apply().wall_thickness
 
   private[this] var width_shift: Int = _
   private[this] var height_shift: Int = _
@@ -15,9 +13,9 @@ class ThiefStrategy extends SpawnStrategy {
   override def generateSpawnQuadrant(map: Array[Array[Int]]): Vector2 = {
     this.width_shift = map.length / 6
     this.height_shift = map(0).length / 6
-    var x = (map.length / 2) + WALL_THICKNESS
+    var x = (map.length / 2) + Wall.WALL_THICKNESS
     if(Random.nextBoolean()) x = x + Random.nextInt(width_shift) else x = x - Random.nextInt(width_shift)
-    var y = (map(0).length / 2) + WALL_THICKNESS
+    var y = (map(0).length / 2) + Wall.WALL_THICKNESS
     if(Random.nextBoolean()) y = y + Random.nextInt(height_shift) else y = y - Random.nextInt(height_shift)
 
     new Vector2(x, y)
