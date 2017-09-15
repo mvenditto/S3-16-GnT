@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2
 
 import scala.util.Random
 
-class GuardStrategy extends SpawnStrategy {
+class GuardSpawningStrategy extends SpawnStrategy {
 
   private val UP = 0
   private val RIGHT = 1
@@ -44,32 +44,49 @@ class GuardStrategy extends SpawnStrategy {
   }
 
   private def spawnTop(map: Array[Array[Int]]): Vector2 = {
-    val x = Random.nextInt(this.width_shift * (WIDTH_PARTS_NUMBER - 1)) + this.width_shift
-    val y = map(0).length - Random.nextInt(this.height_shift)
+    var x = 0
+    var y = 0
+    do{
+      x = Random.nextInt(this.width_shift * (WIDTH_PARTS_NUMBER - 1)) + this.width_shift
+      y = map(0).length - Random.nextInt(this.height_shift)
+    }while(!checkAllowedPosition(map, x, y))
+
     val newGuards = new Vector2(x, y)
     this.guards :+= newGuards
     newGuards
   }
 
   private def spawnRight(map: Array[Array[Int]]): Vector2 = {
-    val x = Random.nextInt(this.width_shift) + (this.width_shift * (WIDTH_PARTS_NUMBER - 1))
-    val y = Random.nextInt(this.height_shift) * (HEIGHT_PARTS_PARTS - 1)
+    var x = 0
+    var y = 0
+    do{
+      x = Random.nextInt(this.width_shift) + (this.width_shift * (WIDTH_PARTS_NUMBER - 1))
+      y = Random.nextInt(this.height_shift) * (HEIGHT_PARTS_PARTS - 1)
+    }while(!checkAllowedPosition(map, x, y))
     val newGuards = new Vector2(x, y)
     this.guards :+= newGuards
     newGuards
   }
 
   private def spawnBottom(map: Array[Array[Int]]): Vector2 = {
-    val x = Random.nextInt(this.width_shift * (WIDTH_PARTS_NUMBER - 1))
-    val y = Random.nextInt(this.height_shift)
+    var x = 0
+    var y = 0
+    do{
+      x = Random.nextInt(this.width_shift * (WIDTH_PARTS_NUMBER - 1))
+      y = Random.nextInt(this.height_shift)
+    }while(!checkAllowedPosition(map, x, y))
     val newGuards = new Vector2(x, y)
     this.guards :+= newGuards
     newGuards
   }
 
   private def spawnLeft(map: Array[Array[Int]]): Vector2 = {
-    val x = Random.nextInt(this.width_shift)
-    val y = Random.nextInt(this.height_shift * (HEIGHT_PARTS_PARTS - 1)) + this.height_shift
+    var x = 0
+    var y = 0
+    do{
+      x = Random.nextInt(this.width_shift)
+      y = Random.nextInt(this.height_shift * (HEIGHT_PARTS_PARTS - 1)) + this.height_shift
+    }while(!checkAllowedPosition(map, x, y))
     val newGuards = new Vector2(x, y)
     this.guards :+= newGuards
     newGuards
@@ -79,6 +96,6 @@ class GuardStrategy extends SpawnStrategy {
 
 }
 
-object GuardStrategy {
-  def apply(): GuardStrategy = new GuardStrategy()
+object GuardSpawningStrategy {
+  def apply(): GuardSpawningStrategy = new GuardSpawningStrategy()
 }

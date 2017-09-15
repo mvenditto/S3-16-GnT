@@ -31,10 +31,4 @@ public class SpawnPointGenerator {
     }
 
     public void setSpawnStrategy(SpawnStrategy strategy){ this.spawnStrategy = strategy; }
-
-    /**true, spawn point allowed / false, spawn point denied**/
-    private boolean checkAllowedPosition(int[][] map, int x, int y){
-        return map[x][y] == 0;
-    }
-
 }
