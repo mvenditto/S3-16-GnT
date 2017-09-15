@@ -60,12 +60,6 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
     //worldObserver.update(world, dt)
   }
 
-  private def getBodies: com.badlogic.gdx.utils.Array[Body] = {
-    val bodies = new com.badlogic.gdx.utils.Array[Body]()
-    world.getBodies(bodies)
-    bodies
-  }
-
   private def parseBodyData(s: String): Option[BodyData] = {
     val b = BodyData()
     s match {
@@ -120,10 +114,11 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
         }), op.getId
       )
 
-    case GetAllBodies() => sender() ! getBodies
+    case GetAllBodies() => sender() ! world.bodies
 
     case ProximityQuery(owner, radius) =>
       proximityDetector.setOwner(owner)
+      proximityDetector.setDetectionRadius(radius)
       var neighbors: Seq[Steerable[Vector2]] = List()
       proximityDetector.findNeighbors(new ProximityCallback[Vector2] {
         override def reportNeighbor(n: Steerable[Vector2]): Boolean = {neighbors :+= n; true}
@@ -141,8 +136,8 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
           parseBodyData(bodyData).foreach(bd => newBody.setUserData(bd)))
       worldObserver.getListener.created(newBody)
 
-    case ResetWorld =>
-      getBodies.asScalaIterable.foreach( b => bodiesToDelete :+= b)
+    case ResetWorld() =>
+      world.bodies.foreach( b => bodiesToDelete :+= b)
 
     case RegisterAsWorldChangeObserver =>
       worldChangeObservers :+= sender
