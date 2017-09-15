@@ -17,6 +17,7 @@ import org.jgrapht.graph.SimpleGraph;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import main_system.GdxDependencies;
+import scala.Option;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,7 +27,7 @@ public class GraphTest {
 
     @Test
     public void checkNewGraph() {
-        SystemManager.createSystem("TestSystem", null);
+        SystemManager.createSystem("TestSystem", Option.empty());
         SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor");
 
         sendMapToWord();

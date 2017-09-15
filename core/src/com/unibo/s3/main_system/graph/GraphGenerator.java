@@ -81,7 +81,7 @@ public class GraphGenerator {
                                                                 RaycastCollisionDetector<Vector2> collisionDetector, int dimWall) {
         UndirectedGraph<Vector2, DefaultEdge> graph = new SimpleGraph<>(DefaultEdge.class);
         addNodes(grid, graph, walls, dimWall);
-        log("Finiti i nodi, sono " + graph.vertexSet().size());
+        //log("Finiti i nodi, sono " + graph.vertexSet().size());
         addEdges(graph, collisionDetector);
         return graph;
     }
@@ -96,7 +96,7 @@ public class GraphGenerator {
         concurrentCheckUnconnectedNodes(graph, collisionDetector);
         cron.stop();
 
-        log("A controllare i nodi staccati ci ha messo: " + cron.getTime());
+        //log("A controllare i nodi staccati ci ha messo: " + cron.getTime());
 
     }
 
@@ -135,7 +135,7 @@ public class GraphGenerator {
             }
         }
 
-        log("Finito");
+        //log("Finito");
         executor.shutdown();
     }
 
