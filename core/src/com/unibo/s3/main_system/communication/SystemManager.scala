@@ -69,7 +69,7 @@ object SystemManager {
     tmp.append("akka.tcp://")
     tmp.append(systemName)
     tmp.append("@")
-    tmp.append(this.ipToConnect)
+    tmp.append(this.ipToConnect.get)
     tmp.append(":")
     tmp.append(AkkaSettings.ComputeSystemPort)
     tmp.append(path)

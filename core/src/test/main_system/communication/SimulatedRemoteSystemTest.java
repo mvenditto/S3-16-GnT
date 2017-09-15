@@ -57,6 +57,7 @@ public class SimulatedRemoteSystemTest {
             try {
                 SystemManager.createSystem("LocalSystem", Option.apply(AkkaSettings.GUISystemPort()));
                 ActorRef localActor = SystemManager.createActor(Props.create(TestActor.class), "localActor");
+
                 String confText = "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," +
                         "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" +
                         ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
