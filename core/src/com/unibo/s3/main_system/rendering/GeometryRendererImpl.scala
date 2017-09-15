@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.{MathUtils, Polygon, Rectangle, Vector2}
 import com.unibo.s3.main_system.characters.BaseCharacter
+import com.unibo.s3.main_system.characters.Guard.Guard
+import com.unibo.s3.main_system.characters.Thief.Thief
 import com.unibo.s3.main_system.characters.steer.MovableEntity
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.util.ScaleUtils
@@ -73,8 +75,12 @@ class GeometryRendererImpl extends GeometryRenderer[Vector2] {
       case bc: BaseCharacter =>
         val fovAngle = bc.getFieldOfView.getAngle * MathUtils.radDeg
         val fovRadius = bc.getFieldOfView.getRadius
-        shapeRenderer.setColor(Color.CYAN)
         val pos = character.getPosition
+        val tint = bc match {
+          case _: Guard => Color.CYAN
+          case _: Thief => Color.RED
+        }
+        shapeRenderer.setColor(tint)
         shapeRenderer.arc(pos.x * s, pos.y * s, fovRadius * s,
           bc.getOrientation * MathUtils.radiansToDegrees - fovAngle / 2f + 90f,
           fovAngle)

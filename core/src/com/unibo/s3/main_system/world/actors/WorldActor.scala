@@ -33,8 +33,8 @@ case class WorldChangeMsg(b: Body)
 case class AskWorldMask(w:Int, h:Int, cellWidth: Float)
 case class AskObjectOnSightLineMsg(p: Vector2, lv: Vector2, rayLenght: Float)
 case class ObjectOnSightLineMsg(bd: Iterable[BodyData])
-case class FilterReachableByRay(op: BaseCharacter, n: Iterable[Vector2])
-case class SendFilterReachableByRay(f: Iterable[Boolean], reqId: Int)
+case class FilterReachableByRay(op: BaseCharacter, n: Iterable[Vector2], reqId: (Long, Int))
+case class SendFilterReachableByRay(f: Iterable[Boolean], reqId: (Long, Int))
 
 class WorldActor(val world: World) extends UntypedAbstractActor {
   import WorldActor._
@@ -105,13 +105,13 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       bdata.foreach(bd => b.setUserData(bd))
       worldObserver.getListener.created(b)
 
-    case FilterReachableByRay(op, n) =>
+    case FilterReachableByRay(op, n, reqId) =>
       val ray = new Ray[Vector2](n.head, n.head)
       sender ! SendFilterReachableByRay(
         n.map(p => {
           ray.start = op.getPosition; ray.end = p
           !rayCastCollisionDetector.collides(ray)
-        }), op.getId
+        }), reqId
       )
 
     case GetAllBodies() => sender() ! world.bodies

@@ -11,6 +11,7 @@ import com.kotcrab.vis.ui.util.ToastManager
 import com.kotcrab.vis.ui.widget.{BusyBar, VisWindow}
 import com.unibo.s3.Main
 import com.unibo.s3.main_system.characters.BaseCharacter
+import com.unibo.s3.main_system.communication.CharacterActors._
 import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.communication.{CharacterActors, GeneralActors, SystemManager}
 import com.unibo.s3.main_system.game.GameSettings
@@ -37,6 +38,7 @@ class MasterModule extends BasicModuleWithGui {
         notifications.show("Thief["+t.getId+"] got caught!")
 
       case SendAllCharactersMsg(_characters) =>
+        //println("Received characters update: ", _characters.size)
         characters = Option(_characters)
 
       case SendGraphMsg(g) =>
@@ -86,7 +88,7 @@ class MasterModule extends BasicModuleWithGui {
     notifications = new ToastManager(gui)
     notifications.setAlignment(Align.topRight)
     spriteRenderer.init()
-    spriteRenderer.setDebugDraw(true)
+    spriteRenderer.setDebugDraw(false)
   }
 
   def initGame(config: GameSettings): Unit = {
@@ -159,7 +161,7 @@ class MasterModule extends BasicModuleWithGui {
       val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
       mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
       spawnActor.tell(
-        GenerateNewCharacterPositionMsg(CharacterActors.GUARD), masterActor)
+        GenerateNewCharacterPositionMsg(GUARD), masterActor)
     }
     false
   }
@@ -167,7 +169,7 @@ class MasterModule extends BasicModuleWithGui {
   override def keyUp(keycode: Int): Boolean = {
     if(keycode == Input.Keys.T) {
       spawnActor.tell(
-        GenerateNewCharacterPositionMsg(CharacterActors.THIEF), masterActor)
+        GenerateNewCharacterPositionMsg(THIEF), masterActor)
     }
     false
   }

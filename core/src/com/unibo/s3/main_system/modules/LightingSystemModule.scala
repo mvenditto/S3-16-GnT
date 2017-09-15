@@ -36,10 +36,10 @@ class LightingSystemModule extends BasicModuleWithGui {
 
   private[this] var rayHandler: RayHandler = _
   private[this] var cam: OrthographicCamera = _
-  private[this] var worldObserverActor: ActorRef = _
+  private[this] var lightingActor: ActorRef = _
 
   private[this] val torches = mutable.Map[Int, ConeLight]()
-  private[this] var charactersUpdate: Option[Iterable[BaseCharacter]] = None
+  private[this] var charactersUpdate = Iterable[BaseCharacter]()
   private[this] var worldShadowCopy: World = _
   private[this] var ambientLightIntensity = 0.2f
 
@@ -57,8 +57,8 @@ class LightingSystemModule extends BasicModuleWithGui {
       case AskIsPointAtShadow(p) =>
         sender ! rayHandler.pointAtShadow(p.x, p.y)
 
-      case SendAllCharactersMsg(character) =>
-        charactersUpdate = Option(character)
+      case SendAllCharactersMsg(characters) =>
+        charactersUpdate = characters
     }
   }
 
@@ -71,12 +71,13 @@ class LightingSystemModule extends BasicModuleWithGui {
 
   def setup(): Unit = {
 
-    worldObserverActor =
-      SystemManager.createActor(Props(new LightingActor), "worldObserver")
+    lightingActor =
+      SystemManager.createGeneralActor(
+        Props(new LightingActor), GeneralActors.LIGHTING_SYSTEM_ACTOR)
 
     SystemManager
       .getLocalGeneralActor(GeneralActors.WORLD_ACTOR)
-      .tell(RegisterAsWorldChangeObserver, worldObserverActor)
+      .tell(RegisterAsWorldChangeObserver, lightingActor)
 
     val c = loadConfigFromPreferences(owner.getPrefs)
     val lqm = c.lightQualityModiefier
@@ -109,35 +110,26 @@ class LightingSystemModule extends BasicModuleWithGui {
   }
 
   private def updateTorches() = {
-    if (charactersUpdate.isDefined) {
-      val characters = charactersUpdate.get
-      characters.foreach(c => {
-        val angle = (c.getOrientation * MathUtils.radiansToDegrees) + 90
-        val id = c.getId
-        val lv = c.getLinearVelocity.cpy().nor().scl(1.0f).add(c.getPosition)
-        if (torches.contains(id)) {
-          val t = torches(id)
-          t.setPosition(lv)
-          t.setDirection(angle)
-        } else {
-          torches(id) = new ConeLight(
-            rayHandler, TorchRaysNum, BrightWhiteColor, TorchDistance,
-            lv.x, lv.y, angle, TorchDegrees)
-        }
-      })
-    }
-    charactersUpdate = None
+    charactersUpdate.foreach(c => {
+      val angle = (c.getOrientation * MathUtils.radiansToDegrees) + 90
+      val id = c.getId
+      val lv = c.getLinearVelocity.cpy().nor().scl(1.0f).add(c.getPosition)
+      if (torches.contains(id)) {
+        val t = torches(id)
+        t.setPosition(lv)
+        t.setDirection(angle)
+      } else {
+        torches(id) = new ConeLight(
+          rayHandler, TorchRaysNum, BrightWhiteColor, TorchDistance,
+          lv.x, lv.y, angle, TorchDegrees)
+      }
+    })
   }
 
   override def update(dt: Float): Unit = {
     super.update(dt)
-    //worldShadowCopy.step(dt, 8, 3)
-
-    SystemManager
-      .getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR)
-      .tell(AskAllCharactersMsg, worldObserverActor)
-
     updateTorches()
+    //println("Receive characters: ", charactersUpdate.size,"/",torches.size)
   }
 
   override def touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
