@@ -11,6 +11,7 @@ import com.unibo.s3.main_system.communication.SystemManager;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import scala.Option;
 
 public class LocalSystemTest {
 
@@ -23,9 +24,7 @@ public class LocalSystemTest {
                         target = actorRef;
                         getSender().tell("done", getSelf());
                     })
-                    .matchEquals(startMsg, message ->  {
-                        getSender().tell(mapMsg, getSelf());
-                    })
+                    .matchEquals(startMsg, message -> getSender().tell(mapMsg, getSelf()))
                     .matchEquals(mapMsg, message -> {
                         if (target != null) target.forward(message, getContext());
                     })
@@ -40,7 +39,7 @@ public class LocalSystemTest {
 
     @BeforeClass
     public static void setup() {
-        SystemManager.createSystem("MySystem", null);
+        SystemManager.createSystem("MySystem", Option.empty());
         SystemManager.createActor(Props.create(TestActor.class), "firstActor");
         SystemManager.createActor(Props.create(TestActor.class), "secondActor");
         testSystem = ActorSystem.create();

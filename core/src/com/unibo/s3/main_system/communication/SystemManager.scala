@@ -1,7 +1,9 @@
 package com.unibo.s3.main_system.communication
 
+import java.net.InetAddress
+
 import akka.actor.{ActorRef, ActorSelection, ActorSystem, Props}
-import com.typesafe.config.Config
+import com.typesafe.config.ConfigFactory
 import com.unibo.s3.main_system.game.AkkaSettings
 
 object SystemManager {
@@ -11,18 +13,26 @@ object SystemManager {
   private[this] var system: ActorSystem = _
   private[this] var actorList: Map[String, ActorRef] = _
 
-  private[this] var ipToConnect: String = _
+  private[this] var ipToConnect: Option[String] = Option.empty
 
-   def createSystem(systemName: String, config: Config): Unit = {
-    this.system = ActorSystem.create(systemName, config)
+  def createSystem(systemName: String, portNumber: Option[Int]): Unit = {
+    if(portNumber.isEmpty)
+      this.system = ActorSystem.create(systemName)
+    else {
+      this.system = ActorSystem.create(systemName, ConfigFactory.parseString(
+        "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," +
+          "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" +
+          ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
+          ",\"netty\":{\"tcp\":{\"hostname\":\""+ InetAddress.getLocalHost.getHostAddress+"\",\"port\":"+portNumber.get+"}}}}}"))
+    }
   }
 
   def setIPForRemoting(ip: String): Unit = {
-    this.ipToConnect = ip
+    this.ipToConnect = Option.apply(ip)
   }
 
   def getIP: Option[String] = {
-    Option(this.ipToConnect)
+    this.ipToConnect
   }
 
   def createActor(props: Props, actorCode: String): ActorRef = {

@@ -27,8 +27,8 @@ class BootstrapRemote() {
   }
 
   private def initActorSystem(): Unit = {
-    SystemManager.createSystem(ActorSystemName, null)
-    log("Creted actor system");
+    SystemManager.createSystem(ActorSystemName, Option.empty)
+    log("Creted actor system")
 
     val world = new World(new Vector2(0, 0), true)
 
@@ -40,15 +40,15 @@ class BootstrapRemote() {
 
     SystemManager.createGeneralActor(
       QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)
-    log("Creted quad tree actor");
+    log("Creted quad tree actor")
 
     SystemManager.createGeneralActor(SpawnActor.props(),
       GeneralActors.SPAWN_ACTOR)
-    log("Created spawn actor");
+    log("Created spawn actor")
 
     SystemManager.createGeneralActor(
       MapActor.props(), GeneralActors.MAP_ACTOR)
-    log("Creted map actor");
+    log("Creted map actor")
 
     SystemManager.createGeneralActor(
       GraphActor.props(), GeneralActors.GRAPH_ACTOR)
