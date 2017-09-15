@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.unibo.s3.main_system.communication.*;
 import com.unibo.s3.main_system.world.actors.WorldActor;
+import scala.Option;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ public class SystemTestJava implements TestClass {
     }
 
     private boolean generationTest() {
-        SystemManager.createSystem("System", null);
+        SystemManager.createSystem("System", Option.empty());
         SystemManager.createGeneralActor(MasterActor.props(), GeneralActors.MASTER_ACTOR());
         SystemManager.createGeneralActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR());
         SystemManager.createGeneralActor(QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR());
