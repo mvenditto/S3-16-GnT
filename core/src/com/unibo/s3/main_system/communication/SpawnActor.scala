@@ -39,8 +39,7 @@ class SpawnActor extends UntypedAbstractActor {
         this.spawnGenerator.setSpawnStrategy(guardStrategy)
       else
         this.spawnGenerator.setSpawnStrategy(ThiefStrategy())
-      SystemManager.getLocalGeneralActor(GeneralActors.MASTER_ACTOR)
-        .tell(CreateCharacterMsg(this.spawnGenerator.generateSpawnPoints(this.map, 1).get(0), msg.characterType), getSelf())
+        sender ! CreateCharacterMsg(this.spawnGenerator.generateSpawnPoints(this.map, 1).get(0), msg.characterType)
 
     case _ => println("(spawnActor) message unknown:" + message)
   }
