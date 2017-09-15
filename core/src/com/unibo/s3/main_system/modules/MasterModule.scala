@@ -154,12 +154,6 @@ class MasterModule extends BasicModuleWithGui {
     inputMultiplexer.addProcessor(this)
   }
 
-  override def touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
-    //need to be fixed, out of sync, new characters shows only after next added.
-    quadTreeActor tell(AskAllCharactersMsg, gameActor)
-    false
-  }
-
   override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
     if (button != 1){
       val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))

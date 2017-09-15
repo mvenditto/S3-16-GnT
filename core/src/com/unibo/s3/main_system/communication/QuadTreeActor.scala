@@ -1,15 +1,13 @@
 package com.unibo.s3.main_system.communication
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import com.badlogic.gdx.ai.steer.Proximity.ProximityCallback
-import com.badlogic.gdx.ai.steer.{Proximity, Steerable}
-import com.badlogic.gdx.ai.steer.proximities.FieldOfViewProximity
+import com.badlogic.gdx.ai.steer.Steerable
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.BaseCharacter
-import com.unibo.s3.main_system.communication.Messages.{AskNeighboursMsg, InitialSavingCharacterMsg, RebuildQuadTreeMsg, SendNeighboursMsg}
-import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
-import com.unibo.s3.main_system.communication.Messages._
+import com.unibo.s3.main_system.communication.Messages.{AskNeighboursMsg, InitialSavingCharacterMsg, RebuildQuadTreeMsg, SendNeighboursMsg, _}
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.world.actors.{FilterReachableByRay, SendFilterReachableByRay}
+import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
 
 case class AskNeighboursWithFovMsg(character: BaseCharacter)
 
@@ -35,6 +33,8 @@ class QuadTreeActor extends UntypedAbstractActor {
 
     case msg: InitialSavingCharacterMsg =>
       agentsTable += (msg.newCharacter -> msg.characterRef)
+      SystemManager.getLocalGeneralActor(
+        GeneralActors.GAME_ACTOR) ! SendAllCharactersMsg(agentsTable.keys)
 
     case RebuildQuadTreeMsg() =>
       root = QuadTreeNode(bounds)
