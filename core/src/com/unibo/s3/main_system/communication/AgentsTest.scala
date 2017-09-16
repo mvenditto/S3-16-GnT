@@ -30,7 +30,7 @@ class AgentsTest extends ApplicationAdapter{
     testGraph.addEdge(v3, v4)
     testGraph.addEdge(v5, v4)
     testGraph.addEdge(v2, v5)
-    SystemManager.createSystem("System", null)
+    SystemManager.createSystem("System", None)
     SystemManager.createGeneralActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR)
     SystemManager.createGeneralActor(GraphActor.props(), GeneralActors.GRAPH_ACTOR)
     val mapActor = SystemManager.createGeneralActor(MapActor.props(), GeneralActors.MAP_ACTOR)

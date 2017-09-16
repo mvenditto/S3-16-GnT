@@ -16,6 +16,8 @@ import com.unibo.s3.main_system.communication.Messages.GenerateMapMsg;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
+import scala.Option;
+import scala.tools.cmd.Opt;
 
 public class CommunicationTest extends ApplicationAdapter {
 
@@ -33,7 +35,7 @@ public class CommunicationTest extends ApplicationAdapter {
         this.batch = new SpriteBatch();
         this.img = new Texture("badlogic.jpg");
 
-        SystemManager.createSystem("System", null);
+        SystemManager.createSystem("System", Option.empty());
         SystemManager.createGeneralActor(MasterActor.props(), GeneralActors.MASTER_ACTOR());
         SystemManager.createGeneralActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR());
         SystemManager.createGeneralActor(QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR());

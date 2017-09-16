@@ -1,12 +1,13 @@
 package com.unibo.s3.main_system.map;
 
 import com.unibo.s3.main_system.game.GameSettings;
+import com.unibo.s3.main_system.game.Wall;
 
 import java.util.List;
 
 public class MapGenerator {
 
-    private static final int BASE_UNIT = GameSettings.apply$default$6();
+    private static final int BASE_UNIT = Wall.WALL_THICKNESS();
     private GenerationStrategy strategy;
 
     public void generateMap(int width, int height) {
