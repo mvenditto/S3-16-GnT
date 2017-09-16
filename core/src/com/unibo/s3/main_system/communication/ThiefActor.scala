@@ -13,7 +13,7 @@ class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor {
     case msg: ActMsg =>
       this.thief.act(msg.dt)
       if (!thief.hasTarget) this.thief.chooseBehaviour()
-      val wa = SystemManager.getLocalGeneralActor(GeneralActors.WORLD_ACTOR)
+      val wa = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
       wa ! AskObjectOnSightLineMsg(
         thief.getPosition, thief.getLinearVelocity, thief.getSightLineLength)
 

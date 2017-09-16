@@ -63,8 +63,8 @@ class Box2dModule extends BaseTestbedModule with InputProcessorAdapter {
     world = new World(new Vector2(0, 0), true)
     log("Starting actor system")
     SystemManager.createSystem("System", None)
-    SystemManager.createGeneralActor(Props.create(classOf[WorldActor], world), GeneralActors.WORLD_ACTOR)
-    worldActor = SystemManager.getLocalGeneralActor(GeneralActors.WORLD_ACTOR)
+    SystemManager.createActor(Props.create(classOf[WorldActor], world), GeneralActors.WORLD_ACTOR)
+    worldActor = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
   }
 
   override def cleanup(): Unit = {

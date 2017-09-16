@@ -117,9 +117,9 @@ class GraphMapTest extends BaseTestbedModule {
   override def setup(log: (String) => Unit): Unit = {
     super.setup(log)
     log("Storing actor refs..")
-    worldActor = SystemManager.getLocalGeneralActor(GeneralActors.WORLD_ACTOR)
-    mapActor = SystemManager.getLocalGeneralActor(GeneralActors.MAP_ACTOR)
-    graphActor = SystemManager.getLocalGeneralActor(GeneralActors.GRAPH_ACTOR)
+    worldActor = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
+    mapActor = SystemManager.getLocalActor(GeneralActors.MAP_ACTOR)
+    graphActor = SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR)
 
     mapActor ! MapSettingsMsg(60, 60)
     graphActor ! MapSettingsMsg(60, 60)

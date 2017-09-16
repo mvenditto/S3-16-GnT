@@ -48,7 +48,7 @@ public class GraphTest {
         String text = file.readString();
         String[] lines = text.split("\\n");
         for(String l : lines) {
-            SystemManager.getLocalGeneralActor(GeneralActors.WORLD_ACTOR()).tell(new Messages.MapElementMsg(l), ActorRef.noSender());
+            SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR()).tell(new Messages.MapElementMsg(l), ActorRef.noSender());
         }
     }
 

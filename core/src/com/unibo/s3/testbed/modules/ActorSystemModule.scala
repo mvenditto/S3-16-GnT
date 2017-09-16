@@ -8,7 +8,7 @@ import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.kotcrab.vis.ui.widget._
-import com.unibo.s3.main_system.communication.{GraphActor, MapActor, QuadTreeActor, SystemManager}
+import com.unibo.s3.main_system.communication._
 import com.unibo.s3.main_system.world.actors.WorldActor
 import com.unibo.s3.testbed.model.BaseTestbedModule
 
@@ -97,16 +97,16 @@ class ActorSystemModule extends BaseTestbedModule {
     SystemManager.createSystem("System", None)
 
     f("Deploy -> WorldActor")
-    SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor")
+    SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR)
 
     f("Deploy -> MapActor")
-    SystemManager.createActor(MapActor.props(), "mapActor")
+    SystemManager.createActor(MapActor.props(), GeneralActors.MAP_ACTOR)
 
     f("Deploy -> GraphActor")
-    SystemManager.createActor(GraphActor.props(), "graphActor")
+    SystemManager.createActor(GraphActor.props(), GeneralActors.GRAPH_ACTOR)
 
     f("Deploy -> ProximityActor")
-    SystemManager.createActor(QuadTreeActor.props(), "quadTreeActor")
+    SystemManager.createActor(QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)
 
     f("Deploy -> LoggerActor")
     SystemManager.createActor(LoggerActor.props(responseTextField), "loggerActor")

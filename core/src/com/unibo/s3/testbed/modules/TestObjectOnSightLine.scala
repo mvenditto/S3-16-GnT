@@ -98,7 +98,7 @@ class TestObjectOnSightLine extends BaseTestbedModule {
 
   override def setup(f: (String) => Unit): Unit = {
     super.setup(f)
-    worldActor = SystemManager.getLocalGeneralActor(GeneralActors.WORLD_ACTOR)
+    worldActor = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
     receiverActor = SystemManager.createActor(ReceiverActor.props(), "receiverActor")
     cd = new Box2dProxyDetectorsFactory(worldActor).newRaycastCollisionDetector()
     character.setColor(Color.GREEN)

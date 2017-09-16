@@ -20,8 +20,8 @@ class MasterActor extends UntypedAbstractActor with Stash {
   override def onReceive(message: Any): Unit = message match {
 
     case msg: ActMsg =>
-      SystemManager.getLocalGeneralActor(GeneralActors.WORLD_ACTOR).tell(msg, getSelf())
-      SystemManager.getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR).tell(RebuildQuadTreeMsg(), getSelf())
+      SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR).tell(msg, getSelf())
+      SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR).tell(RebuildQuadTreeMsg(), getSelf())
       charactersList.foreach(cop => cop.tell(msg, getSelf()))
       //manca il ladro o i ladri
 
@@ -32,7 +32,7 @@ class MasterActor extends UntypedAbstractActor with Stash {
           this.characterID = this.characterID + 1
           val newCharacter = entitiesSystem.spawnEntityAt(msg.characterType, msg.position, this.characterID).asInstanceOf[Guard]
           newCharacter.setColor(Color.BLUE)
-          val characterRef = SystemManager.createCharacterActor(
+          val characterRef = SystemManager.createActor(
             GuardActor.props(newCharacter), CharacterActors.GUARD, this.characterID)
           characterSettings(newCharacter, characterRef)
         case CharacterActors.THIEF =>
@@ -41,14 +41,14 @@ class MasterActor extends UntypedAbstractActor with Stash {
           newCharacter.setColor(Color.RED)
           newCharacter.setMaxLinearAcceleration(8f)
           newCharacter.setMaxLinearSpeed(2.5f)
-          val characterRef = SystemManager.createCharacterActor(
+          val characterRef = SystemManager.createActor(
             ThiefActor.props(newCharacter), CharacterActors.THIEF, this.characterID)
           characterSettings(newCharacter, characterRef)
       }
 
       def characterSettings(newCharacter: BaseCharacter, characterRef: ActorRef): Unit = {
         if (collisionDetector == null) {
-          val worldActorRef = SystemManager.getLocalGeneralActor(GeneralActors.WORLD_ACTOR)
+          val worldActorRef = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
           collisionDetector = new Box2dProxyDetectorsFactory(worldActorRef).newRaycastCollisionDetector()
         }
 
@@ -56,9 +56,9 @@ class MasterActor extends UntypedAbstractActor with Stash {
 
         charactersList :+= characterRef
 
-        SystemManager.getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR)
+        SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR)
           .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
-        SystemManager.getLocalGeneralActor(GeneralActors.GRAPH_ACTOR)
+        SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR)
           .tell(AskForGraphMsg, characterRef)
       }
 

@@ -31,11 +31,11 @@ class AgentsTest extends ApplicationAdapter{
     testGraph.addEdge(v5, v4)
     testGraph.addEdge(v2, v5)
     SystemManager.createSystem("System", None)
-    SystemManager.createGeneralActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR)
-    SystemManager.createGeneralActor(GraphActor.props(), GeneralActors.GRAPH_ACTOR)
-    val mapActor = SystemManager.createGeneralActor(MapActor.props(), GeneralActors.MAP_ACTOR)
-    SystemManager.createGeneralActor(QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)
-    val masterActor = SystemManager.createGeneralActor(MasterActor.props(), GeneralActors.MAP_ACTOR)
+    SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR)
+    SystemManager.createActor(GraphActor.props(), GeneralActors.GRAPH_ACTOR)
+    val mapActor = SystemManager.createActor(MapActor.props(), GeneralActors.MAP_ACTOR)
+    SystemManager.createActor(QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)
+    val masterActor = SystemManager.createActor(MasterActor.props(), GeneralActors.MAP_ACTOR)
 
     masterActor ! ActMsg(0.016f)
 
@@ -43,9 +43,9 @@ class AgentsTest extends ApplicationAdapter{
     masterActor.tell(Messages.CreateCharacterMsg(new Vector2(1, 1), CharacterActors.GUARD), ActorRef.noSender)
     masterActor.tell(Messages.CreateCharacterMsg(new Vector2(1, 1), CharacterActors.GUARD), ActorRef.noSender)
 
-    var copOne = SystemManager.getLocalCharacterActor(CharacterActors.GUARD, 1)
-    var copTwo = SystemManager.getLocalCharacterActor(CharacterActors.GUARD, 2)
-    var copThree = SystemManager.getLocalCharacterActor(CharacterActors.GUARD, 3)
+    var copOne = SystemManager.getLocalActor(CharacterActors.GUARD, 1)
+    var copTwo = SystemManager.getLocalActor(CharacterActors.GUARD, 2)
+    var copThree = SystemManager.getLocalActor(CharacterActors.GUARD, 3)
 
     copOne ! SendGraphMsg(testGraph)
     copTwo ! SendGraphMsg(testGraph)
