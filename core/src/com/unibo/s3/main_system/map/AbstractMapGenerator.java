@@ -6,6 +6,7 @@ import com.unibo.s3.main_system.game.GameSettings$;
 import com.unibo.s3.main_system.game.Wall;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -32,8 +33,8 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
         this.widthSplits = width;
         this.heightSplits = height;
         this.generatedMap = new int[widthSplits][heightSplits];
-        System.out.println("splits: " + widthSplits + " " + heightSplits);
-        System.out.println("Generated matrix " + generatedMap.length + "x" + generatedMap[0].length);
+        //System.out.println("splits: " + widthSplits + " " + heightSplits);
+        //System.out.println("Generated matrix " + generatedMap.length + "x" + generatedMap[0].length);
     }
 
     public List<String> getMap(){
@@ -63,13 +64,8 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
         perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + HALF_BASE_UNIT + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
         perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + (heightSplits * BASE_UNIT + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
 
-        for(int i = 0; i < 20; i++) {
-            Vector2 exit = generateExit();
-            System.out.println("DOOR:");
-            System.out.println("coord: " + exit.x + " " + exit.y);
-            //perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((firstSplit * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * 5 * 2));
+        for(Vector2 exit : generateCardinalExits()) {
             perimeter.add(((exit.x * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + ((exit.y * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + (BASE_UNIT) + SEPARATOR + "E");
-            //perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((secondSplit * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT* 20));
         }
         return perimeter;
     }
@@ -164,9 +160,7 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
     }
 
     protected boolean isVerticalWallDenied(int coordinate, int startY, int endY){
-        if (startY == 0 && endY == heightSplits) {
-            //System.out.println("Initial wall OK");
-        }
+        if (startY == 0 && endY == heightSplits) {}
         else if(endY == heightSplits){
             if (generatedMap[coordinate][startY - 1] == 0) {
                 return  true;
@@ -186,9 +180,7 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
     }
 
     protected boolean isHorizontalWallDenied(int coordinate, int startX, int endX) {
-        if (startX == 0 && endX == widthSplits) {
-            //System.out.println("Initial wall OK");
-        }
+        if (startX == 0 && endX == widthSplits) {}
         else if(endX == widthSplits){
             if(generatedMap[startX - 1][coordinate] == 0){
                 System.out.println();
@@ -208,48 +200,74 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
         return false;
     }
 
+    private List<Vector2> generateCardinalExits(){
+        List<Vector2> exits = new ArrayList<>();
+        exits.add(generateLeftWallExit());
+        exits.add(generateRightWallExit());
+        exits.add(generateUpperWallExit());
+        exits.add(generateLowerWallExit());
+        return exits;
+    }
+
     private Vector2 generateExit(){
         int wallWithDoor = new Random().nextInt(4);
-        int y = 0;
-        int x = 0;
+        Vector2 exit = new Vector2();
         switch (wallWithDoor){
             case LEFT_WALL:
-                do{
-                    y = generateInRange(1, heightSplits - 1);
-                    System.out.println("La porta non va bene");
-                }while(generatedMap[0][y] == 1);
-                y += HALF_BASE_UNIT;
+                exit = generateLeftWallExit();
                 break;
             case RIGHT_WALL:
-                do {
-                    y = generateInRange(1, heightSplits - 1);
-                    x = widthSplits - 1;
-                    System.out.println("La porta non va bene");
-                }while(generatedMap[x][y] == 1);
-                x += BASE_UNIT;
-                y += HALF_BASE_UNIT;
+                exit = generateRightWallExit();
                 break;
             case UPPER_WALL:
-                do {
-                    x = generateInRange(1, widthSplits - 1);
-                    y = heightSplits - 1;
-                    System.out.println("La porta non va bene");
-                }while(generatedMap[x][y] == 1);
-                x += HALF_BASE_UNIT;
-                y += BASE_UNIT;
+                exit = generateUpperWallExit();
                 break;
             case LOWER_WALL:
-                do {
-                    x = generateInRange(1, widthSplits - 1);
-                    System.out.println("La porta non va bene");
-                }while(generatedMap[x][0] == 1);
-                x += HALF_BASE_UNIT;
+                exit = generateLowerWallExit();
                 break;
             default:
                 break;
         }
-        System.out.println("Door: " + wallWithDoor + " " + x + "," +y);
-        return new Vector2(x,y);
+        return exit;
     }
 
+    private Vector2 generateLeftWallExit(){
+        Vector2 v = new Vector2(0, 0);
+        do{
+            v.y = generateInRange(1, heightSplits - 1);
+        }while(generatedMap[0][(int) v.y] == 1);
+        v.y += HALF_BASE_UNIT;
+        return v;
+    }
+
+    private Vector2 generateRightWallExit(){
+        Vector2 v = new Vector2(0, 0);
+        do {
+            v.y = generateInRange(1, heightSplits - 1);
+            v.x = widthSplits - 1;
+        }while(generatedMap[(int) v.x][(int) v.y] == 1);
+        v.x += BASE_UNIT;
+        v.y += HALF_BASE_UNIT;
+        return v;
+    }
+
+    private Vector2 generateUpperWallExit(){
+        Vector2 v = new Vector2(0, 0);
+        do {
+            v.x = generateInRange(1, widthSplits - 1);
+            v.y = heightSplits - 1;
+        }while(generatedMap[(int) v.x][(int) v.y] == 1);
+        v.x += HALF_BASE_UNIT;
+        v.y += BASE_UNIT;
+        return v;
+    }
+
+    private Vector2 generateLowerWallExit(){
+        Vector2 v = new Vector2(0, 0);
+        do {
+            v.x = generateInRange(1, widthSplits - 1);
+        }while(generatedMap[(int) v.x][0] == 1);
+        v.x += HALF_BASE_UNIT;
+        return v;
+    }
 }
