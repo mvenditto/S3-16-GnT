@@ -1,4 +1,4 @@
-package main_system.world
+package world
 
 import akka.actor.ActorRef
 import akka.pattern.ask
@@ -26,7 +26,7 @@ import scala.concurrent.{Await, Future}
 @RunWith(classOf[GdxDependencies])
 class WorldTest {
 
-  private[this] val ErrFutureFailure = "Future failed with error: "
+  private[this] val ErrFutureFailureOrBadMatch = "Failed to retrieve future or bad math."
 
   implicit val timeout = Timeout(5 seconds)
 
@@ -36,7 +36,7 @@ class WorldTest {
   initActorSystem()
 
   private def initActorSystem() = {
-    SystemManager.createSystem("WorldTestSystem", null)
+    SystemManager.createSystem("WorldTestSystem", None)
     worldActor = SystemManager.createGeneralActor(
       WorldActor.props(world), GeneralActors.WORLD_ACTOR)
   }
@@ -45,8 +45,8 @@ class WorldTest {
     Await.result(future, timeout.duration)
   }
 
-  private def failedToRetrieveFutureResult() = {
-    fail("Failed to retrieve future result.")
+  private def futureFailedOrBadMatch() = {
+    fail(ErrFutureFailureOrBadMatch)
   }
 
   @Before def resetWorld(): Unit = {
@@ -59,7 +59,7 @@ class WorldTest {
     val bodies = blockingWaitForResponse(future)
     bodies match {
       case b: Iterable[Body] => assert(b.size == 1)
-      case _ => failedToRetrieveFutureResult()
+      case _ => futureFailedOrBadMatch()
     }
   }
 
@@ -71,7 +71,7 @@ class WorldTest {
     val bodies = blockingWaitForResponse(future)
     bodies match {
       case b: Iterable[Body] => assert(b.isEmpty)
-      case _ => failedToRetrieveFutureResult()
+      case _ => futureFailedOrBadMatch()
     }
   }
 
@@ -83,7 +83,7 @@ class WorldTest {
     val collides = blockingWaitForResponse(future)
     collides match {
       case RayCastCollidesResponse(r) => assert(r)
-      case _ => failedToRetrieveFutureResult()
+      case _ => futureFailedOrBadMatch()
     }
   }
 
@@ -104,7 +104,7 @@ class WorldTest {
           && cp.point.epsilonEquals(expectedCollisionPoint, epsilon)
           && cp.normal.epsilonEquals(expectedCollisionNormal, epsilon)
         )
-      case _ => failedToRetrieveFutureResult()
+      case _ => futureFailedOrBadMatch()
     }
   }
 
@@ -116,7 +116,7 @@ class WorldTest {
     val collides = blockingWaitForResponse(future)
     collides match {
       case RayCastCollidesResponse(r) => assert(!r)
-      case _ => failedToRetrieveFutureResult()
+      case _ => futureFailedOrBadMatch()
     }
   }
 
@@ -130,7 +130,7 @@ class WorldTest {
     val onlyVisible = blockingWaitForResponse(future)
     onlyVisible match {
       case SendFilterReachableByRay(mask, _) => assert(mask.equals(expected))
-      case _ => failedToRetrieveFutureResult()
+      case _ => futureFailedOrBadMatch()
     }
   }
 
@@ -149,7 +149,7 @@ class WorldTest {
         case Some(c: Color) => assert(c == Color.RED)
         case _ => fail()
       })
-      case _ => failedToRetrieveFutureResult()
+      case _ => futureFailedOrBadMatch()
     }
   }
 
@@ -167,7 +167,7 @@ class WorldTest {
         case Some(c: BodyType) => assert(c == Exit)
         case _ => fail()
       })
-      case _ => failedToRetrieveFutureResult()
+      case _ => futureFailedOrBadMatch()
     }
   }
 
@@ -183,7 +183,7 @@ class WorldTest {
     val bodies = blockingWaitForResponse(future)
     bodies match {
       case b: Iterable[Body] => assert(b.size == 1)
-      case _ => failedToRetrieveFutureResult()
+      case _ => futureFailedOrBadMatch()
     }
   }
 
@@ -199,7 +199,7 @@ class WorldTest {
       case ProximityQueryResponse(b) =>
         val toPoints = b.map(n => n.getPosition)
         assert(toPoints.contains(boxes(1)) && toPoints.contains(boxes(2)))
-      case _ => failedToRetrieveFutureResult()
+      case _ => futureFailedOrBadMatch()
     }
   }
 
