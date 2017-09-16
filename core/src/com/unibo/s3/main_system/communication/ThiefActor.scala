@@ -2,7 +2,7 @@ package com.unibo.s3.main_system.communication
 
 import akka.actor.{Props, UntypedAbstractActor}
 import com.unibo.s3.main_system.characters.Thief.Thief
-import com.unibo.s3.main_system.communication.Messages.{ActMsg, SendGraphMsg}
+import com.unibo.s3.main_system.communication.Messages.{ActMsg, SendGraphMsg, SendNeighboursMsg}
 import com.unibo.s3.main_system.world.Exit
 import com.unibo.s3.main_system.world.actors.{AskObjectOnSightLineMsg, ObjectOnSightLineMsg}
 
@@ -21,11 +21,13 @@ class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor {
       thief.chooseTarget(guards)
     }
 
+    case SendNeighboursMsg(_) =>
+
     case msg: SendGraphMsg =>
       this.thief.setGraph(msg.graph)
 
     case  ObjectOnSightLineMsg(bd) =>
-      bd.foreach(b => if (b.bodyType.contains(Exit)) println(log() + "Thief won!"))
+      //bd.foreach(b => if (b.bodyType.contains(Exit)) println(log() + "Thief won!"))
 
     case _ => println("(thiefActor) message unknown:" + message)
   }

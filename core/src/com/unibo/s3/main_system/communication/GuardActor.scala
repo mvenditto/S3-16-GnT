@@ -28,7 +28,7 @@ class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor {
       //refresha vicini
       //character.refreshNeighbours()
 
-      println(log + "My neighbours are: " + msg.neighbours.filter(neighbour => !neighbour.equals(getSelf())))
+      //println(log + "My neighbours are: " + msg.neighbours.filter(neighbour => !neighbour.equals(getSelf())))
 
       msg.neighbours.filter(neighbour => !neighbour.equals(getSelf())).foreach(neighbour => guard.addNeighbour(neighbour))
       ///msg.neighbours.filter(neighbour => !neighbour.equals(getSelf())).foreach(neighbour => neighbour.tell(SendCopInfoMsg(character.getInformation), getSelf()))
@@ -42,13 +42,13 @@ class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor {
       character.updateGraph(msg.visitedVertices)
 */
     case SendThievesInProximityMsg(thieves) =>
-      thieves.foreach(t => println(log() + "Ladro! " + t))
+      //thieves.foreach(t => println(log() + "Ladro! " + t))
       guard.chooseTarget(thieves)
 
 
     case msg: SendGraphMsg =>
-      println(log() + "Initial graph received")
-      println("cop: " + getSelf() + "| received graph")
+      //println(log() + "Initial graph received")
+      //println("cop: " + getSelf() + "| received graph")
       guard.setGraph(msg.graph)
 
     case _ => //println("(guardActor) message unknown:" + message)

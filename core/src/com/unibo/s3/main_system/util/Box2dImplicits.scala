@@ -5,6 +5,12 @@ import com.badlogic.gdx.physics.box2d._
 import GdxImplicits._
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 
+/**
+  * A collection of implicits related do Box2d classes, as utility methods for [[World]]
+  * and [[Body]].
+  * 
+  * @author mvenditto
+  */
 object Box2dImplicits {
 
   implicit class AugmentedWorld(world: World) {

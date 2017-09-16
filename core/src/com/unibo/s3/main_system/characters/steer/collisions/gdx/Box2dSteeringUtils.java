@@ -1,4 +1,4 @@
-package com.unibo.s3.main_system.characters.steer.collisions;
+package com.unibo.s3.main_system.characters.steer.collisions.gdx;
 
 /*******************************************************************************
  * Copyright 2014 See AUTHORS file.

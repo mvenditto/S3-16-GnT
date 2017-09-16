@@ -1,19 +1,3 @@
-/*******************************************************************************
- * Copyright 2014 See AUTHORS file.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
-
 package com.unibo.s3.main_system.characters.steer.collisions
 
 import com.badlogic.gdx.ai.utils.Collision
@@ -24,11 +8,9 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 
 
-/** A raycast collision detector for box2d.
- * 
- * @author mvenditto */
-
-
+/**
+  * The callback called when a collision is detected.
+  */
 class Box2dRaycastCallback extends RayCastCallback {
   var outputCollision: Collision[Vector2] = _
   var collided: Boolean = _
@@ -40,6 +22,9 @@ class Box2dRaycastCallback extends RayCastCallback {
   }
 }
 
+/** A raycast collision detector for box2d.
+  *
+  * @author mvenditto */
 class Box2dRaycastCollisionDetector(val world: World, val callback: Box2dRaycastCallback) extends RaycastCollisionDetector[Vector2] {
 
 	def this(world: World) {

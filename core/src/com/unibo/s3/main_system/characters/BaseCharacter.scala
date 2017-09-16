@@ -75,7 +75,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
     currentNode = computeInitialNearestNode
     index = new NeighborIndex[Vector2, DefaultEdge](graph)
     currentDestination = selectRandomDestination
-    System.out.println(log + "my destination is " + currentDestination)
+    //System.out.println(log + "my destination is " + currentDestination)
     setNewDestination(currentDestination.get)
   }
 
@@ -159,10 +159,10 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
 
   def chooseBehaviour(): Unit = {
     this.currentNode = computeNearestVertex
-    //System.out.println("Choose behaviour, current: " + currentNode.get + " | previous: " + previousNode.get +" | destination: " + currentDestination.get)
+    ////System.out.println("Choose behaviour, current: " + currentNode.get + " | previous: " + previousNode.get +" | destination: " + currentDestination.get)
     if (currentNode == currentDestination) {
 
-      //System.out.println(log + "Destination " + currentDestination + " = " + currentNode + " achieved! Choose the next one")
+      ////System.out.println(log + "Destination " + currentDestination + " = " + currentNode + " achieved! Choose the next one")
 
       currentDestination = selectRandomDestination
     }
@@ -195,7 +195,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
     }
     if (currentNode ne nearest){
       discoverNewVertex(nearest)
-      //System.out.println(log + "Cambio nodo di riferimento " + currentNode + " to " + nearest)
+      ////System.out.println(log + "Cambio nodo di riferimento " + currentNode + " to " + nearest)
       previousNode = currentNode
       currentNode = nearest
 
@@ -213,6 +213,13 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   def getCurrentDestination: Vector2 = currentDestination.getOrElse(new Vector2())
 
   private def log = "Agent " + id + ": "
+
+  override def equals(o: scala.Any): Boolean = {
+    o match {
+      case other: BaseCharacter => other.getId == id
+      case _ => false
+    }
+  }
 }
 
 object Guard {
