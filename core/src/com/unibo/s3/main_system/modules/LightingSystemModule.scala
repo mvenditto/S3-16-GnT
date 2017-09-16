@@ -2,16 +2,16 @@ package com.unibo.s3.main_system.modules
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import box2dLight.{ConeLight, PointLight, RayHandler}
-import com.badlogic.gdx.{Gdx, InputMultiplexer, Preferences}
 import com.badlogic.gdx.graphics.{Color, GL20, OrthographicCamera}
 import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.physics.box2d.World
+import com.badlogic.gdx.{Gdx, InputMultiplexer, Preferences}
 import com.unibo.s3.Main
-import com.unibo.s3.main_system.util.GntMathUtils.keepInRange
 import com.unibo.s3.main_system.characters.BaseCharacter
-import com.unibo.s3.main_system.communication.Messages.{AskAllCharactersMsg, SendAllCharactersMsg}
+import com.unibo.s3.main_system.communication.Messages.SendAllCharactersMsg
 import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
 import com.unibo.s3.main_system.util.Box2dImplicits._
+import com.unibo.s3.main_system.util.GntMathUtils.keepInRange
 import com.unibo.s3.main_system.util.ScaleUtils
 import com.unibo.s3.main_system.world.actors.{RegisterAsWorldChangeObserver, WorldChangeMsg}
 
@@ -26,7 +26,7 @@ case class LightingSystemConfig(
   enableGammaCorrection: Boolean,
   enableBlur: Boolean,
   enableShadows: Boolean,
-  lightQualityModiefier: Float,
+  lightQualityModifier: Float,
   blurLevel: Int,
   blendingFunc: Int
   )
@@ -36,10 +36,11 @@ class LightingSystemModule extends BasicModuleWithGui {
 
   private[this] var rayHandler: RayHandler = _
   private[this] var cam: OrthographicCamera = _
-  private[this] var worldObserverActor: ActorRef = _
+  private[this] var lightingActor: ActorRef = _
 
   private[this] val torches = mutable.Map[Int, ConeLight]()
-  private[this] var charactersUpdate: Option[Iterable[BaseCharacter]] = None
+  private[this] var newCharacters = Set[BaseCharacter]()
+  private[this] var charactersUpdate = Set[BaseCharacter]()
   private[this] var worldShadowCopy: World = _
   private[this] var ambientLightIntensity = 0.2f
 
@@ -57,8 +58,8 @@ class LightingSystemModule extends BasicModuleWithGui {
       case AskIsPointAtShadow(p) =>
         sender ! rayHandler.pointAtShadow(p.x, p.y)
 
-      case SendAllCharactersMsg(character) =>
-        charactersUpdate = Option(character)
+      case SendAllCharactersMsg(characters) =>
+        characters.foreach(c => newCharacters += c)
     }
   }
 
@@ -71,15 +72,16 @@ class LightingSystemModule extends BasicModuleWithGui {
 
   def setup(): Unit = {
 
-    worldObserverActor =
-      SystemManager.createActor(Props(new LightingActor), "worldObserver")
+    lightingActor =
+      SystemManager.createGeneralActor(
+        Props(new LightingActor), GeneralActors.LIGHTING_SYSTEM_ACTOR)
 
     SystemManager
       .getLocalGeneralActor(GeneralActors.WORLD_ACTOR)
-      .tell(RegisterAsWorldChangeObserver, worldObserverActor)
+      .tell(RegisterAsWorldChangeObserver, lightingActor)
 
     val c = loadConfigFromPreferences(owner.getPrefs)
-    val lqm = c.lightQualityModiefier
+    val lqm = c.lightQualityModifier
 
     rayHandler.setWorld(worldShadowCopy)
     RayHandler.setGammaCorrection(c.enableGammaCorrection)
@@ -109,33 +111,27 @@ class LightingSystemModule extends BasicModuleWithGui {
   }
 
   private def updateTorches() = {
-    if (charactersUpdate.isDefined) {
-      val characters = charactersUpdate.get
-      characters.foreach(c => {
-        val angle = (c.getOrientation * MathUtils.radiansToDegrees) + 90
-        val id = c.getId
-        val lv = c.getLinearVelocity.cpy().nor().scl(1.0f).add(c.getPosition)
-        if (torches.contains(id)) {
-          val t = torches(id)
-          t.setPosition(lv)
-          t.setDirection(angle)
-        } else {
-          torches(id) = new ConeLight(
-            rayHandler, TorchRaysNum, BrightWhiteColor, TorchDistance,
-            lv.x, lv.y, angle, TorchDegrees)
-        }
-      })
-    }
-    charactersUpdate = None
+    charactersUpdate.foreach(c => {
+      val angle = (c.getOrientation * MathUtils.radiansToDegrees) + 90
+      val id = c.getId
+      val lv = c.getLinearVelocity.cpy().nor().scl(1.0f).add(c.getPosition)
+      if (torches.contains(id)) {
+        val t = torches(id)
+        t.setPosition(lv)
+        t.setDirection(angle)
+      } else {
+        torches(id) = new ConeLight(
+          rayHandler, TorchRaysNum, BrightWhiteColor, TorchDistance,
+          lv.x, lv.y, angle, TorchDegrees)
+      }
+    })
   }
 
   override def update(dt: Float): Unit = {
     super.update(dt)
-    //worldShadowCopy.step(dt, 8, 3)
 
-    SystemManager
-      .getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR)
-      .tell(AskAllCharactersMsg, worldObserverActor)
+    newCharacters.foreach(nc => charactersUpdate += nc)
+    newCharacters = Set()
 
     updateTorches()
   }

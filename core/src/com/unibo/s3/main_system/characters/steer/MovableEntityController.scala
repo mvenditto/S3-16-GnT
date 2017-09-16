@@ -6,6 +6,17 @@ import com.unibo.s3.InputProcessorAdapter
 
 import scala.collection.mutable
 
+/**
+  *
+  * A class implementing a basic controller to move a [[MovableEntity]] with keyboard.
+  * This implementation relies on [[com.badlogic.gdx.ai.steer.SteeringBehavior]].
+  * The entity position/velocity is not directly modified, instead a 'target point' is moved
+  * according to keyboard input and the entity is instructed to follow it. This approach
+  * enable also to manage collisions with game objects in the same way as other,
+  * non-user-controlled entities.
+  *
+  * @param entity the entity to control.
+  */
 class MovableEntityController (
   entity: MovableEntity[Vector2]) extends InputProcessorAdapter {
 
@@ -24,10 +35,22 @@ class MovableEntityController (
   entity.setMaxAngularSpeed(10f)
   entity.setMaxLinearAcceleration(10f)
 
+  /**
+    * Set the speed at which the entity 'target point' is moved.
+    * @param speed the new speed to set
+    */
   def setDirectionSpeed(speed: Float): Unit = controlSpeed = speed
 
+  /**
+    * Returns the 'taget point'
+    * @return the [[Vector2]] target point
+    */
   def getTargetVector: Vector2 = keyboard
 
+  /**
+    * Update the position of the 'target point' and set the entity's behavior accordingly.
+    * @param dt delta time
+    */
   def update(dt: Float): Unit = {
     val entityPos = entity.getPosition
 

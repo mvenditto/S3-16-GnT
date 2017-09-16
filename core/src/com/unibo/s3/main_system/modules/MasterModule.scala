@@ -5,10 +5,13 @@ import com.badlogic.gdx.graphics.Color._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.{Gdx, Input, InputMultiplexer}
+import com.kotcrab.vis.ui.util.ToastManager
 import com.kotcrab.vis.ui.widget.{BusyBar, VisWindow}
 import com.unibo.s3.Main
 import com.unibo.s3.main_system.characters.BaseCharacter
+import com.unibo.s3.main_system.communication.CharacterActors._
 import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.communication.{CharacterActors, GeneralActors, SystemManager}
 import com.unibo.s3.main_system.game.GameSettings
@@ -22,29 +25,33 @@ class MasterModule extends BasicModuleWithGui {
 
   private[this] var graph: Option[GraphAdapter[Vector2]] = None
   private[this] var characters: Option[Iterable[BaseCharacter]] = None
+  private[this] var notifications: ToastManager = _
 
-  class DummyReceiverActor extends UntypedAbstractActor {
+  class GameActor extends UntypedAbstractActor {
 
     override def onReceive(message: Any): Unit = message match {
 
-      case i: Int => println(i)
+      case ThiefReachedExitMsg(t) =>
+        notifications.show("Thief["+t.getId+"] reached an Exit!")
+
+      case ThiefCaughtMsg(t) =>
+        notifications.show("Thief["+t.getId+"] got caught!")
 
       case SendAllCharactersMsg(_characters) =>
+        //println("Received characters update: ", _characters.size)
         characters = Option(_characters)
 
       case SendGraphMsg(g) =>
         graph = Option(g)
         busyBarWindow.addAction(
-          Actions.sequence(
-            Actions.fadeOut(1.5f), Actions.run(new Runnable {
-              override def run(): Unit = busyBarWindow.remove()
-            })))
+          Actions.sequence(Actions.fadeOut(1.5f), Actions.run(new Runnable {
+              override def run(): Unit = busyBarWindow.remove()})))
         cacheMap()
     }
   }
 
-  object DummyReceiverActor {
-    def props() : Props = Props(new DummyReceiverActor())
+  object GameActor {
+    def props() : Props = Props(new GameActor())
   }
 
   private[this] var masterActor: ActorRef = _
@@ -52,7 +59,7 @@ class MasterModule extends BasicModuleWithGui {
   private[this] var mapActor: ActorRef = _
   private[this] var graphActor: ActorRef = _
   private[this] var quadTreeActor: ActorRef = _
-  private[this] var dummyReceiverActor: ActorRef = _
+  private[this] var gameActor: ActorRef = _
   private[this] var spawnActor: ActorRef = _
 
   private[this] val renderer = GeometryRendererImpl()
@@ -78,8 +85,10 @@ class MasterModule extends BasicModuleWithGui {
     busyBarWindow.pack()
     gui.addActor(busyBarWindow)
     busyBarWindow.centerWindow()
+    notifications = new ToastManager(gui)
+    notifications.setAlignment(Align.topRight)
     spriteRenderer.init()
-    spriteRenderer.setDebugDraw(true)
+    spriteRenderer.setDebugDraw(false)
   }
 
   def initGame(config: GameSettings): Unit = {
@@ -93,8 +102,8 @@ class MasterModule extends BasicModuleWithGui {
     worldActor = getActor(GeneralActors.WORLD_ACTOR)
     quadTreeActor = getActor(GeneralActors.QUAD_TREE_ACTOR)
     graphActor = getActor(GeneralActors.GRAPH_ACTOR)
-    dummyReceiverActor = SystemManager
-      .createActor(DummyReceiverActor.props(), "graphReceiver")
+    gameActor = SystemManager.createGeneralActor(
+      GameActor.props(), GeneralActors.GAME_ACTOR)
     spawnActor = getActor(GeneralActors.SPAWN_ACTOR)
 
     List(graphActor, quadTreeActor).foreach(a =>
@@ -103,7 +112,7 @@ class MasterModule extends BasicModuleWithGui {
     mapActor ! MapSettingsMsg(w, h)
 
     mapActor ! GenerateMapMsg()
-    graphActor tell(AskForGraphMsg, dummyReceiverActor)
+    graphActor tell(AskForGraphMsg, gameActor)
 
     spawnActor ! MapSettingsMsg(30, 30)
   }
@@ -147,24 +156,20 @@ class MasterModule extends BasicModuleWithGui {
     inputMultiplexer.addProcessor(this)
   }
 
-  override def touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
-    //need to be fixed, out of sync, new characters shows only after next added.
-    quadTreeActor tell(AskAllCharactersMsg, dummyReceiverActor)
-    false
-  }
-
   override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
     if (button != 1){
       val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
       mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
-      spawnActor.tell(GenerateNewCharacterPositionMsg(CharacterActors.GUARD), masterActor)
+      spawnActor.tell(
+        GenerateNewCharacterPositionMsg(GUARD), masterActor)
     }
     false
   }
 
   override def keyUp(keycode: Int): Boolean = {
     if(keycode == Input.Keys.T) {
-      spawnActor.tell(GenerateNewCharacterPositionMsg(CharacterActors.THIEF), masterActor)
+      spawnActor.tell(
+        GenerateNewCharacterPositionMsg(THIEF), masterActor)
     }
     false
   }

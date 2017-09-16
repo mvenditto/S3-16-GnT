@@ -7,6 +7,11 @@ import org.jgrapht.alg.NeighborIndex
 import com.badlogic.gdx.math.Vector
 import com.unibo.s3.main_system.graph.GraphAdapter
 
+/**
+  * An collection of possibly useful implicit conversions.
+  *
+  * @author mvenditto
+  */
 object ImplicitConversions {
 
   implicit def UndirectedGraphToRenderable[T <: Vector[T], V](g: UndirectedGraph[T, V]):

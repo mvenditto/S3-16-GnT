@@ -1,9 +1,9 @@
 package com.unibo.s3.main_system.util
 
 /**
- *
- * @author mvenditto
- * */
+  * An utility class implementing world to screen space conversions.
+  * @author mvenditto
+  * */
 object ScaleUtils {
 
     private[this] val PIXELS_PER_METER: Integer = 50

@@ -15,9 +15,10 @@ import com.unibo.s3.main_system.util.ScaleUtils.{getPixelsPerMeter, metersToPixe
 import scala.collection.JavaConversions._
 
 /**
- *
- * @author mvenditto
- * */
+  * An implementation of [[GeometryRenderer]] trait.
+  *
+  * @author mvenditto
+  * */
 class GeometryRendererImpl extends GeometryRenderer[Vector2] {
 
   override def renderCharacter(shapeRenderer: ShapeRenderer, character: MovableEntity[Vector2]): Unit = {

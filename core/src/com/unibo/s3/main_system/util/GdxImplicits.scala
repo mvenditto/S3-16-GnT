@@ -5,6 +5,11 @@ import com.unibo.s3.main_system.characters.steer.CustomLocation
 
 import scala.collection.JavaConversions._
 
+/**
+  * A collection of implicits useful for dealing with Gdx classes.
+  *
+  * @author mvenditto
+  */
 object GdxImplicits {
 
   implicit def Vector2ToCustomLocation(v: Vector2): CustomLocation =
