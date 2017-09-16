@@ -18,7 +18,7 @@ class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor {
   override def onReceive(message: Any): Unit = message match {
     case ActMsg(dt) =>
       guard.act(dt)
-      SystemManager.getLocalActor("quadTreeActor").tell(AskNeighboursWithFovMsg(this.guard), getSelf())
+      SystemManager.getLocalActor("quadTreeActor").tell(AskNeighboursWithinFovMsg(this.guard), getSelf())
       //println(log() + "Act received")
       //println(log() + "Current node/destination: " + character.getCurrentNode.getOrElse("Not definied") + "," + character.getCurrentDestination)
 

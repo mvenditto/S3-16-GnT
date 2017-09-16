@@ -22,7 +22,7 @@ object Messages {
   case class SendGraphMsg(graph: UndirectedGraph[Vector2, DefaultEdge])
 
   //message for CharacterActor
-  case class AskNeighboursMsg(character: BaseCharacter)
+  case class AskNeighboursMsg(character: BaseCharacter, radius: Option[Float] = None)
   case class SendNeighboursMsg(neighbours: Iterable[ActorRef])
   case class AskAllCharactersMsg()
   case class SendAllCharactersMsg(characters: Iterable[BaseCharacter])
