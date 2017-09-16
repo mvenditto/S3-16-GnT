@@ -1,4 +1,4 @@
-package main_system.communication;
+package communication;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;

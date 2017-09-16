@@ -1,4 +1,4 @@
-package com.unibo.s3.main_system.characters.steer.collisions;
+package com.unibo.s3.main_system.characters.steer.collisions.gdx;
 
 /*******************************************************************************
  * Copyright 2014 See AUTHORS file.
@@ -16,14 +16,10 @@ package com.unibo.s3.main_system.characters.steer.collisions;
  * limitations under the License.
  ******************************************************************************/
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.steer.SteeringAcceleration;
 import com.badlogic.gdx.ai.steer.SteeringBehavior;
 import com.badlogic.gdx.ai.utils.Location;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 

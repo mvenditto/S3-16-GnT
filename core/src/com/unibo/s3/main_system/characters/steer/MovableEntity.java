@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector;
 
 /**
+ * An interface describing an entity that can have {@link com.badlogic.gdx.ai.steer.SteeringBehavior} set to it, and
+ * can also manage obstacle avoidance, through a collision detector.
  *
  * @author mvenditto
  * */

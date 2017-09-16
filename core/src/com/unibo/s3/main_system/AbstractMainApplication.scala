@@ -16,6 +16,18 @@ import com.unibo.s3.CameraInputControllerKeymap
 import com.unibo.s3.InputProcessorAdapter
 import com.unibo.s3.main_system.util.ScaleUtils.getPixelsPerMeter
 
+/**
+  * This is a base skeleton application. Only implemented aspects are:
+  *{{{
+  * - base game-loop logic, update/render cycle + pause.
+  * - AI timepiece update
+  * - camera management
+  * - base support for debug rendering (geometric shapes renderer)
+  * - from/to screen space <-> world space projections.
+  * - input processing
+  *}}}
+  * @author mvenditto
+  */
 abstract class AbstractMainApplication extends ApplicationAdapter with InputProcessorAdapter {
   /*rendering stuff*/
   protected var shapeRenderer: ShapeRenderer = _

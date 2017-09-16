@@ -10,6 +10,13 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
+/**
+  * A raycast collision detector, that works interacting with [[WorldActor]],
+  * instead of directly referencing a [[com.badlogic.gdx.physics.box2d.World]].
+  * This anyway introduces latency and a collision could be missed on high load.
+  * @see [[com.unibo.s3.main_system.characters.steer.collisions.Box2dRaycastCollisionDetector]]
+  * @param worldActor a reference to the WorldActor
+  */
 class Box2dRayCastCollisionDetectorProxy(worldActor: ActorRef) extends RaycastCollisionDetector[Vector2]{
 
   implicit val timeout = Timeout(5 seconds)

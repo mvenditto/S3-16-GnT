@@ -39,14 +39,12 @@ class QuadTreeActor extends UntypedAbstractActor {
     case MapSettingsMsg(w, h) =>
       bounds = Bounds(0, 0, w, h)
 
-    case msg: InitialSavingCharacterMsg =>
-      agentsTable += (msg.newCharacter -> msg.characterRef)
+    case InitialSavingCharacterMsg(newCharacter, characterRef) =>
+      agentsTable += (newCharacter -> characterRef)
       SystemManager.getLocalGeneralActor(
         GeneralActors.GAME_ACTOR) ! SendAllCharactersMsg(agentsTable.keys)
       SystemManager.getLocalGeneralActor(
         GeneralActors.LIGHTING_SYSTEM_ACTOR) ! SendAllCharactersMsg(agentsTable.keys)
-
-      println
 
     case RebuildQuadTreeMsg() =>
       root = QuadTreeNode(bounds)
@@ -76,7 +74,6 @@ class QuadTreeActor extends UntypedAbstractActor {
           FilterReachableByRay(c, neighborsInFov.map(p => p.getPosition), reqId)
 
         nearbyRequestCache += (reqId -> neighborsInFov)
-        println("CREATE REQUEST", reqId)
 
         SystemManager.getLocalGeneralActor(
           GeneralActors.WORLD_ACTOR) ! filterOnlyOnSightLine
@@ -103,7 +100,6 @@ class QuadTreeActor extends UntypedAbstractActor {
       }
 
       nearbyRequestCache -= reqId
-      println("CLOSED REQUEST", reqId)
     case AskAllCharactersMsg =>
       sender ! SendAllCharactersMsg(agentsTable.keys)
 

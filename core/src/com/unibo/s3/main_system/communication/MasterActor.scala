@@ -54,11 +54,6 @@ class MasterActor extends UntypedAbstractActor with Stash {
         }
 
         newCharacter.setCollisionDetector(collisionDetector)
-        newCharacter
-          .setComplexSteeringBehavior()
-          .avoidCollisionsWithWorld()
-          .wander()
-          .buildPriority(true)
 
         charactersList :+= characterRef
 

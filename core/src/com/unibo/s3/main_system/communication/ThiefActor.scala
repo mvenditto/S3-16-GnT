@@ -27,7 +27,7 @@ class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor {
       this.thief.setGraph(msg.graph)
 
     case  ObjectOnSightLineMsg(bd) =>
-      bd.foreach(b => if (b.bodyType.contains(Exit)) println(log() + "Thief won!"))
+      //bd.foreach(b => if (b.bodyType.contains(Exit)) println(log() + "Thief won!"))
 
     case _ => println("(thiefActor) message unknown:" + message)
   }

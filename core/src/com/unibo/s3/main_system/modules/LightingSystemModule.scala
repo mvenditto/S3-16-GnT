@@ -2,16 +2,16 @@ package com.unibo.s3.main_system.modules
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import box2dLight.{ConeLight, PointLight, RayHandler}
-import com.badlogic.gdx.{Gdx, InputMultiplexer, Preferences}
 import com.badlogic.gdx.graphics.{Color, GL20, OrthographicCamera}
 import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.physics.box2d.World
+import com.badlogic.gdx.{Gdx, InputMultiplexer, Preferences}
 import com.unibo.s3.Main
-import com.unibo.s3.main_system.util.GntMathUtils.keepInRange
 import com.unibo.s3.main_system.characters.BaseCharacter
-import com.unibo.s3.main_system.communication.Messages.{AskAllCharactersMsg, SendAllCharactersMsg}
+import com.unibo.s3.main_system.communication.Messages.SendAllCharactersMsg
 import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
 import com.unibo.s3.main_system.util.Box2dImplicits._
+import com.unibo.s3.main_system.util.GntMathUtils.keepInRange
 import com.unibo.s3.main_system.util.ScaleUtils
 import com.unibo.s3.main_system.world.actors.{RegisterAsWorldChangeObserver, WorldChangeMsg}
 
@@ -26,7 +26,7 @@ case class LightingSystemConfig(
   enableGammaCorrection: Boolean,
   enableBlur: Boolean,
   enableShadows: Boolean,
-  lightQualityModiefier: Float,
+  lightQualityModifier: Float,
   blurLevel: Int,
   blendingFunc: Int
   )
@@ -39,7 +39,8 @@ class LightingSystemModule extends BasicModuleWithGui {
   private[this] var lightingActor: ActorRef = _
 
   private[this] val torches = mutable.Map[Int, ConeLight]()
-  private[this] var charactersUpdate = Iterable[BaseCharacter]()
+  private[this] var newCharacters = Set[BaseCharacter]()
+  private[this] var charactersUpdate = Set[BaseCharacter]()
   private[this] var worldShadowCopy: World = _
   private[this] var ambientLightIntensity = 0.2f
 
@@ -58,7 +59,7 @@ class LightingSystemModule extends BasicModuleWithGui {
         sender ! rayHandler.pointAtShadow(p.x, p.y)
 
       case SendAllCharactersMsg(characters) =>
-        charactersUpdate = characters
+        characters.foreach(c => newCharacters += c)
     }
   }
 
@@ -80,7 +81,7 @@ class LightingSystemModule extends BasicModuleWithGui {
       .tell(RegisterAsWorldChangeObserver, lightingActor)
 
     val c = loadConfigFromPreferences(owner.getPrefs)
-    val lqm = c.lightQualityModiefier
+    val lqm = c.lightQualityModifier
 
     rayHandler.setWorld(worldShadowCopy)
     RayHandler.setGammaCorrection(c.enableGammaCorrection)
@@ -128,8 +129,11 @@ class LightingSystemModule extends BasicModuleWithGui {
 
   override def update(dt: Float): Unit = {
     super.update(dt)
+
+    newCharacters.foreach(nc => charactersUpdate += nc)
+    newCharacters = Set()
+
     updateTorches()
-    //println("Receive characters: ", charactersUpdate.size,"/",torches.size)
   }
 
   override def touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {

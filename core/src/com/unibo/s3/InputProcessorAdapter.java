@@ -5,6 +5,8 @@ import com.badlogic.gdx.InputProcessor;
 /**
  * {@link InputProcessorAdapter} is an adapter interface with default empty implementation of {@link InputProcessor}
  * interface methods.
+ *
+ * @author mvenditto
  * */
 public interface InputProcessorAdapter extends InputProcessor {
 

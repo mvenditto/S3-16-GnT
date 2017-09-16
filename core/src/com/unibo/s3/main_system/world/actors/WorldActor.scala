@@ -7,7 +7,8 @@ import com.badlogic.gdx.ai.utils.{Collision, Ray}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 import com.unibo.s3.main_system.characters.BaseCharacter
-import com.unibo.s3.main_system.characters.steer.collisions.{Box2dRaycastCollisionDetector, Box2dSquareAABBProximity}
+import com.unibo.s3.main_system.characters.steer.collisions.Box2dRaycastCollisionDetector
+import com.unibo.s3.main_system.characters.steer.collisions.gdx.Box2dSquareAABBProximity
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
 import com.unibo.s3.main_system.util.GntUtils
 import com.unibo.s3.main_system.world.{BodyData, Exit, Hideout}
@@ -36,6 +37,12 @@ case class ObjectOnSightLineMsg(bd: Iterable[BodyData])
 case class FilterReachableByRay(op: BaseCharacter, n: Iterable[Vector2], reqId: (Long, Int))
 case class SendFilterReachableByRay(f: Iterable[Boolean], reqId: (Long, Int))
 
+/**
+  * An actor managing a [[com.badlogic.gdx.physics.box2d.World]].
+  * @param world a [[World]] to be managed by this actor.
+  *
+  * @author mvenditto
+  */
 class WorldActor(val world: World) extends UntypedAbstractActor {
   import WorldActor._
 

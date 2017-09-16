@@ -19,10 +19,13 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
-*
-* @author mvenditto
-* */
+ /**
+ * This class implements a basic entity
+ * with facility methods for setting {@link SteeringBehavior}(s) to it
+ * and collision and proximity management.
+ *
+ * @author mvenditto
+ * */
 public class BaseMovableEntity extends BaseSteeringEntity implements MovableEntity<Vector2> {
 
     private RayConfigurationBase<Vector2> rayConfiguration;
@@ -55,7 +58,7 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
 
     /*arrive behavior*/
     private final static float arriveArrivalTolerance = 0.001f;
-    private final static float arriveDeceleratioRadius = 1;
+    private final static float arriveDecelerationRadius = 1;
 
     /*hide behavior*/
     private final static float hideDistFromBoundary = 2f;
@@ -87,13 +90,13 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
         arrive = new Arrive<>(this, null)
                 .setTimeToTarget(defaultTimeToTarget)
                 .setArrivalTolerance(arriveArrivalTolerance)
-                .setDecelerationRadius(arriveDeceleratioRadius);
+                .setDecelerationRadius(arriveDecelerationRadius);
 
         hide = new Hide<>(this, null, null)
                 .setDistanceFromBoundary(hideDistFromBoundary) //
                 .setTimeToTarget(defaultTimeToTarget) //
                 .setArrivalTolerance(arriveArrivalTolerance) //
-                .setDecelerationRadius(arriveDeceleratioRadius);
+                .setDecelerationRadius(arriveDecelerationRadius);
     }
 
     @Override
