@@ -37,7 +37,7 @@ class WorldTest {
 
   private def initActorSystem() = {
     SystemManager.createSystem("WorldTestSystem", None)
-    worldActor = SystemManager.createGeneralActor(
+    worldActor = SystemManager.createActor(
       WorldActor.props(world), GeneralActors.WORLD_ACTOR)
   }
   

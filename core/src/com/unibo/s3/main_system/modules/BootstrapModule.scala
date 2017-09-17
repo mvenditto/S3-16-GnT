@@ -86,25 +86,25 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
     val world = new World(new Vector2(0, 0), true)
     setProgress(20)
 
-    SystemManager.createGeneralActor(
+    SystemManager.createActor(
       MasterActor.props(), GeneralActors.MASTER_ACTOR)
     setProgress(30)
 
-    SystemManager.createGeneralActor(
+    SystemManager.createActor(
       WorldActor.props(world), GeneralActors.WORLD_ACTOR)
     setProgress(40)
 
-    SystemManager.createGeneralActor(
+    SystemManager.createActor(
       QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)
 
-    SystemManager.createGeneralActor(SpawnActor.props(), GeneralActors.SPAWN_ACTOR)
+    SystemManager.createActor(SpawnActor.props(), GeneralActors.SPAWN_ACTOR)
     setProgress(60)
 
-    SystemManager.createGeneralActor(
+    SystemManager.createActor(
       MapActor.props(), GeneralActors.MAP_ACTOR)
     setProgress(80)
 
-    SystemManager.createGeneralActor(
+    SystemManager.createActor(
       GraphActor.props(), GeneralActors.GRAPH_ACTOR)
     setProgress(100)
 

@@ -33,22 +33,22 @@ class BootstrapRemote() {
 
     val world = new World(new Vector2(0, 0), true)
 
-    /*SystemManager.createGeneralActor(
+    /*SystemManager.createActor(
       MasterActor.props(), GeneralActors.MASTER_ACTOR)*/
 
-    /*SystemManager.createGeneralActor( ?
+    /*SystemManager.createActor( ?
       WorldActor.props(world), GeneralActors.WORLD_ACTOR)*/
 
-    SystemManager.createGeneralActor(
+    SystemManager.createActor(
       QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)
 
-    SystemManager.createGeneralActor(SpawnActor.props(),
+    SystemManager.createActor(SpawnActor.props(),
       GeneralActors.SPAWN_ACTOR)
 
-    SystemManager.createGeneralActor(
+    SystemManager.createActor(
       MapActor.props(), GeneralActors.MAP_ACTOR)
 
-    SystemManager.createGeneralActor(
+    SystemManager.createActor(
       GraphActor.props(), GeneralActors.GRAPH_ACTOR)
     log("-- Actors created --")
   }
