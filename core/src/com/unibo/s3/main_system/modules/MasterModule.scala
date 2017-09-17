@@ -73,7 +73,7 @@ class MasterModule extends BasicModuleWithGui with Overlay {
   private[this] var busyBarWindow: VisWindow = _
 
   private def getActor(actor: GeneralActors.Value): ActorRef =
-    SystemManager.getLocalGeneralActor(actor)
+    SystemManager.getLocalActor(actor)
 
   private def cacheMap() = {
     worldMap = GntUtils.parseMapToRectangles(
@@ -103,14 +103,14 @@ class MasterModule extends BasicModuleWithGui with Overlay {
     val w = mapSize.x.toInt
     val h = mapSize.y.toInt
 
-    masterActor = getActor(MASTER_ACTOR)
-    mapActor = getActor(MAP_ACTOR)
-    worldActor = getActor(WORLD_ACTOR)
-    quadTreeActor = getActor(QUAD_TREE_ACTOR)
-    graphActor = getActor(GRAPH_ACTOR)
-    gameActor = SystemManager.createGeneralActor(
-      GameActor.props(), GAME_ACTOR)
-    spawnActor = getActor(SPAWN_ACTOR)
+    masterActor = getActor(GeneralActors.MASTER_ACTOR)
+    mapActor = getActor(GeneralActors.MAP_ACTOR)
+    worldActor = getActor(GeneralActors.WORLD_ACTOR)
+    quadTreeActor = getActor(GeneralActors.QUAD_TREE_ACTOR)
+    graphActor = getActor(GeneralActors.GRAPH_ACTOR)
+    gameActor = SystemManager.createActor(
+      GameActor.props(), GeneralActors.GAME_ACTOR)
+    spawnActor = getActor(GeneralActors.SPAWN_ACTOR)
 
     List(graphActor, quadTreeActor).foreach(a =>
       a ! MapSettingsMsg(w, h))

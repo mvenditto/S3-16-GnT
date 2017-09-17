@@ -42,9 +42,9 @@ class QuadTreeActor extends UntypedAbstractActor {
 
     case InitialSavingCharacterMsg(newCharacter, characterRef) =>
       agentsTable += (newCharacter -> characterRef)
-      SystemManager.getLocalGeneralActor(
+      SystemManager.getLocalActor(
         GeneralActors.GAME_ACTOR) ! SendAllCharactersMsg(agentsTable.keys)
-      SystemManager.getLocalGeneralActor(
+      SystemManager.getLocalActor(
         GeneralActors.LIGHTING_SYSTEM_ACTOR) ! SendAllCharactersMsg(agentsTable.keys)
 
     case RebuildQuadTreeMsg() =>
@@ -76,7 +76,7 @@ class QuadTreeActor extends UntypedAbstractActor {
 
         nearbyRequestCache += (reqId -> neighborsInFov)
 
-        SystemManager.getLocalGeneralActor(
+        SystemManager.getLocalActor(
           GeneralActors.WORLD_ACTOR) ! filterOnlyOnSightLine
 
       } else {

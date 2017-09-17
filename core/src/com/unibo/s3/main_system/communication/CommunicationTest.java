@@ -36,16 +36,16 @@ public class CommunicationTest extends ApplicationAdapter {
         this.img = new Texture("badlogic.jpg");
 
         SystemManager.createSystem("System", Option.empty());
-        SystemManager.createGeneralActor(MasterActor.props(), GeneralActors.MASTER_ACTOR());
-        SystemManager.createGeneralActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR());
-        SystemManager.createGeneralActor(QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR());
-        SystemManager.createGeneralActor(MapActor.props(), GeneralActors.MAP_ACTOR());
-        SystemManager.createGeneralActor(GraphActor.props(), GeneralActors.GRAPH_ACTOR());
+        SystemManager.createActor(MasterActor.props(), GeneralActors.MASTER_ACTOR());
+        SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR());
+        SystemManager.createActor(QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR());
+        SystemManager.createActor(MapActor.props(), GeneralActors.MAP_ACTOR());
+        SystemManager.createActor(GraphActor.props(), GeneralActors.GRAPH_ACTOR());
 
-        ActorRef masterActor = SystemManager.getLocalGeneralActor(GeneralActors.MASTER_ACTOR());
-        ActorRef mapActor = SystemManager.getLocalGeneralActor(GeneralActors.MAP_ACTOR());
-        ActorRef graphActor = SystemManager.getLocalGeneralActor(GeneralActors.GRAPH_ACTOR());
-        ActorRef quadTreeActor = SystemManager.getLocalGeneralActor(GeneralActors.QUAD_TREE_ACTOR());
+        ActorRef masterActor = SystemManager.getLocalActor(GeneralActors.MASTER_ACTOR());
+        ActorRef mapActor = SystemManager.getLocalActor(GeneralActors.MAP_ACTOR());
+        ActorRef graphActor = SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR());
+        ActorRef quadTreeActor = SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR());
 
         mapActor.tell(new Messages.MapSettingsMsg(60, 60), ActorRef.noSender());
         graphActor.tell(new Messages.MapSettingsMsg(60, 60), ActorRef.noSender());
@@ -75,9 +75,9 @@ public class CommunicationTest extends ApplicationAdapter {
             e.printStackTrace();
         }
 
-        ActorRef cop1 = SystemManager.getLocalCharacterActor(CharacterActors.GUARD(), 1);
-        ActorRef cop2 = SystemManager.getLocalCharacterActor(CharacterActors.GUARD(), 2);
-        ActorRef cop3 = SystemManager.getLocalCharacterActor(CharacterActors.GUARD(), 3);
+        ActorRef cop1 = SystemManager.getLocalActor(CharacterActors.GUARD(), 1);
+        ActorRef cop2 = SystemManager.getLocalActor(CharacterActors.GUARD(), 2);
+        ActorRef cop3 = SystemManager.getLocalActor(CharacterActors.GUARD(), 3);
 
         cop1.tell(new Messages.SendGraphMsg(graph), ActorRef.noSender());
         cop2.tell(new Messages.SendGraphMsg(graph), ActorRef.noSender());

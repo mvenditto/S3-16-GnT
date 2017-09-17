@@ -80,11 +80,11 @@ class LightingSystemModule extends BasicModuleWithGui {
   def setup(): Unit = {
 
     lightingActor =
-      SystemManager.createGeneralActor(
+      SystemManager.createActor(
         Props(new LightingActor), GeneralActors.LIGHTING_SYSTEM_ACTOR)
 
     SystemManager
-      .getLocalGeneralActor(GeneralActors.WORLD_ACTOR)
+      .getLocalActor(GeneralActors.WORLD_ACTOR)
       .tell(RegisterAsWorldChangeObserver, lightingActor)
 
     val c = loadConfigFromPreferences(owner.getPrefs)

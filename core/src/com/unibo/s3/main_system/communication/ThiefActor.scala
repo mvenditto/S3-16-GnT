@@ -1,21 +1,37 @@
 package com.unibo.s3.main_system.communication
 
-import akka.actor.{Props, UntypedAbstractActor}
+import akka.actor.{Props, Stash, UntypedAbstractActor}
 import com.unibo.s3.main_system.characters.Thief.Thief
 import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.world.Exit
 import com.unibo.s3.main_system.world.actors.{AskObjectOnSightLineMsg, ObjectOnSightLineMsg}
 
-class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor {
+class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor with Stash {
   var captureThreshold = 2f
+
+  context.become(setGraph())
 
   private def canAct: Boolean = !thief.hasReachedExit && !thief.gotCaughtByGuard
 
-  override def onReceive(message: Any): Unit = message match {
+  override def onReceive(message: Any): Unit = {}
+
+  private def setGraph(): Receive = {
+    case msg: SendGraphMsg =>
+      this.thief.setGraph(msg.graph)
+      context.become(normalBehave())
+      unstashAll()
+
+    case _: ActMsg =>
+
+    case _ =>
+      stash()
+  }
+
+  private def normalBehave(): Receive =  {
     case msg: ActMsg =>
       this.thief.act(msg.dt)
       if (canAct) this.thief.chooseBehaviour()
-      val wa = SystemManager.getLocalGeneralActor(GeneralActors.WORLD_ACTOR)
+      val wa = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
       wa ! AskObjectOnSightLineMsg(
         thief.getPosition, thief.getLinearVelocity, thief.getSightLineLength)
 
@@ -29,7 +45,7 @@ class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor {
           if (dist <= captureThreshold) {
             thief.setGotCaughtByGuard(true)
             SystemManager
-              .getLocalGeneralActor(GeneralActors.GAME_ACTOR) ! ThiefCaughtMsg(thief, g)
+              .getLocalActor(GeneralActors.GAME_ACTOR) ! ThiefCaughtMsg(thief, g)
           }
         }
       }
@@ -42,12 +58,13 @@ class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor {
     case  ObjectOnSightLineMsg(bd) =>
       if(canAct && bd.exists(b => b.bodyType.contains(Exit))) {
         thief.setReachedExit(true)
-        SystemManager
-          .getLocalGeneralActor(GeneralActors.GAME_ACTOR) ! ThiefReachedExitMsg(thief)
+        SystemManager.getLocalActor(GeneralActors.GAME_ACTOR) ! ThiefReachedExitMsg(thief)
       }
 
     case _ => println("(thiefActor) message unknown:" + message)
   }
+
+
 
   def log() : String = "[CHARACTER " + thief.getId + "]: "
 }
