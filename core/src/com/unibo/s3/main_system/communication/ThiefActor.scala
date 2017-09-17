@@ -61,7 +61,7 @@ class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor wi
         SystemManager.getLocalActor(GeneralActors.GAME_ACTOR) ! ThiefReachedExitMsg(thief)
       }
 
-    case _ => println("(thiefActor) message unknown:" + message)
+    case m => println("(thiefActor) message unknown:" + m)
   }
 
 

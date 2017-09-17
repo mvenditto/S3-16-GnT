@@ -2,14 +2,10 @@ package com.unibo.s3.main_system.communication
 
 import akka.actor.{Props, Stash, UntypedAbstractActor}
 import com.badlogic.gdx.math.Vector2
-import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.characters.Guard.Guard
 import com.unibo.s3.main_system.communication.Messages._
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
-
-import scala.collection.JavaConversions.asScalaBuffer
-import scala.collection.JavaConverters._
 
 class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor with Stash {
 
@@ -75,7 +71,7 @@ class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor wi
   private def normalBehave(): Receive = {
     case ActMsg(dt) =>
       guard.act(dt)
-      SystemManager.getLocalActor("quadTreeActor").tell(AskNeighboursWithFovMsg(this.guard), getSelf())
+      SystemManager.getLocalActor("quadTreeActor").tell(AskNeighboursWithinFovMsg(this.guard), getSelf())
       //println(log() + "Act received")
       //println(log() + "Current node/destination: " + character.getCurrentNode.getOrElse("Not definied") + "," + character.getCurrentDestination)
 

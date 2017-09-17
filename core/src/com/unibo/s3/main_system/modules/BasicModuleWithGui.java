@@ -15,6 +15,10 @@ public class BasicModuleWithGui implements BasicModule, InputProcessorAdapter {
     private boolean guiEnabled = true;
     private boolean enabled = true;
 
+    public Stage getGuiStage() {
+        return gui;
+    }
+
     @Override
     public void init(Main owner) {
         this.owner = owner;

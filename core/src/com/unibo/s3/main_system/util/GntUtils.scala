@@ -1,6 +1,8 @@
 package com.unibo.s3.main_system.util
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Rectangle
 
 /**
@@ -31,5 +33,4 @@ object GntUtils {
 
   def parseMapToRectangles(map: FileHandle): Iterable[Rectangle] =
     parseMapToRectangles(map.readString())
-
 }

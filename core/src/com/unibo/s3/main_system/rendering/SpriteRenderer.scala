@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.utils.Disposable
 import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.characters.steer.MovableEntity
+import com.unibo.s3.main_system.game.{GameSettings, Wall}
 import com.unibo.s3.main_system.util.ScaleUtils
 
 import scala.collection.mutable
@@ -20,13 +21,15 @@ import scala.collection.mutable
 class SpriteRenderer extends Disposable {
   import SpriteRenderer._
 
-  private var batch: SpriteBatch = _
+  var batch: SpriteBatch = _
   private val animationsCache = mutable.Map[String, Animation[TextureRegion]]()
   private var guardAtlas: TextureAtlas = _
   private var stateTime = 0f
   private var floorTexture: TextureRegion = _
   private var font: BitmapFont = _
   private var debugDraw = false
+  private var exitTexture: Texture = _
+  private var exitSprite: TextureRegion = _
 
   private def getAndCacheAnimation(s: String): Animation[TextureRegion] = {
     animationsCache.getOrElseUpdate(s,
@@ -63,6 +66,8 @@ class SpriteRenderer extends Disposable {
     font.setColor(Color.YELLOW)
     font.getData.setScale(2f, 2f)
     guardAtlas = new TextureAtlas(guardAtlasFile)
+    exitTexture = new Texture(Gdx.files.internal(exitSpriteFile))
+    exitSprite = new TextureRegion(exitTexture, 0, 0, exitTexture.getWidth, exitTexture.getHeight)
   }
 
   def setDebugDraw(flag: Boolean): Unit = debugDraw = flag
@@ -101,6 +106,18 @@ class SpriteRenderer extends Disposable {
 
   }
 
+
+  def renderExits(exits: Iterable[Vector2], cam: Camera): Unit = {
+    val s = ScaleUtils.getPixelsPerMeter
+    val hw = exitSprite.getRegionWidth / 2
+    val wt = Wall.WALL_THICKNESS * s
+    batch.setProjectionMatrix(cam.combined)
+    batch.begin()
+
+    exits.foreach(e => batch.draw(exitSprite, (e.x * s) - wt / 2, (e.y * s) - wt / 2, wt, wt))
+    batch.end()
+  }
+
   def updateAndRender(dt: Float, c: MovableEntity[Vector2], cam: Camera): Unit = {
     render(c, cam)
     update(dt)
@@ -130,6 +147,7 @@ class SpriteRenderer extends Disposable {
     batch.dispose()
     guardAtlas.dispose()
     font.dispose()
+    exitTexture.dispose()
   }
 }
 
@@ -142,6 +160,7 @@ object SpriteRenderer {
   private val guardFeetWalk = "guard-walk"
   private val guardFeetRun = "guard-run"
   private val defaultFloor = "sprites/floor3.png"
+  private val exitSpriteFile = "sprites/exit_icon.png"
   private val guardScale = 1.0f / 3.0f
   private val runThreshold = 1.0f
   private val idleThreshold = 0.01f

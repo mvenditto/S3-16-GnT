@@ -42,9 +42,9 @@ class QuadTreeTest extends BaseTestInvolvingActors("QuadTreeTestSystem") {
     quadTreeActor ! MapSettingsMsg(bounds.w.toInt, bounds.h.toInt)
 
     List(GAME_ACTOR, LIGHTING_SYSTEM_ACTOR)
-      .foreach(a =>SystemManager.createGeneralActor(Props(new DummyActor), a))
+      .foreach(a =>SystemManager.createActor(Props(new DummyActor), a))
 
-    SystemManager.createGeneralActor(
+    SystemManager.createActor(
       WorldActor.props(new World(new Vector2(0,0), true)),WORLD_ACTOR)
 
     dummyActor = SystemManager.createActor(Props(new DummyActor), "dummyActor")
