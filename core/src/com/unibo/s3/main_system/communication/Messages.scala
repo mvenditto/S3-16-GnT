@@ -29,7 +29,7 @@ object Messages {
   case class SendCopInfoMsg(visitedVertices: List[Vector2])
 
   //messages for GameActor
-  case class ThiefCaughtMsg(thief: BaseCharacter)
+  case class ThiefCaughtMsg(thief: BaseCharacter, guard: BaseCharacter)
   case class ThiefReachedExitMsg(thief: BaseCharacter)
 
   //message for MasterActor

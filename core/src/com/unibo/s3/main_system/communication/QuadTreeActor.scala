@@ -91,16 +91,26 @@ class QuadTreeActor extends UntypedAbstractActor {
 
       val reqCharacter = agentsTable.keys.filter(a => a.getId == reqId._2).head
       val requester = agentsTable(reqCharacter)
-      requester ! SendNeighboursMsg(onlyVisible.filter(a => a match {
-        case _ : Guard => true; case _ => false}).map(a => agentsTable(a)))
-      val thievesInProximity = onlyVisible.filter(a => a match {case _ : Thief => true; case _ => false})
+
+      requester ! SendNeighboursMsg(
+        onlyVisible.filter(a => a match {
+          case _ : Guard => true
+          case _ => false
+        }).map(a => agentsTable(a)))
+
+      val thievesInProximity = onlyVisible.filter(a => a match {
+          case t : Thief => !t.hasReachedExit && !t.gotCaughtByGuard
+          case _ => false
+        })
 
       if(thievesInProximity.nonEmpty) {
         requester ! SendThievesInProximityMsg(thievesInProximity)
-        thievesInProximity.foreach(t => agentsTable(t) ! SendGuardsInProximityMsg(List(reqCharacter)))
+        thievesInProximity.foreach(t =>
+          agentsTable(t) ! SendGuardsInProximityMsg(List(reqCharacter)))
       }
 
       nearbyRequestCache -= reqId
+
     case AskAllCharactersMsg =>
       sender ! SendAllCharactersMsg(agentsTable.keys)
 

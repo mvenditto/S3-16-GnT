@@ -1,7 +1,6 @@
 package world
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
-import akka.pattern.ask
 import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.physics.box2d.World
 import com.unibo.s3.main_system.characters.BaseCharacter
@@ -15,6 +14,11 @@ import main_system.GdxDependencies
 import org.junit.runner.RunWith
 import org.junit.{Before, Test}
 
+
+/**
+  * Test QuadTreeActor interactions.
+  * @author mvenditto
+  */
 @RunWith(classOf[GdxDependencies])
 class QuadTreeTest extends BaseTestInvolvingActors("QuadTreeTestSystem") {
 
@@ -25,14 +29,12 @@ class QuadTreeTest extends BaseTestInvolvingActors("QuadTreeTestSystem") {
 
   initActorSystem()
 
-  private case class LatestResult()
   private class DummyActor() extends UntypedAbstractActor {
     override def onReceive(m: Any): Unit = m match {case _ => ()}
   }
 
   private def randomPointInBounds(b: Bounds): Vector2 =
     new Vector2(MathUtils.random(b.x, b.w), MathUtils.random(b.y, b.h))
-
 
   override def deployActors(): Unit = {
     quadTreeActor = system.actorOf(
@@ -87,21 +89,27 @@ class QuadTreeTest extends BaseTestInvolvingActors("QuadTreeTestSystem") {
     val cx = bounds.w / 2f
     val cy = bounds.h / 2f
     val c0 = Guard(new Vector2(cx, cy), 0)
-    c0.getLinearVelocity.set(0, 10) //make look upward
+    c0.getLinearVelocity.set(0, 10) //make it look upward
     val cr = c0.getFieldOfView.getRadius
 
-    val behind = for(i <- 0 to 19) yield Guard(new Vector2(cx  + (i - 10), cy - (cr / 2f)), i + 10)
-    val ahead = for(i <- 0 to 19) yield Guard(new Vector2(cx + (i - 10), cy + (cr / 2f)), (i + 10) + 10)
+    val behind = for(i <- 0 to 19)
+      yield Guard(new Vector2(cx  + (i - 10), cy - (cr / 2f)), i + 10)
 
-    (ahead ++ behind).foreach(c => quadTreeActor ! InitialSavingCharacterMsg(c, dummyActor))
+    val ahead = for(i <- 0 to 19)
+      yield Guard(new Vector2(cx + (i - 10), cy + (cr / 2f)), (i + 10) + 10)
+
+    val aheadActorRef = system.actorOf(Props(new DummyActor))
+
+    ahead.foreach(c => quadTreeActor ! InitialSavingCharacterMsg(c, aheadActorRef))
+    behind.foreach(c => quadTreeActor ! InitialSavingCharacterMsg(c, dummyActor))
 
     quadTreeActor ! InitialSavingCharacterMsg(c0, testActor)
     quadTreeActor ! RebuildQuadTreeMsg()
     quadTreeActor ! AskNeighboursWithinFovMsg(c0)
 
     expectMsgPF(){
-      case SendNeighboursMsg(n) => println(n.size)
-          assert(n.nonEmpty)
+      case SendNeighboursMsg(n) =>
+          assert(n.nonEmpty && n.forall(a => a.equals(aheadActorRef)))
       case _ => BadMatchFail()
     }
   }

@@ -16,7 +16,10 @@ import org.junit.Assert.fail
 import org.junit.runner.RunWith
 import org.junit.{Before, Test}
 
-
+/**
+  * Test WorldActor interactions.
+  * @author mvenditto
+  */
 @RunWith(classOf[GdxDependencies])
 class WorldTest extends BaseTestInvolvingActors("WorldTestSystem") {
 

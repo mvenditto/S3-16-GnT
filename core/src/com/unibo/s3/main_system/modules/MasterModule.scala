@@ -1,6 +1,7 @@
 package com.unibo.s3.main_system.modules
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
+import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
 import com.badlogic.gdx.graphics.Color._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.{Rectangle, Vector2}
@@ -8,19 +9,20 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.{Gdx, Input, InputMultiplexer}
 import com.kotcrab.vis.ui.util.ToastManager
-import com.kotcrab.vis.ui.widget.{BusyBar, VisWindow}
+import com.kotcrab.vis.ui.widget.{BusyBar, VisLabel, VisWindow}
 import com.unibo.s3.Main
 import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.communication.CharacterActors._
+import com.unibo.s3.main_system.communication.GeneralActors.{apply => _, _}
 import com.unibo.s3.main_system.communication.Messages._
-import com.unibo.s3.main_system.communication.{CharacterActors, GeneralActors, SystemManager}
+import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
 import com.unibo.s3.main_system.game.GameSettings
 import com.unibo.s3.main_system.graph.GraphAdapter
-import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig, SpriteRenderer}
+import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig, Overlay, SpriteRenderer}
 import com.unibo.s3.main_system.util.ImplicitConversions._
 import com.unibo.s3.main_system.util.{GntUtils, ScaleUtils}
 
-class MasterModule extends BasicModuleWithGui {
+class MasterModule extends BasicModuleWithGui with Overlay {
   import MasterModule._
 
   private[this] var graph: Option[GraphAdapter[Vector2]] = None
@@ -33,12 +35,15 @@ class MasterModule extends BasicModuleWithGui {
 
       case ThiefReachedExitMsg(t) =>
         notifications.show("Thief["+t.getId+"] reached an Exit!")
+        getActor(
+          LIGHTING_SYSTEM_ACTOR) ! CreatePointLightAt(t.getPosition, Color.RED)
 
-      case ThiefCaughtMsg(t) =>
-        notifications.show("Thief["+t.getId+"] got caught!")
+      case ThiefCaughtMsg(t, g) =>
+        notifications.show("Thief["+t.getId+"] got caught! by Guard["+g.getId+"]")
+        getActor(
+          LIGHTING_SYSTEM_ACTOR) ! CreatePointLightAt(g.getPosition, Color.BLUE)
 
       case SendAllCharactersMsg(_characters) =>
-        //println("Received characters update: ", _characters.size)
         characters = Option(_characters)
 
       case SendGraphMsg(g) =>
@@ -89,6 +94,7 @@ class MasterModule extends BasicModuleWithGui {
     notifications.setAlignment(Align.topRight)
     spriteRenderer.init()
     spriteRenderer.setDebugDraw(false)
+    overlay.getViewport.setCamera(owner.getCamera)
   }
 
   def initGame(config: GameSettings): Unit = {
@@ -97,14 +103,14 @@ class MasterModule extends BasicModuleWithGui {
     val w = mapSize.x.toInt
     val h = mapSize.y.toInt
 
-    masterActor = getActor(GeneralActors.MASTER_ACTOR)
-    mapActor = getActor(GeneralActors.MAP_ACTOR)
-    worldActor = getActor(GeneralActors.WORLD_ACTOR)
-    quadTreeActor = getActor(GeneralActors.QUAD_TREE_ACTOR)
-    graphActor = getActor(GeneralActors.GRAPH_ACTOR)
+    masterActor = getActor(MASTER_ACTOR)
+    mapActor = getActor(MAP_ACTOR)
+    worldActor = getActor(WORLD_ACTOR)
+    quadTreeActor = getActor(QUAD_TREE_ACTOR)
+    graphActor = getActor(GRAPH_ACTOR)
     gameActor = SystemManager.createGeneralActor(
-      GameActor.props(), GeneralActors.GAME_ACTOR)
-    spawnActor = getActor(GeneralActors.SPAWN_ACTOR)
+      GameActor.props(), GAME_ACTOR)
+    spawnActor = getActor(SPAWN_ACTOR)
 
     List(graphActor, quadTreeActor).foreach(a =>
       a ! MapSettingsMsg(w, h))
@@ -148,7 +154,6 @@ class MasterModule extends BasicModuleWithGui {
         spriteRenderer.render(c, owner.getCamera)
         renderer.renderCharacterDebugInfo(shapeRenderer, c)
       }))
-
   }
 
   override def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit = {
@@ -158,8 +163,14 @@ class MasterModule extends BasicModuleWithGui {
 
   override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
     if (button != 1){
-      val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
-      mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
+      //val mouseWorldPos = owner.screenToWorld(new Vector2(screenX, screenY))
+      //mouseWorldPos.scl(ScaleUtils.getMetersPerPixel)
+
+      /*
+      val l = new VisLabel("TEST")
+      l.setPosition(mouseWorldPos.x, mouseWorldPos.y)
+      overlay.addActor(l)*/
+
       spawnActor.tell(
         GenerateNewCharacterPositionMsg(GUARD), masterActor)
     }

@@ -17,6 +17,7 @@ import com.unibo.s3.main_system.world.actors.{RegisterAsWorldChangeObserver, Wor
 
 import scala.collection.mutable
 
+case class CreatePointLightAt(p: Vector2, c: Color)
 case class AskIsPointAtShadow(p: Vector2)
 
 case class LightingSystemConfig(
@@ -60,6 +61,12 @@ class LightingSystemModule extends BasicModuleWithGui {
 
       case SendAllCharactersMsg(characters) =>
         characters.foreach(c => newCharacters += c)
+
+      case CreatePointLightAt(p, c) =>
+        val pl = new PointLight(
+          rayHandler, PointLightRaysNum, c,
+          PointLightRadius, p.x, p.y)
+        pl.setStaticLight(true)
     }
   }
 

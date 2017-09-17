@@ -80,6 +80,12 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
 
     case ActMsg(dt) => act(dt)
 
+    case ResetWorld() =>
+      world.bodies.foreach( b => bodiesToDelete :+= b)
+
+    case RegisterAsWorldChangeObserver =>
+      worldChangeObservers :+= sender
+
     case RayCastCollidesQuery(ray) =>
       sender() ! RayCastCollidesResponse(rayCastCollisionDetector.collides(ray))
 
@@ -107,9 +113,9 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
         sender ! ObjectOnSightLineMsg(data)
       }
 
-    case CreateBox(pos, size, bdata) =>
+    case CreateBox(pos, size, bodyData) =>
       val b = world.createBox(pos, size)
-      bdata.foreach(bd => b.setUserData(bd))
+      bodyData.foreach(bd => b.setUserData(bd))
       worldObserver.getListener.created(b)
 
     case FilterReachableByRay(op, n, reqId) =>
@@ -142,13 +148,6 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       bodyData.foreach(bodyData =>
           parseBodyData(bodyData).foreach(bd => newBody.setUserData(bd)))
       worldObserver.getListener.created(newBody)
-
-    case ResetWorld() =>
-      world.bodies.foreach( b => bodiesToDelete :+= b)
-
-    case RegisterAsWorldChangeObserver =>
-      worldChangeObservers :+= sender
-      
   }
 }
 

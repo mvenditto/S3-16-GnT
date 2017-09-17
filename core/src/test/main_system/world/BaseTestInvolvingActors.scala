@@ -8,6 +8,11 @@ import org.junit.Assert.fail
 
 import scala.concurrent.duration._
 
+/**
+  * Base actors test class including AkkaTestKit tools
+  * + custom SystemManager's actor system.
+  * @author mvenditto
+*/
 abstract class BaseTestInvolvingActors(val systemName: String)
   extends TestKit(ActorSystem(systemName)) with ImplicitSender {
 
