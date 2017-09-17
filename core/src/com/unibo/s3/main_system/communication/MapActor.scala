@@ -1,13 +1,13 @@
 package com.unibo.s3.main_system.communication
 
 import scala.collection.JavaConversions.asScalaBuffer
-import akka.actor.{Props, UntypedAbstractActor}
+import akka.actor.{Props, Stash, UntypedAbstractActor}
 import com.unibo.s3.main_system.communication.Messages.{GenerateMapMsg, MapElementMsg, MapSettingsMsg}
 import com.unibo.s3.main_system.map.{AbstractMapGenerator, MapGenerator, MazeMapGenerator, RoomMapGenerator}
 
 
 
-class MapActor extends UntypedAbstractActor {
+class MapActor extends UntypedAbstractActor with Stash {
 
   // val FILEPATH = "maps/mapFile.txt" uncomment if file is required
   private[this] val mapGenerator: MapGenerator = new MapGenerator
@@ -15,6 +15,7 @@ class MapActor extends UntypedAbstractActor {
   private[this] var mapHeight: Int = _
   private[this] var mapType: Boolean = true
 //per ora di default true
+  /*
   override def onReceive(message: Any): Unit = message match {
 
     case msg: MapSettingsMsg =>
@@ -40,6 +41,40 @@ class MapActor extends UntypedAbstractActor {
     // val file = Gdx.files.local(FILEPATH)
      // file.readString().split("\\n").foreach(line => SystemManager.getInstance().getLocalActor("graphActor").tell(MapMsg(line), getSelf()))
     case _ => println("(mapActor) message unknown:" + message)
+  }*/
+  context.become(this.settings)
+
+  override def onReceive(message: Any): Unit = {}
+
+  private def settings: Receive = {
+    case msg: MapSettingsMsg =>
+      println("ricevute: " + msg.width + " " + msg.height)
+      this.mapWidth = msg.width
+      this.mapHeight = msg.height
+      context.become(generateMap)
+      unstashAll()
+
+    case _ => stash()
+  }
+
+  private def generateMap: Receive = {
+    case _: GenerateMapMsg =>
+      //this.mapGenerator.generate(8, this.mapWidth/3, this.mapHeight/3, 0, 0) //valori da decidere una volta decise le dimensioni possibili per la mappa
+      mapType match {
+        case true =>
+          this.mapGenerator.setStrategy(new MazeMapGenerator)
+        case false =>
+          this.mapGenerator.setStrategy(new RoomMapGenerator)
+      }
+      //valori da decidere una volta decise le dimensioni possibili per la mappa
+      this.mapGenerator.generateMap(this.mapWidth, this.mapHeight)
+      this.mapGenerator.getMap.foreach(line => {
+        SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR).tell(MapElementMsg(line), getSelf())
+        SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR).tell(MapElementMsg(line), getSelf())
+        SystemManager.getLocalActor(GeneralActors.SPAWN_ACTOR).tell(MapElementMsg(line), getSelf())
+      })
+    // val file = Gdx.files.local(FILEPATH)
+    // file.readString().split("\\n").foreach(line => SystemManager.getInstance().getLocalActor("graphActor").tell(MapMsg(line), getSelf()))
   }
 }
 
