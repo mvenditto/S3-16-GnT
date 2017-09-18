@@ -1,6 +1,6 @@
 package com.unibo.s3.main_system.world.actors
 
-import akka.actor.ActorRef
+import akka.actor.{ActorRef, ActorSelection}
 import akka.pattern.ask
 import akka.util.Timeout
 import com.badlogic.gdx.ai.utils.{Collision, Ray, RaycastCollisionDetector}
@@ -9,6 +9,10 @@ import com.badlogic.gdx.math.Vector2
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.language.postfixOps
+
+sealed trait ActorRefUnion
+case class ActorRefHolder(ar: ActorRef) extends ActorRefUnion
+case class ActorSelHolder(ar: ActorSelection) extends ActorRefUnion
 
 /**
   * A raycast collision detector, that works interacting with [[WorldActor]],

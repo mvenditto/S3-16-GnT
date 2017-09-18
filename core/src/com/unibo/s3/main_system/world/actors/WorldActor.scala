@@ -67,10 +67,13 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
     //worldObserver.update(world, dt)
   }
 
-  private def parseBodyData(s: String): Option[BodyData] = {
+  private def parseBodyData(s: String, body: Body): Option[BodyData] = {
     val b = BodyData()
     s match {
-      case "E" => b.bodyType = Option(Exit); Option(b)
+      case "E" =>
+        b.bodyType = Option(Exit)
+        b.userData = Option(body.getWorldCenter.cpy)
+        Option(b)
       case "H" => b.bodyType = Option(Hideout); Option(b)
       case _ => None
     }
@@ -146,7 +149,7 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
 
       val newBody = world.createBox(new Vector2(body(0), body(1)), new Vector2(body(2), body(3)))
       bodyData.foreach(bodyData =>
-          parseBodyData(bodyData).foreach(bd => newBody.setUserData(bd)))
+          parseBodyData(bodyData, newBody).foreach(bd => newBody.setUserData(bd)))
       worldObserver.getListener.created(newBody)
   }
 }

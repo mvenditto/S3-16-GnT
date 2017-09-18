@@ -51,9 +51,9 @@ class GraphActor extends  UntypedAbstractActor with Stash {
   override def onReceive(message: Any): Unit = {}
 
   private def mapSettings(): Receive = {
-    case MapSettingsMsg(w, h) =>
-      this.width = w
-      this.height = h
+    case GameSettingsMsg(g) =>
+      this.width = g.mapSize.x.toInt
+      this.height = g.mapSize.y.toInt
       context.become(generateGraph())
       unstashAll()
     case _ => stash()
