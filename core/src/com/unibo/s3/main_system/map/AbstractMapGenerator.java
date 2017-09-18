@@ -64,7 +64,8 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
         perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + HALF_BASE_UNIT + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
         perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + (heightSplits * BASE_UNIT + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
 
-        for(Vector2 exit : generateCardinalExits()) {
+        //for(Vector2 exit : generateCardinalExits()) {
+        for(Vector2 exit : generateMultipleExit()) {
             perimeter.add(((exit.x * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + ((exit.y * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + (BASE_UNIT) + SEPARATOR + "E");
         }
         return perimeter;
@@ -206,6 +207,14 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
         exits.add(generateRightWallExit());
         exits.add(generateUpperWallExit());
         exits.add(generateLowerWallExit());
+        return exits;
+    }
+
+    private List<Vector2> generateMultipleExit(){
+        List<Vector2> exits = new ArrayList<>();
+        for(int i = 0; i < 5; i ++) {
+            exits.addAll(generateCardinalExits());
+        }
         return exits;
     }
 
