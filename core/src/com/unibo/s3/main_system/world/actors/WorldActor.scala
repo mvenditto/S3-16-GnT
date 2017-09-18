@@ -10,13 +10,10 @@ import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dRaycastCollisionDetector
 import com.unibo.s3.main_system.characters.steer.collisions.gdx.Box2dSquareAABBProximity
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
+import com.unibo.s3.main_system.util.Box2dImplicits._
 import com.unibo.s3.main_system.util.GntUtils
 import com.unibo.s3.main_system.world.{BodyData, Exit, Hideout}
-import com.unibo.s3.main_system.util.GdxImplicits._
-import com.unibo.s3.main_system.util.Box2dImplicits._
 import net.dermetfan.gdx.physics.box2d.WorldObserver
-
-import scala.util.Try
 
 
 case class RayCastCollidesQuery(ray: Ray[Vector2])
@@ -67,10 +64,13 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
     //worldObserver.update(world, dt)
   }
 
-  private def parseBodyData(s: String): Option[BodyData] = {
+  private def parseBodyData(s: String, body: Body): Option[BodyData] = {
     val b = BodyData()
     s match {
-      case "E" => b.bodyType = Option(Exit); Option(b)
+      case "E" =>
+        b.bodyType = Option(Exit)
+        b.userData = Option(body.getWorldCenter.cpy)
+        Option(b)
       case "H" => b.bodyType = Option(Hideout); Option(b)
       case _ => None
     }
@@ -146,7 +146,7 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
 
       val newBody = world.createBox(new Vector2(body(0), body(1)), new Vector2(body(2), body(3)))
       bodyData.foreach(bodyData =>
-          parseBodyData(bodyData).foreach(bd => newBody.setUserData(bd)))
+          parseBodyData(bodyData, newBody).foreach(bd => newBody.setUserData(bd)))
       worldObserver.getListener.created(newBody)
   }
 }

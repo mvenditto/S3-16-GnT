@@ -1,8 +1,10 @@
 package com.unibo.s3.main_system.communication
 
 import akka.actor.{Props, Stash, UntypedAbstractActor}
+import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.Thief.Thief
 import com.unibo.s3.main_system.communication.Messages._
+import com.unibo.s3.main_system.game.Wall
 import com.unibo.s3.main_system.world.Exit
 import com.unibo.s3.main_system.world.actors.{AskObjectOnSightLineMsg, ObjectOnSightLineMsg}
 
@@ -57,8 +59,21 @@ class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor wi
 
     case  ObjectOnSightLineMsg(bd) =>
       if(canAct && bd.exists(b => b.bodyType.contains(Exit))) {
-        thief.setReachedExit(true)
-        SystemManager.getLocalActor(GeneralActors.GAME_ACTOR) ! ThiefReachedExitMsg(thief)
+        val exitInRange = bd.exists(b => b.userData match {
+          case Some(v: Vector2) => v.dst(thief.getPosition) <= Wall.WALL_THICKNESS
+          case _ => false
+        })
+        if (exitInRange) {
+          thief.setReachedExit(true)
+          SystemManager.getLocalActor(GeneralActors.GAME_ACTOR) ! ThiefReachedExitMsg(thief)
+        } else {
+
+          val exit = bd.filter(b => b.bodyType.contains(Exit))
+            .map(b => b.userData)
+            .map { case Some(vv: Vector2) => vv }.head
+
+          thief.priorityRunTo(exit)
+        }
       }
 
     case m => println("(thiefActor) message unknown:" + m)

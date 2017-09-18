@@ -53,7 +53,8 @@ public class GraphGenerator {
         int dimWall = Wall.WALL_THICKNESS();
 
         ActorRef worldActor = SystemManager.getLocalActor("worldActor");
-        RaycastCollisionDetector<Vector2> collisionDetector = new Box2dProxyDetectorsFactory(worldActor).newRaycastCollisionDetector();
+        RaycastCollisionDetector<Vector2> collisionDetector =
+                Box2dProxyDetectorsFactory.of(worldActor).newRaycastCollisionDetector();
         HashMap<Vector2, Vector2> walls = new HashMap<>();
         Integer[][] grid = new Integer[width+(dimWall*2)][height+(dimWall*2)];
         log("genero il grafo di dimensione: " + width + ", " + height);

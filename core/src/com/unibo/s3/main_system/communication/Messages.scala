@@ -3,6 +3,7 @@ package com.unibo.s3.main_system.communication
 import akka.actor.ActorRef
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.BaseCharacter
+import com.unibo.s3.main_system.game.GameSettings
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
@@ -12,7 +13,7 @@ object Messages {
   case class ActMsg(dt: Float)
 
   //message for MapActor
-  case class MapSettingsMsg(width: Int, height: Int)
+  case class GameSettingsMsg(g: GameSettings)
   case class GenerateMapMsg() //ci va un flag con la tipologia di grafo
 
   //message for GraphActor

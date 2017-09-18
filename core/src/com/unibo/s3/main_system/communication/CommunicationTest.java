@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.unibo.s3.main_system.game.*;
 import com.unibo.s3.main_system.world.actors.WorldActor;
 
 import com.unibo.s3.main_system.communication.Messages.CreateCharacterMsg;
@@ -17,10 +18,10 @@ import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 import scala.Option;
-import scala.tools.cmd.Opt;
+
 
 public class CommunicationTest extends ApplicationAdapter {
-
+/*
     private SpriteBatch batch;
     private Texture img;
 
@@ -47,9 +48,11 @@ public class CommunicationTest extends ApplicationAdapter {
         ActorRef graphActor = SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR());
         ActorRef quadTreeActor = SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR());
 
-        mapActor.tell(new Messages.MapSettingsMsg(60, 60), ActorRef.noSender());
-        graphActor.tell(new Messages.MapSettingsMsg(60, 60), ActorRef.noSender());
-        quadTreeActor.tell(new Messages.MapSettingsMsg(60, 60), ActorRef.noSender());
+        final GameSettings gs = new GameSettings(5, 5, new Vector2(60,60), null, null);
+
+        mapActor.tell(new Messages.GameSettingsMsg(60, 60), ActorRef.noSender());
+        graphActor.tell(new Messages.GameSettingsMsg(60, 60), ActorRef.noSender());
+        quadTreeActor.tell(new Messages.GameSettingsMsg(60, 60), ActorRef.noSender());
 
         try {
             Thread.sleep(500);
@@ -99,5 +102,5 @@ public class CommunicationTest extends ApplicationAdapter {
     public void dispose () {
         this.batch.dispose();
         this.img.dispose();
-    }
+    }*/
 }

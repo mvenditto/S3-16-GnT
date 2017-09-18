@@ -1,7 +1,5 @@
 package com.unibo.s3.main_system.world.actors
 
-import akka.actor.ActorRef
-import akka.pattern.ask
 import akka.util.Timeout
 import com.badlogic.gdx.ai.utils.{Collision, Ray, RaycastCollisionDetector}
 import com.badlogic.gdx.math.Vector2
@@ -9,15 +7,16 @@ import com.badlogic.gdx.math.Vector2
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.language.postfixOps
+import ActorRefOrSelection.{ActorRefOrSelectionHolder, _}
 
 /**
   * A raycast collision detector, that works interacting with [[WorldActor]],
   * instead of directly referencing a [[com.badlogic.gdx.physics.box2d.World]].
   * This anyway introduces latency and a collision could be missed on high load.
   * @see [[com.unibo.s3.main_system.characters.steer.collisions.Box2dRaycastCollisionDetector]]
-  * @param worldActor a reference to the WorldActor
+  * @param worldActor a [[ActorRefOrSelection]] to the WorldActor
   */
-class Box2dRayCastCollisionDetectorProxy(worldActor: ActorRef) extends RaycastCollisionDetector[Vector2]{
+class Box2dRayCastCollisionDetectorProxy(worldActor: ActorRefOrSelectionHolder) extends RaycastCollisionDetector[Vector2]{
 
   implicit val timeout = Timeout(5 seconds)
 

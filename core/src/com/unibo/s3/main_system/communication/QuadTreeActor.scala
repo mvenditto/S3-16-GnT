@@ -37,8 +37,8 @@ class QuadTreeActor extends UntypedAbstractActor {
   }
 
   override def onReceive(message: Any): Unit = message match {
-    case MapSettingsMsg(w, h) =>
-      bounds = Bounds(0, 0, w, h)
+    case GameSettingsMsg(gs) =>
+      bounds = Bounds(0, 0, gs.mapSize.x, gs.mapSize.y)
 
     case InitialSavingCharacterMsg(newCharacter, characterRef) =>
       agentsTable += (newCharacter -> characterRef)

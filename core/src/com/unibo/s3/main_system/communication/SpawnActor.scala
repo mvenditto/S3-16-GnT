@@ -50,8 +50,9 @@ class SpawnActor extends UntypedAbstractActor with Stash {
   override def onReceive(message: Any): Unit = {}
 
   private def mapSettings(): Receive = {
-    case msg: MapSettingsMsg =>
-      this.map = Array.ofDim[Int](msg.width, msg.height)
+    case GameSettingsMsg(g) =>
+      val wt = g.mapSize.cpy().scl(1.0f / Wall.WALL_THICKNESS)
+      this.map = Array.ofDim[Int](wt.x.toInt, wt.y.toInt)
       context.become(setMatrix())
       unstashAll()
     case _ => stash()

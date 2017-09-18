@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.Main
-import com.unibo.s3.main_system.communication.Messages.MapSettingsMsg
+import com.unibo.s3.main_system.communication.Messages.GameSettingsMsg
 import com.unibo.s3.main_system.communication._
 import com.unibo.s3.main_system.world.actors.WorldActor
 
