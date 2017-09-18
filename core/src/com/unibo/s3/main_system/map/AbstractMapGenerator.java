@@ -20,8 +20,8 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
     private static final int LOWER_WALL = 2;
     private static final int UPPER_WALL = 3;
 
-    private int widthSplits;// = (int) (MAP_WIDTH / BASE_UNIT);
-    private int heightSplits;// = (int) (MAP_HEIGHT / BASE_UNIT);
+    private int widthSplits;
+    private int heightSplits;
     private boolean stringMapGenerated = false;
     private static final String END_OF_FILE = "0.0:0.0:0.0:0.0";
     private static final String SEPARATOR = ":";
@@ -33,8 +33,6 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
         this.widthSplits = width;
         this.heightSplits = height;
         this.generatedMap = new int[widthSplits][heightSplits];
-        //System.out.println("splits: " + widthSplits + " " + heightSplits);
-        //System.out.println("Generated matrix " + generatedMap.length + "x" + generatedMap[0].length);
     }
 
     public List<String> getMap(){
@@ -59,16 +57,26 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
 
     private ArrayList<String> generatePerimeterWalls(){
         ArrayList<String> perimeter = new ArrayList<>();
-        perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((heightSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * heightSplits + BASE_UNIT * 2));
-        perimeter.add(((widthSplits * BASE_UNIT) + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + ((heightSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + (BASE_UNIT * heightSplits + BASE_UNIT * 2));
-        perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + HALF_BASE_UNIT + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
-        perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + (heightSplits * BASE_UNIT + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
+        //perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((heightSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * heightSplits + BASE_UNIT * 2));
+        perimeter.add(concat(Arrays.asList(HALF_BASE_UNIT,(float) ((heightSplits * BASE_UNIT)/2 + BASE_UNIT), (float) BASE_UNIT, (float)(BASE_UNIT * heightSplits + BASE_UNIT * 2))));
+        ///perimeter.add(((widthSplits * BASE_UNIT) + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + ((heightSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + (BASE_UNIT * heightSplits + BASE_UNIT * 2));
+        perimeter.add(concat(Arrays.asList(((widthSplits * BASE_UNIT) + BASE_UNIT + HALF_BASE_UNIT),(float) ((heightSplits * BASE_UNIT)/2 + BASE_UNIT), (float) BASE_UNIT, (float)(BASE_UNIT * heightSplits + BASE_UNIT * 2))));
+        //perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + HALF_BASE_UNIT + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
+        perimeter.add(concat(Arrays.asList((float) ((widthSplits * BASE_UNIT)/2 + BASE_UNIT), HALF_BASE_UNIT, (float) (BASE_UNIT * widthSplits + BASE_UNIT * 2), (float) BASE_UNIT)));
+        //perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + (heightSplits * BASE_UNIT + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
+        perimeter.add(concat(Arrays.asList((float) ((widthSplits * BASE_UNIT)/2 + BASE_UNIT), (heightSplits * BASE_UNIT + BASE_UNIT + HALF_BASE_UNIT), (float) (BASE_UNIT * widthSplits + BASE_UNIT * 2), (float) BASE_UNIT)));
 
         //for(Vector2 exit : generateCardinalExits()) {
-        for(Vector2 exit : generateMultipleExit()) {
+        for(Vector2 exit : generateMultipleExits()) {
             perimeter.add(((exit.x * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + ((exit.y * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + (BASE_UNIT) + SEPARATOR + "E");
         }
         return perimeter;
+    }
+
+    private String concat(List<Float> list){
+        String s;
+        s = list.get(0) + SEPARATOR + list.get(1) + SEPARATOR + list.get(2) + SEPARATOR + list.get(3);
+        return s;
     }
 
     protected void buildWall(boolean orientation, int coord){
@@ -210,7 +218,7 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
         return exits;
     }
 
-    private List<Vector2> generateMultipleExit(){
+    private List<Vector2> generateMultipleExits(){
         List<Vector2> exits = new ArrayList<>();
         for(int i = 0; i < 5; i ++) {
             exits.addAll(generateCardinalExits());
