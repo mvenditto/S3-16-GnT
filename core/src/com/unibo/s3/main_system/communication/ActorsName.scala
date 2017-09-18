@@ -11,6 +11,7 @@ object GeneralActors extends Enumeration {
   val SPAWN_ACTOR = EnumerationType("spawnActor")
   val GAME_ACTOR = EnumerationType("gameActor")
   val LIGHTING_SYSTEM_ACTOR = EnumerationType("lightingActor")
+  val COMMUNICATOR_ACTOR = EnumerationType("communicatorActor")
 
   protected case class EnumerationType(name: String) extends Val(name)
 }

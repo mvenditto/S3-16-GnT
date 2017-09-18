@@ -7,6 +7,7 @@ import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.characters.Guard.Guard
 import com.unibo.s3.main_system.characters.Thief.Thief
 import com.unibo.s3.main_system.communication.Messages.{AskNeighboursMsg, InitialSavingCharacterMsg, RebuildQuadTreeMsg, SendNeighboursMsg, _}
+import com.unibo.s3.main_system.game.AkkaSettings
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.world.actors.{FilterReachableByRay, SendFilterReachableByRay}
 import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
@@ -41,10 +42,10 @@ class QuadTreeActor extends UntypedAbstractActor {
 
     case InitialSavingCharacterMsg(newCharacter, characterRef) =>
       agentsTable += (newCharacter -> characterRef)
-      SystemManager.getLocalActor(
-        GeneralActors.GAME_ACTOR) ! SendAllCharactersMsg(agentsTable.keys)
-      SystemManager.getLocalActor(
-        GeneralActors.LIGHTING_SYSTEM_ACTOR) ! SendAllCharactersMsg(agentsTable.keys)
+      SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
+        GeneralActors.GAME_ACTOR.name) ! SendAllCharactersMsg(agentsTable.keys)
+      SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
+        GeneralActors.LIGHTING_SYSTEM_ACTOR.name) ! SendAllCharactersMsg(agentsTable.keys)
 
     case RebuildQuadTreeMsg() =>
       root = QuadTreeNode(bounds)

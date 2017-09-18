@@ -39,4 +39,7 @@ object Messages {
 
   //message for SpawnActor
   case class GenerateNewCharacterPositionMsg(characterType: CharacterActors)
+
+  //message for CommunciatorActor
+  case class SendIPMsg(IP: String)
 }
