@@ -1,10 +1,9 @@
 package com.unibo.s3.main_system.map;
 
 import com.badlogic.gdx.math.Vector2;
-import com.unibo.s3.main_system.spawn.GuardSpawningStrategy;
-import com.unibo.s3.main_system.spawn.RandomSpawnPointGenerator;
+import com.unibo.s3.main_system.spawn.GuardStrategy;
 import com.unibo.s3.main_system.spawn.SpawnPointGenerator;
-import com.unibo.s3.main_system.spawn.ThiefSpawningStrategy;
+import com.unibo.s3.main_system.spawn.ThiefStrategy;
 import org.junit.*;
 
 import java.util.List;
@@ -67,14 +66,14 @@ public class TestMapGeneration {
                 }
             }
             SpawnPointGenerator spawnPointGenerator = new SpawnPointGenerator();
-            spawnPointGenerator.setSpawnStrategy(new GuardSpawningStrategy());
+            spawnPointGenerator.setSpawnStrategy(new GuardStrategy());
             List<Vector2> guardsList = spawnPointGenerator.generateSpawnPoints(map, 10); //generate 10 spawn points
             for(Vector2 v : guardsList){
                 int xInMatrix = (int) ((v.x - 2) / 2);
                 int yInMatrix = (int) ((v.y - 2) / 2);
                 assertEquals(0, map[xInMatrix][yInMatrix]);
             }
-            spawnPointGenerator.setSpawnStrategy(new ThiefSpawningStrategy());
+            spawnPointGenerator.setSpawnStrategy(new ThiefStrategy());
             List<Vector2> thievesList = spawnPointGenerator.generateSpawnPoints(map, 10); //generate 10 spawn points
             for(Vector2 v : thievesList){
                 int xInMatrix = (int) ((v.x - 2) / 2);

@@ -5,7 +5,7 @@ import com.unibo.s3.main_system.game.{GameSettings, Wall}
 
 import scala.util.Random
 
-class ThiefSpawningStrategy extends SpawnStrategy {
+class ThiefStrategy extends SpawnStrategy {
 
   private[this] var width_shift: Int = _
   private[this] var height_shift: Int = _
@@ -26,6 +26,6 @@ class ThiefSpawningStrategy extends SpawnStrategy {
 
 }
 
-object ThiefSpawningStrategy {
-  def apply(): ThiefSpawningStrategy = new ThiefSpawningStrategy()
+object ThiefStrategy {
+  def apply(): ThiefStrategy = new ThiefStrategy()
 }
