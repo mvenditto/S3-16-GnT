@@ -23,7 +23,7 @@ abstract class BaseTestInvolvingActors(val systemName: String)
   def deployActors()
 
   protected def initActorSystem(): Unit = {
-    SystemManager.createSystem(systemName, None)
+    SystemManager.createSystem(systemName, None, None)
     deployActors()
   }
 
