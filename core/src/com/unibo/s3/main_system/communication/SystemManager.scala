@@ -15,15 +15,15 @@ object SystemManager {
 
   private[this] var ipToConnect: Option[String] = Option.empty
 
-  def createSystem(systemName: String, portNumber: Option[Int]): Unit = {
-    if(portNumber.isEmpty)
-      this.system = ActorSystem.create(systemName)
-    else {
+  def createSystem(systemName: String, ip: Option[String], portNumber: Option[Int]): Unit = {
+    if(portNumber.isDefined && ip.isDefined)
       this.system = ActorSystem.create(systemName, ConfigFactory.parseString(
         "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," +
           "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" +
           ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
-          ",\"netty\":{\"tcp\":{\"hostname\":\""+ InetAddress.getLocalHost.getHostAddress+"\",\"port\":"+portNumber.get+"}}}}}"))
+          ",\"netty\":{\"tcp\":{\"hostname\":\""+ ip.get +"\",\"port\":"+portNumber.get+"}}}}}"))
+    else {
+      this.system = ActorSystem.create(systemName)
     }
   }
 

@@ -62,7 +62,7 @@ class Box2dModule extends BaseTestbedModule with InputProcessorAdapter {
     log("Initializing world")
     world = new World(new Vector2(0, 0), true)
     log("Starting actor system")
-    SystemManager.createSystem("System", None)
+    SystemManager.createSystem("System", ip = None, portNumber = None)
     SystemManager.createActor(Props.create(classOf[WorldActor], world), GeneralActors.WORLD_ACTOR)
     worldActor = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
   }

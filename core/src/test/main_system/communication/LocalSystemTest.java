@@ -39,7 +39,7 @@ public class LocalSystemTest {
 
     @BeforeClass
     public static void setup() {
-        SystemManager.createSystem("MySystem", Option.empty());
+        SystemManager.createSystem("MySystem", Option.empty(), Option.empty());
         SystemManager.createActor(Props.create(TestActor.class), "firstActor");
         SystemManager.createActor(Props.create(TestActor.class), "secondActor");
         testSystem = ActorSystem.create();
