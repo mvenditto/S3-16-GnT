@@ -94,7 +94,7 @@ class ActorSystemModule extends BaseTestbedModule {
   override def setup(f: (String) => Unit): Unit = {
     super.setup(f)
     f("Init actor system")
-    SystemManager.createSystem("System", None)
+    SystemManager.createSystem("System",ip = None, portNumber = None)
 
     f("Deploy -> WorldActor")
     SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR)

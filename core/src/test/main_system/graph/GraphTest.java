@@ -27,7 +27,7 @@ public class GraphTest {
 
     @Test
     public void checkNewGraph() {
-        SystemManager.createSystem("TestSystem", Option.empty());
+        SystemManager.createSystem("TestSystem",Option.empty(), Option.empty());
         SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor");
 
         sendMapToWord();

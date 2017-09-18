@@ -28,7 +28,7 @@ class BootstrapRemote() {
 
   private def initActorSystem(): Unit = {
     log("-- Computation node configuration and startup --");
-    SystemManager.createSystem(ActorSystemName, Option.empty)
+    SystemManager.createSystem(ActorSystemName, ip = None, portNumber = None)
     log("-- Actor system creted --");
 
     val world = new World(new Vector2(0, 0), true)
