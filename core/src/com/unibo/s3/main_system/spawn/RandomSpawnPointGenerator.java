@@ -15,4 +15,9 @@ public class RandomSpawnPointGenerator implements SpawnStrategy{
     public Vector2 generateSpawnQuadrant(int[][] map) {
         return null;
     }
+
+    @Override
+    public boolean checkAllowedPosition(int[][] map, int x, int y) {
+        return map[x][y] == 0;
+    }
 }

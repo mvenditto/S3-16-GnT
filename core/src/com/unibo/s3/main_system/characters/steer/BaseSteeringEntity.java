@@ -16,7 +16,7 @@ public class BaseSteeringEntity implements SteeringEntity<Vector2> {
     private Vector2 linearVelocity;
     private float rotation = 0.0f;
     private float angularVelocity;
-    private float boundingRadius = 1.0f; //0.1f;
+    private float boundingRadius = 0.1f;
 
     private boolean tagged;
     private boolean independentFacing = false;

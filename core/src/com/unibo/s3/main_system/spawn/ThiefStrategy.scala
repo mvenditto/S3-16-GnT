@@ -11,13 +11,16 @@ class ThiefStrategy extends SpawnStrategy {
   private[this] var height_shift: Int = _
 
   override def generateSpawnQuadrant(map: Array[Array[Int]]): Vector2 = {
-    this.width_shift = map.length / 6
-    this.height_shift = map(0).length / 6
-    var x = (map.length / 2) + Wall.WALL_THICKNESS
-    if(Random.nextBoolean()) x = x + Random.nextInt(width_shift) else x = x - Random.nextInt(width_shift)
-    var y = (map(0).length / 2) + Wall.WALL_THICKNESS
-    if(Random.nextBoolean()) y = y + Random.nextInt(height_shift) else y = y - Random.nextInt(height_shift)
-
+    var x = 0
+    var y = 0
+    do{
+      this.width_shift = map.length / 6
+      this.height_shift = map(0).length / 6
+      x = (map.length / 2) + Wall.WALL_THICKNESS
+      if(Random.nextBoolean()) x = x + Random.nextInt(width_shift) else x = x - Random.nextInt(width_shift)
+      y = (map(0).length / 2) + Wall.WALL_THICKNESS
+      if(Random.nextBoolean()) y = y + Random.nextInt(height_shift) else y = y - Random.nextInt(height_shift)
+    }while(!checkAllowedPosition(map, x, y))
     new Vector2(x, y)
   }
 
