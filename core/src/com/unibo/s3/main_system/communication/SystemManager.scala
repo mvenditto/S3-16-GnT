@@ -11,7 +11,7 @@ object SystemManager {
   private[this] type CharacterActors = CharacterActors.Value
 
   private[this] var system: ActorSystem = _
-  private[this] var actorList: Map[String, ActorRef] = _
+  private[this] var actorList = Map[String, ActorRef]()
 
   private[this] var ipToConnect: Option[String] = Option.empty
 
@@ -36,32 +36,27 @@ object SystemManager {
   }
 
   def createActor(props: Props, actorCode: String): ActorRef = {
-    if(this.actorList == null) {
-      this.actorList = Map()
-    }
     val ref: ActorRef = this.system.actorOf(props, actorCode)
     this.actorList += actorCode -> ref
     ref
   }
 
-  def createGeneralActor(props: Props, actorName: GeneralActors): ActorRef = {
+  def createActor(props: Props, actorName: GeneralActors): ActorRef = {
     createActor(props, actorName.toString)
   }
 
-  def createCharacterActor(props: Props, actorName: CharacterActors, id: Int): ActorRef = {
-    val actorCode = actorName.toString + id
-    createActor(props, actorCode)
+  def createActor(props: Props, actorName: CharacterActors, id: Int): ActorRef = {
+    createActor(props, actorName.toString + id)
   }
 
   def getLocalActor(actorCode: String): ActorRef = this.actorList.filter(elem => elem._1.equals(actorCode)).head._2
 
-  def getLocalGeneralActor(actorName: GeneralActors): ActorRef = {
+  def getLocalActor(actorName: GeneralActors): ActorRef = {
     getLocalActor(actorName.toString)
   }
 
-  def getLocalCharacterActor(actorName: CharacterActors, id: Int): ActorRef = {
-    val actorCode = actorName.toString + id
-    getLocalActor(actorCode.toString)
+  def getLocalActor(actorName: CharacterActors, id: Int): ActorRef = {
+    getLocalActor(actorName.toString + id)
   }
 
   def getRemoteActor(systemName: String, path: String, actorName: String): ActorSelection = {

@@ -7,6 +7,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.world.actors.Box2dRayCastCollisionDetectorProxy;
 import com.unibo.s3.main_system.world.actors.Box2dSquareAABBProximityProxy;
 
+/**
+ * A factory of 'proxy' detectors, based on WorldActor instead of a World instance directly.
+ *
+ * @author mvenditto
+ */
 public class Box2dProxyDetectorsFactory implements DetectorsFactory<Vector2> {
 
     private ActorRef worldActor;

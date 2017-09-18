@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 /**
- *
+ * An implementation of a {@link SteeringEntity}. partially taken from gdx-ai tests repository.
  * @author mvenditto
  * */
 public class BaseSteeringEntity implements SteeringEntity<Vector2> {
@@ -16,7 +16,7 @@ public class BaseSteeringEntity implements SteeringEntity<Vector2> {
     private Vector2 linearVelocity;
     private float rotation = 0.0f;
     private float angularVelocity;
-    private float boundingRadius = 0.1f;
+    private float boundingRadius = 1.0f; //0.1f;
 
     private boolean tagged;
     private boolean independentFacing = false;

@@ -5,6 +5,9 @@ import com.badlogic.gdx.math.Vector2
 
 import scala.collection.mutable.ListBuffer
 
+/*
+* A 2d space rectangular partition.
+* */
 case class Bounds(x: Float, y: Float, w: Float, h: Float) {
 
   def contains(p: Vector2): Boolean = x <= p.x && x + w >= p.x && y <= p.y && y + h >= p.y
@@ -13,6 +16,14 @@ case class Bounds(x: Float, y: Float, w: Float, h: Float) {
 
 }
 
+/**
+  * An implementation of a QuadTree structure for 2d proximity searches.
+  *
+  * @param bounds the structure's root space (rectangle)
+  * @tparam T any [[Steerable]] of type [[Vector2]]
+  *
+  * @author mvenditto
+  */
 class QuadTreeNode[T <: Steerable[Vector2]](bounds: Bounds){
 
   private var entities: ListBuffer[T] = ListBuffer[T]()
@@ -37,6 +48,11 @@ class QuadTreeNode[T <: Steerable[Vector2]](bounds: Bounds){
 
   }
 
+  /**
+    * Inserts an item into the structure.
+    * @param p the item to insert into the QuadTree
+    * @return true if there were room left for p to be inserted in.
+    */
   def insert(p: T): Boolean = {
 
     if (bounds.contains(p.getPosition)) {
@@ -56,6 +72,11 @@ class QuadTreeNode[T <: Steerable[Vector2]](bounds: Bounds){
     false
   }
 
+  /**
+    * Query for entities in the given area.
+    * @param queryArea the [[Bounds]] to search for entities in.
+    * @return an [[Iterable]] of [[T]] entities contained in queryArea.
+    */
   def rangeQuery(queryArea: Bounds): Iterable[T] = {
     var neighbors: Seq[T] = List()
 
@@ -73,6 +94,10 @@ class QuadTreeNode[T <: Steerable[Vector2]](bounds: Bounds){
     neighbors
   }
 
+  /**
+    * Traverse the structure and apply the given function to all nodes.
+    * @param consumer a function to be applied to each node of the structure.
+    */
   def traverse(consumer: (QuadTreeNode[T]) => Unit) : Unit = {
 
     consumer(this)

@@ -3,7 +3,11 @@ package com.unibo.s3.main_system.util
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.Rectangle
 
-
+/**
+  * An utility class containing map parsing method.
+  *
+  * @author mvenditto
+  */
 object GntUtils {
 
   private[this] val newline = "\n"

@@ -81,7 +81,7 @@ public class GraphGenerator {
                                                                 RaycastCollisionDetector<Vector2> collisionDetector, int dimWall) {
         UndirectedGraph<Vector2, DefaultEdge> graph = new SimpleGraph<>(DefaultEdge.class);
         addNodes(grid, graph, walls, dimWall);
-        log("Finiti i nodi, sono " + graph.vertexSet().size());
+        //log("Finiti i nodi, sono " + graph.vertexSet().size());
         addEdges(graph, collisionDetector);
         return graph;
     }
@@ -96,7 +96,7 @@ public class GraphGenerator {
         concurrentCheckUnconnectedNodes(graph, collisionDetector);
         cron.stop();
 
-        log("A controllare i nodi staccati ci ha messo: " + cron.getTime());
+        //log("A controllare i nodi staccati ci ha messo: " + cron.getTime());
 
     }
 
@@ -135,7 +135,7 @@ public class GraphGenerator {
             }
         }
 
-        log("Finito");
+        //log("Finito");
         executor.shutdown();
     }
 
@@ -241,7 +241,7 @@ public class GraphGenerator {
         Set<Future<List<Vector2>>> resultSet = new HashSet<>();
         int nTasks = 3600;
 
-        FileHandle file = Gdx.files.internal(mapFilename);
+        FileHandle file = Gdx.files.local(mapFilename);
         String text = file.readString();
         String[] lines = text.split("\\n");
         int linesForTask = lines.length / (nTasks+1);
@@ -273,8 +273,9 @@ public class GraphGenerator {
     }
 
     private static void readMap(String mapFilename, HashMap<Vector2, Vector2> walls, Integer[][] grid) {
-        FileHandle file = Gdx.files.internal(mapFilename);
+        FileHandle file = Gdx.files.local(mapFilename);
         String text = file.readString();
+        //log("File = " + text);
         String[] lines = text.split("\\n");
         boolean print = false;
         for(int l = 0; l < lines.length; l++) {
@@ -335,7 +336,7 @@ public class GraphGenerator {
                 if(checkGrid(row, col, grid)) {
                     Vector2 v = createVector(row, col);
                     graph.addVertex(v);
-                    log("Primi nodi: " + v.toString());
+                    //log("Primi nodi: " + v.toString());
                 }
             }
         }
@@ -372,7 +373,7 @@ public class GraphGenerator {
                 if(checkForAddingNode(x, y, grid, graph)) {
                     Vector2 v = createVector(x, y);
                     graph.addVertex(v);
-                    log("Secondi nodi: " + v.toString());
+                    //log("Secondi nodi: " + v.toString());
                 }
 
                 boolean modified = false;

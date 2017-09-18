@@ -27,32 +27,30 @@ class BootstrapRemote() {
   }
 
   private def initActorSystem(): Unit = {
+    log("-- Computation node configuration and startup --");
     SystemManager.createSystem(ActorSystemName, Option.empty)
-    log("Creted actor system")
+    log("-- Actor system creted --");
 
     val world = new World(new Vector2(0, 0), true)
 
-    /*SystemManager.createGeneralActor(
+    /*SystemManager.createActor(
       MasterActor.props(), GeneralActors.MASTER_ACTOR)*/
 
-    /*SystemManager.createGeneralActor( ?
+    /*SystemManager.createActor( ?
       WorldActor.props(world), GeneralActors.WORLD_ACTOR)*/
 
-    SystemManager.createGeneralActor(
+    SystemManager.createActor(
       QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)
-    log("Creted quad tree actor")
 
-    SystemManager.createGeneralActor(SpawnActor.props(),
+    SystemManager.createActor(SpawnActor.props(),
       GeneralActors.SPAWN_ACTOR)
-    log("Created spawn actor")
 
-    SystemManager.createGeneralActor(
+    SystemManager.createActor(
       MapActor.props(), GeneralActors.MAP_ACTOR)
-    log("Creted map actor")
 
-    SystemManager.createGeneralActor(
+    SystemManager.createActor(
       GraphActor.props(), GeneralActors.GRAPH_ACTOR)
-    log("Creted graph actor")
+    log("-- Actors created --")
   }
 
 
@@ -78,7 +76,6 @@ class BootstrapRemote() {
 
 object BootstrapRemote {
   private val ActorSystemName = "System"
-  private val LoadingDialogTitle = "System Initialization"
 
   def apply(): BootstrapRemote =
     new BootstrapRemote()

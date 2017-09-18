@@ -28,6 +28,10 @@ object Messages {
   case class SendAllCharactersMsg(characters: Iterable[BaseCharacter])
   case class SendCopInfoMsg(visitedVertices: List[Vector2])
 
+  //messages for GameActor
+  case class ThiefCaughtMsg(thief: BaseCharacter)
+  case class ThiefReachedExitMsg(thief: BaseCharacter)
+
   //message for MasterActor
   case class RebuildQuadTreeMsg()
   case class CreateCharacterMsg(position: Vector2, characterType: CharacterActors)

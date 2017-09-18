@@ -7,13 +7,16 @@ import com.badlogic.gdx.graphics.{Camera, Color, Texture}
 import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.utils.Disposable
 import com.unibo.s3.main_system.characters.BaseCharacter
-import com.unibo.s3.main_system.characters.Guard.Guard
-import com.unibo.s3.main_system.characters.Thief.Thief
 import com.unibo.s3.main_system.characters.steer.MovableEntity
 import com.unibo.s3.main_system.util.ScaleUtils
 
 import scala.collection.mutable
 
+/**
+  * This class manages the animation/rendering of characters sprites.
+  *
+  * @author mvenditto
+  */
 class SpriteRenderer extends Disposable {
   import SpriteRenderer._
 
@@ -24,6 +27,35 @@ class SpriteRenderer extends Disposable {
   private var floorTexture: TextureRegion = _
   private var font: BitmapFont = _
   private var debugDraw = false
+
+  private def getAndCacheAnimation(s: String): Animation[TextureRegion] = {
+    animationsCache.getOrElseUpdate(s,
+      new Animation[TextureRegion](freq, guardAtlas.findRegions(s), PlayMode.LOOP))
+  }
+
+  private def getCurrentAnimation(
+    c: MovableEntity[Vector2]): (Animation[TextureRegion], Animation[TextureRegion]) = {
+
+    val v = c.getLinearVelocity
+
+    val a = v.len2 match {
+      case x if x < idleThreshold => (guardIdle, guardFeetIdle)
+      case x if x < runThreshold => (guardMove, guardFeetWalk)
+      case x if x > runThreshold => (guardMove, guardFeetRun)
+    }
+
+    val body = getAndCacheAnimation(a._1)
+    val feet = getAndCacheAnimation(a._2)
+
+    (body, feet)
+  }
+
+  private def drawDebugInfo(c: MovableEntity[Vector2]) = {
+    val s = ScaleUtils.getPixelsPerMeter
+    c match {
+      case bc: BaseCharacter =>
+        font.draw(batch, "id: " + bc.getId.toString, c.getPosition.x * s, c.getPosition.y * s)}
+  }
 
   def init(): Unit = {
     batch = new SpriteBatch()
@@ -48,13 +80,6 @@ class SpriteRenderer extends Disposable {
     renderKeyFrame(c, body)
     if (debugDraw) drawDebugInfo(c)
     batch.end()
-  }
-
-  private def drawDebugInfo(c: MovableEntity[Vector2]) = {
-    val s = ScaleUtils.getPixelsPerMeter
-    c match {
-      case bc: BaseCharacter =>
-        font.draw(batch, "id: " + bc.getId.toString, c.getPosition.x * s, c.getPosition.y * s)}
   }
 
   def renderFloor(w: Float, h: Float, cam: Camera): Unit = {
@@ -99,28 +124,6 @@ class SpriteRenderer extends Disposable {
 
     batch.draw(tr, (pos.x * s) - ox, (pos.y * s) - oy, ox, oy,
       height, width, guardScale, guardScale, rotation, false)
-  }
-
-  private def getAndCacheAnimation(s: String): Animation[TextureRegion] = {
-    animationsCache.getOrElseUpdate(s,
-      new Animation[TextureRegion](freq, guardAtlas.findRegions(s), PlayMode.LOOP))
-  }
-
-  private def getCurrentAnimation(
-    c: MovableEntity[Vector2]): (Animation[TextureRegion], Animation[TextureRegion]) = {
-
-    val v = c.getLinearVelocity
-
-    val a = v.len2 match {
-      case x if x < idleThreshold => (guardIdle, guardFeetIdle)
-      case x if x < runThreshold => (guardMove, guardFeetWalk)
-      case x if x > runThreshold => (guardMove, guardFeetRun)
-    }
-
-    val body = getAndCacheAnimation(a._1)
-    val feet = getAndCacheAnimation(a._2)
-
-    (body, feet)
   }
 
   override def dispose(): Unit = {
