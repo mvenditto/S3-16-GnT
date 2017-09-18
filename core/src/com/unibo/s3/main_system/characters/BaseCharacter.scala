@@ -6,6 +6,7 @@ import akka.actor.ActorRef
 import com.badlogic.gdx.ai.steer.proximities.FieldOfViewProximity
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.{MathUtils, Vector2}
+import com.unibo.s3.main_system.characters.Thief.Thief
 import com.unibo.s3.main_system.characters.steer.{BaseMovableEntity, CustomLocation}
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.alg.NeighborIndex
@@ -238,6 +239,13 @@ object Guard {
 
     def chooseTarget(possibleTargets: Iterable[BaseCharacter]): Unit = {
 
+      if (target.isDefined) {
+        target match {
+          case Some(t: Thief) => if (t.gotCaughtByGuard) target = None
+          case _ => ()
+        }
+      }
+
       if (possibleTargets.isEmpty) {
         if (target.isDefined) {
         val patrol = setComplexSteeringBehavior()
@@ -285,11 +293,22 @@ object Thief {
 
     private var target: Option[BaseCharacter] = None
 
+    private var hasReachedExit_ = false
+    private var gotCaughtByGuard_ = false
+
+    def gotCaughtByGuard: Boolean = gotCaughtByGuard_
+
+    def hasReachedExit: Boolean = hasReachedExit_
+
+    def setReachedExit(f: Boolean): Unit = hasReachedExit_ = f
+
+    def setGotCaughtByGuard(f: Boolean): Unit = gotCaughtByGuard_ = f
+
     def hasTarget: Boolean = target.isDefined
 
+    def getTarget: Option[BaseCharacter] = target
+
     def chooseTarget(possibleTargets: Iterable[BaseCharacter]): Unit = {
-
-
       if (possibleTargets.isEmpty) {
         if (target.isDefined) {
           val patrol = setComplexSteeringBehavior()
@@ -307,12 +326,9 @@ object Thief {
           evadeTarget(possibleTargets.head)
         }
       }
-
-
     }
 
     private def evadeTarget(t: BaseCharacter): Unit = {
-
       val evade = this.setComplexSteeringBehavior()
         .evadeFrom(t)
         .arriveTo(getCurrentDestination)
@@ -325,6 +341,5 @@ object Thief {
 
       target = Option(t)
     }
-
   }
 }
