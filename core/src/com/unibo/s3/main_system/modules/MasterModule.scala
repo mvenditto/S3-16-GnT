@@ -65,10 +65,8 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
       case bodies: Iterable[Body] =>
         bodies.foreach(b => b.getUserData match {
           case bd: BodyData =>
-            println("sizee2", bd)
             if (bd.bodyType.contains(Exit)) exitLocations :+= b.getWorldCenter
-          case d =>
-            println("sizee", d)
+          case _ => ()
         })
     }
   }

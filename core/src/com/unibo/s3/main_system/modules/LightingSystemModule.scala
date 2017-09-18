@@ -216,8 +216,8 @@ object LightingSystemModule {
       p.getBoolean(GammaCorrectionEnabled, true),
       p.getBoolean(BlurEnabled, true),
       p.getBoolean(EnableShadows, true),
-      keepInRange(p.getFloat(LightQualityModifier, 0.25f), 0.25f, 4f),
-      keepInRange(p.getInteger(BlurLevel, 2).toFloat, 1f, 4f).toInt,
+      keepInRange(p.getFloat(LightQualityModifier, 0.50f), 0.25f, 4f),
+      keepInRange(p.getInteger(BlurLevel, 1).toFloat, 1f, 4f).toInt,
       keepInRange(p.getInteger(BlendingFunction, 1).toFloat, 0f, 3f).toInt
     )
   }
