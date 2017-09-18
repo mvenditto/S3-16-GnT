@@ -1,8 +1,9 @@
 package com.unibo.s3.main_system.map;
 
 import com.badlogic.gdx.math.Vector2;
-import com.unibo.s3.main_system.spawn.RandomSpawnPointGenerator;
+import com.unibo.s3.main_system.spawn.GuardStrategy;
 import com.unibo.s3.main_system.spawn.SpawnPointGenerator;
+import com.unibo.s3.main_system.spawn.ThiefStrategy;
 import org.junit.*;
 
 import java.util.List;
@@ -64,18 +65,20 @@ public class TestMapGeneration {
                     map[i][j] = rand.nextInt(2);
                 }
             }
-            SpawnPointGenerator spawner = new SpawnPointGenerator();
-            spawner.setSpawnStrategy(new RandomSpawnPointGenerator());
-            List<Vector2> list = spawner.generateSpawnPoints(map, 4);
-            /*for(int i = 0; i < 20; i ++){
-                for(int j = 0; j < 20; j++){
-                    System.out.print(map[i][j] + " ");
-                }
-                System.out.println();
-            }*/
-            for(Vector2 v : list){
-                assertEquals(map[(int) v.x][(int) v.y], 0);
-                assertFalse(map[(int) v.x][(int) v.y] == 1);
+            SpawnPointGenerator spawnPointGenerator = new SpawnPointGenerator();
+            spawnPointGenerator.setSpawnStrategy(new GuardStrategy());
+            List<Vector2> guardsList = spawnPointGenerator.generateSpawnPoints(map, 10); //generate 10 spawn points
+            for(Vector2 v : guardsList){
+                int xInMatrix = (int) ((v.x - 2) / 2);
+                int yInMatrix = (int) ((v.y - 2) / 2);
+                assertEquals(0, map[xInMatrix][yInMatrix]);
+            }
+            spawnPointGenerator.setSpawnStrategy(new ThiefStrategy());
+            List<Vector2> thievesList = spawnPointGenerator.generateSpawnPoints(map, 10); //generate 10 spawn points
+            for(Vector2 v : thievesList){
+                int xInMatrix = (int) ((v.x - 2) / 2);
+                int yInMatrix = (int) ((v.y - 2) / 2);
+                assertEquals(0, map[xInMatrix][yInMatrix]);
             }
         }
     }

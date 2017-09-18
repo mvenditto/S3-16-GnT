@@ -39,7 +39,7 @@ class SpawnActor extends UntypedAbstractActor with Stash {
       if (msg.characterType.equals(CharacterActors.GUARD))
         this.spawnGenerator.setSpawnStrategy(guardStrategy)
       else
-        this.spawnGenerator.setSpawnStrategy(ThiefStrategy())
+        this.spawnGenerator.setSpawnStrategy(ThiefSpawningStrategy())
         sender ! CreateCharacterMsg(this.spawnGenerator.generateSpawnPoints(this.map, 1).get(0), msg.characterType)
 
     case _ => println("(spawnActor) message unknown:" + message)

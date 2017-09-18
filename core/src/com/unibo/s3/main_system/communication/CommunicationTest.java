@@ -35,7 +35,7 @@ public class CommunicationTest extends ApplicationAdapter {
         this.batch = new SpriteBatch();
         this.img = new Texture("badlogic.jpg");
 
-        SystemManager.createSystem("System", Option.empty());
+        SystemManager.createSystem("System", Option.empty(), Option.empty());
         SystemManager.createActor(MasterActor.props(), GeneralActors.MASTER_ACTOR());
         SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), GeneralActors.WORLD_ACTOR());
         SystemManager.createActor(QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR());
