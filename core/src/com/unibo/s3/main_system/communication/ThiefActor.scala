@@ -73,7 +73,6 @@ class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor wi
             .map { case Some(vv: Vector2) => vv }.head
 
           thief.priorityRunTo(exit)
-          println("running to", exit)
         }
       }
 

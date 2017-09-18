@@ -10,13 +10,10 @@ import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dRaycastCollisionDetector
 import com.unibo.s3.main_system.characters.steer.collisions.gdx.Box2dSquareAABBProximity
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
+import com.unibo.s3.main_system.util.Box2dImplicits._
 import com.unibo.s3.main_system.util.GntUtils
 import com.unibo.s3.main_system.world.{BodyData, Exit, Hideout}
-import com.unibo.s3.main_system.util.GdxImplicits._
-import com.unibo.s3.main_system.util.Box2dImplicits._
 import net.dermetfan.gdx.physics.box2d.WorldObserver
-
-import scala.util.Try
 
 
 case class RayCastCollidesQuery(ray: Ray[Vector2])
