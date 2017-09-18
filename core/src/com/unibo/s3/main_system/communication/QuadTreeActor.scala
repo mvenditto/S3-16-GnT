@@ -12,7 +12,7 @@ import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.world.actors.{FilterReachableByRay, SendFilterReachableByRay}
 import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
 
-case class AskNeighboursWithFovMsg(character: BaseCharacter)
+case class AskNeighboursWithinFovMsg(character: BaseCharacter)
 case class SendThievesInProximityMsg(thieves: Iterable[BaseCharacter])
 case class SendGuardsInProximityMsg(thieves: Iterable[BaseCharacter])
 
@@ -28,9 +28,10 @@ class QuadTreeActor extends UntypedAbstractActor {
 
   private def timestamp: Long = System.nanoTime()
 
-  private def queryForNeighbors(c: BaseCharacter): Iterable[BaseCharacter] = {
-    val pos = c.getPosition.cpy().sub(queryRadius, queryRadius)
-    val twiceQueryRadius= 2 * queryRadius
+  private def queryForNeighbors(c: BaseCharacter, r: Option[Float]): Iterable[BaseCharacter] = {
+    val radius = if(r.isDefined) r.get else c.getFieldOfView.getRadius
+    val pos = c.getPosition.cpy().sub(radius, radius)
+    val twiceQueryRadius= 2 * radius
     val neighbours = root.rangeQuery(
       Bounds(pos.x, pos.y, twiceQueryRadius, twiceQueryRadius))
     neighbours
@@ -51,13 +52,13 @@ class QuadTreeActor extends UntypedAbstractActor {
       root = QuadTreeNode(bounds)
       agentsTable.keys.foreach(c => root.insert(c))
 
-    case AskNeighboursMsg(character) =>
-      val neighbours = queryForNeighbors(character)
+    case AskNeighboursMsg(character, radius) =>
+      val neighbours = queryForNeighbors(character, radius)
       sender ! SendNeighboursMsg(neighbours.map(c => agentsTable(c)))
 
-    case AskNeighboursWithFovMsg(c) =>
+    case AskNeighboursWithinFovMsg(c) =>
       val fov = c.getFieldOfView
-      val neighbors = queryForNeighbors(c).map { x: Steerable[Vector2] => x }
+      val neighbors = queryForNeighbors(c, None).map { x: Steerable[Vector2] => x }
       var neighborsInFov = List[BaseCharacter]()
 
       fov.setAgents(neighbors.asGdxArray)
@@ -91,16 +92,26 @@ class QuadTreeActor extends UntypedAbstractActor {
 
       val reqCharacter = agentsTable.keys.filter(a => a.getId == reqId._2).head
       val requester = agentsTable(reqCharacter)
-      requester ! SendNeighboursMsg(onlyVisible.filter(a => a match {
-        case _ : Guard => true; case _ => false}).map(a => agentsTable(a)))
-      val thievesInProximity = onlyVisible.filter(a => a match {case _ : Thief => true; case _ => false})
+
+      requester ! SendNeighboursMsg(
+        onlyVisible.filter(a => a match {
+          case _ : Guard => true
+          case _ => false
+        }).map(a => agentsTable(a)))
+
+      val thievesInProximity = onlyVisible.filter(a => a match {
+          case t : Thief => !t.hasReachedExit && !t.gotCaughtByGuard
+          case _ => false
+        })
 
       if(thievesInProximity.nonEmpty) {
         requester ! SendThievesInProximityMsg(thievesInProximity)
-        thievesInProximity.foreach(t => agentsTable(t) ! SendGuardsInProximityMsg(List(reqCharacter)))
+        thievesInProximity.foreach(t =>
+          agentsTable(t) ! SendGuardsInProximityMsg(List(reqCharacter)))
       }
 
       nearbyRequestCache -= reqId
+
     case AskAllCharactersMsg =>
       sender ! SendAllCharactersMsg(agentsTable.keys)
 
