@@ -18,10 +18,10 @@ object ActorRefOrSelection {
   type ActorRefOrSelectionHolder = Either[ActorRef, ActorSelection]
 
   implicit def packActorRef(ar: ActorRef): ActorRefOrSelectionHolder = Left(ar)
-  implicit def packActorSelection(ar: ActorSelection): ActorRefOrSelectionHolder = Right(ar)
+  implicit def packActorSelection(as: ActorSelection): ActorRefOrSelectionHolder = Right(as)
 
   implicit class AugmentedActorRefOrSelection(ars: ActorRefOrSelectionHolder) {
     implicit def ?(msg: Any)(implicit timeout: Timeout): Future[Any] =
-      ars.fold(ar => ask(ar, msg), ar => ask(ar, msg))
+      ars.fold(ar => ask(ar, msg), as => ask(as, msg))
   }
 }

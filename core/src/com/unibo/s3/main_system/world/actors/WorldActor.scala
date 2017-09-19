@@ -15,11 +15,17 @@ import com.unibo.s3.main_system.util.GntUtils
 import com.unibo.s3.main_system.world.{BodyData, Exit, Hideout}
 import net.dermetfan.gdx.physics.box2d.WorldObserver
 
+case class CollisionHolder(point: Vector2, normal: Vector2)
 
-case class RayCastCollidesQuery(ray: Ray[Vector2])
+object CollisionHolder{
+  def of(c: Collision[Vector2]): CollisionHolder =
+    CollisionHolder(c.point, c.normal)
+}
+
+case class RayCastCollidesQuery(rayStart: Vector2, rayEnd: Vector2)
 case class RayCastCollidesResponse(collides: Boolean)
-case class RayCastCollisionQuery(ray: Ray[Vector2])
-case class RayCastCollisionResponse(collided: Boolean, coll: Collision[Vector2])
+case class RayCastCollisionQuery(rayStart: Vector2, rayEnd: Vector2)
+case class RayCastCollisionResponse(collided: Boolean, coll: CollisionHolder)
 case class ProximityQuery(subject: Steerable[Vector2], detectionRadius: Float)
 case class ProximityQueryResponse(neighbors: Seq[Steerable[Vector2]])
 case class DeleteBodyAt(x: Float, y: Float)
@@ -86,13 +92,15 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
     case RegisterAsWorldChangeObserver =>
       worldChangeObservers :+= sender
 
-    case RayCastCollidesQuery(ray) =>
-      sender() ! RayCastCollidesResponse(rayCastCollisionDetector.collides(ray))
+    case RayCastCollidesQuery(start, end) =>
+      sender() ! RayCastCollidesResponse(
+        rayCastCollisionDetector.collides(new Ray(start, end)))
 
-    case RayCastCollisionQuery(ray) =>
+    case RayCastCollisionQuery(start, end) =>
       val outputCollision = new Collision[Vector2](new Vector2(0,0), new Vector2(0,0))
+      val ray = new Ray(start, end)
       val collided = rayCastCollisionDetector.findCollision(outputCollision, ray)
-      sender ! RayCastCollisionResponse(collided, outputCollision)
+      sender ! RayCastCollisionResponse(collided, CollisionHolder.of(outputCollision))
 
     case DeleteBodyAt(x, y) =>
       world.QueryAABB(new QueryCallback {
