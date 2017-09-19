@@ -22,7 +22,6 @@ public class SpawnPointGenerator {
                     spawnQuadrant.y * 2 + WALL_THICKNESS));
             nSpawnPoints--;
         }
-        //System.out.println("SpawnPoints " + spawnPoints);
         return spawnPoints;
     }
 

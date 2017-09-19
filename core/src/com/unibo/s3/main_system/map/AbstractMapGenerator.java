@@ -26,7 +26,7 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
     private static final String END_OF_FILE = "0.0:0.0:0.0:0.0";
     private static final String SEPARATOR = ":";
 
-    private int[][] generatedMap;// = new int[widthSplits][heightSplits];
+    private int[][] generatedMap;
     private List<String> map = new ArrayList<>();
 
     public void initialSetup(int width, int height){

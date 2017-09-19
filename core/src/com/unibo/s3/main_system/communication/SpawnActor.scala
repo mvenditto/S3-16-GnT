@@ -3,7 +3,7 @@ package com.unibo.s3.main_system.communication
 import akka.actor.{Props, Stash, UntypedAbstractActor}
 import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.game.{GameSettings, Wall}
-import com.unibo.s3.main_system.spawn.{GuardStrategy, SpawnPointGenerator, ThiefStrategy}
+import com.unibo.s3.main_system.spawn.{GuardSpawningStrategy, SpawnPointGenerator, ThiefSpawningStrategy}
 import com.unibo.s3.main_system.util.GntUtils
 
 class SpawnActor extends UntypedAbstractActor with Stash {
@@ -13,7 +13,7 @@ class SpawnActor extends UntypedAbstractActor with Stash {
   private[this] val spawnGenerator = new SpawnPointGenerator
   private[this] var map: Array[Array[Int]] = _
 
-  private[this] val guardStrategy = GuardStrategy()
+  private[this] val guardStrategy = GuardSpawningStrategy()
 
   /*
   override def onReceive(message: Any): Unit = message match {
@@ -85,7 +85,7 @@ class SpawnActor extends UntypedAbstractActor with Stash {
       if (msg.characterType.equals(CharacterActors.GUARD))
         this.spawnGenerator.setSpawnStrategy(guardStrategy)
       else
-        this.spawnGenerator.setSpawnStrategy(ThiefStrategy())
+        this.spawnGenerator.setSpawnStrategy(ThiefSpawningStrategy())
       sender ! CreateCharacterMsg(this.spawnGenerator.generateSpawnPoints(this.map, 1).get(0), msg.characterType)
   }
 }

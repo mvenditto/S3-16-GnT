@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2
 
 import scala.util.Random
 
-class GuardStrategy extends SpawnStrategy {
+class GuardSpawningStrategy extends SpawnStrategy {
 
   private val UP = 0
   private val RIGHT = 1
@@ -96,6 +96,6 @@ class GuardStrategy extends SpawnStrategy {
 
 }
 
-object GuardStrategy {
-  def apply(): GuardStrategy = new GuardStrategy()
+object GuardSpawningStrategy {
+  def apply(): GuardSpawningStrategy = new GuardSpawningStrategy()
 }
