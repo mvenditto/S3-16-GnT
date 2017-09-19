@@ -15,6 +15,7 @@ import org.jgrapht.graph.DefaultEdge
 import scala.util.Random
 import com.unibo.s3.main_system.util.GdxImplicits._
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
 trait Character{
@@ -135,7 +136,6 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   }
 
   private def selectPriorityDestination : Option[Vector2] = {
-    import scala.collection.JavaConverters._
 
     var list = index.neighborListOf(currentNode.get).asScala
     var out : Option[Vector2] = None
