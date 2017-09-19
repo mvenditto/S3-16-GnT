@@ -10,8 +10,8 @@ import com.badlogic.gdx.math.Vector
   * */
 trait GraphAdapter[T <: Vector[T]] {
 
-    def getVertices: java.util.Iterator[T]
+    def getVertices: Iterator[T]
 
-    def getNeighbors(vertex: T): java.util.Iterator[T]
+    def getNeighbors(vertex: T): Iterator[T]
 
 }

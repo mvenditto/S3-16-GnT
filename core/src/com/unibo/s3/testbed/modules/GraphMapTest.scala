@@ -26,6 +26,7 @@ import org.jgrapht.graph.DefaultEdge
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.collection.JavaConverters._
 
 class GraphMapTest extends BaseTestbedModule {
 
@@ -63,12 +64,12 @@ class GraphMapTest extends BaseTestbedModule {
           .asInstanceOf[SendGraphMsg].graph
 
         graph = Option(new GraphAdapter[Vector2] {
-          override def getNeighbors(vertex: Vector2): util.Iterator[Vector2] = {
+          override def getNeighbors(vertex: Vector2): Iterator[Vector2] = {
             new NeighborIndex[Vector2, DefaultEdge](result)
-              .neighborsOf(vertex).iterator
+              .neighborsOf(vertex).iterator.asScala
           }
 
-          override def getVertices: util.Iterator[Vector2] = result.vertexSet.iterator
+          override def getVertices: Iterator[Vector2] = result.vertexSet.iterator.asScala
         })
         cacheMap()
       }

@@ -10,16 +10,16 @@ import com.unibo.s3.main_system.characters.Thief.Thief
 import com.unibo.s3.main_system.characters.steer.MovableEntity
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.util.ScaleUtils
-import com.unibo.s3.main_system.util.ScaleUtils.{getPixelsPerMeter, metersToPixels}
+import com.unibo.s3.main_system.util.ScaleUtils.getPixelsPerMeter
 
-import scala.collection.JavaConversions._
+import scala.collection.mutable
 
 /**
   * An implementation of [[GeometryRenderer]] trait.
   *
   * @author mvenditto
   * */
-class GeometryRendererImpl extends GeometryRenderer[Vector2] {
+class GeometryRendererImpl extends GeometryRenderer[Vector2]{
 
   override def renderCharacter(shapeRenderer: ShapeRenderer, character: MovableEntity[Vector2]): Unit = {
     val scale = getPixelsPerMeter
@@ -92,7 +92,7 @@ class GeometryRendererImpl extends GeometryRenderer[Vector2] {
   }
 
   override def renderGraph(shapeRenderer: ShapeRenderer,
-    graph: GraphAdapter[Vector2], config: GraphRenderingConfig ) {
+    graph: GraphAdapter[Vector2], config: GraphRenderingConfig) {
 
     val edgeColor = config.edgeColor
     val vertexColor = config.vertexColor
@@ -102,14 +102,14 @@ class GeometryRendererImpl extends GeometryRenderer[Vector2] {
     val t = shapeRenderer.getCurrentType
 
     shapeRenderer.setAutoShapeType(true)
-    graph.getVertices.toIterable.foreach(v => {
+    graph.getVertices.foreach(v => {
       val scaledX = v.x * scale
       val scaledY = v.y * scale
       shapeRenderer.set(ShapeType.Line)
       shapeRenderer.setColor(vertexColor)
       shapeRenderer.circle(scaledX, scaledY, vertexRadiusPixel)
       shapeRenderer.setColor(edgeColor)
-      graph.getNeighbors(v).toIterable.foreach(n => {
+      graph.getNeighbors(v).foreach(n => {
         shapeRenderer.set(ShapeType.Filled)
         shapeRenderer.rectLine(scaledX, scaledY, n.x * scale, n.y * scale, 4f)
       })

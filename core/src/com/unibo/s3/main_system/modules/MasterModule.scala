@@ -83,7 +83,7 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
   private[this] var gameActor: ActorRef = _
   private[this] var spawnActor: ActorRef = _
 
-  private[this] val renderer = GeometryRendererImpl()
+  private[this] val renderer = new GeometryRendererImpl() with GraphCache
   private[this] val spriteRenderer = SpriteRenderer()
   private[this] var worldMap = List[Rectangle]()
   private[this] var busyBarWindow: VisWindow = _
