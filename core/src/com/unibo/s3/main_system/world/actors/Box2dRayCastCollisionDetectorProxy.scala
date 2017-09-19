@@ -30,7 +30,7 @@ class Box2dRayCastCollisionDetectorProxy(worldActor: ActorRefOrSelectionHolder) 
   override def findCollision(outputCollision: Collision[Vector2], inputRay: Ray[Vector2]): Boolean = {
     val future = worldActor ? RayCastCollisionQuery(inputRay.start, inputRay.end)
     val result = waitWorldResponse(future).asInstanceOf[RayCastCollisionResponse]
-    outputCollision.set(result.coll)
+    outputCollision.set(result.coll.point, result.coll.normal)
     result.collided
   }
 
