@@ -6,6 +6,13 @@ import com.unibo.s3.main_system.graph.GraphAdapter
 
 import scala.collection.mutable
 
+/**
+  * This trait enables caching of the waypoints graph in a GeometryRenderer.
+  * Used when the graph doesn't changes over time and can be stored and
+  * then accessed more efficiently later.
+  *
+  * @author mvenditto
+  */
 trait GraphCache extends GeometryRenderer[Vector2] {
 
   private[this] lazy val graphCache = mutable.AnyRefMap[Vector2, Iterable[Vector2]]()
