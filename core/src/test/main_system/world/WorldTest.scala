@@ -60,7 +60,7 @@ class WorldTest extends BaseTestInvolvingActors("WorldTestSystem") {
     val boxCenter = new Vector2(0, 0)
     worldActor ! CreateBox(boxCenter, new Vector2(10, 10))
     val ray = new Ray[Vector2](boxCenter.cpy().sub(0, 10), boxCenter)
-    worldActor ! RayCastCollidesQuery(ray)
+    worldActor ! RayCastCollidesQuery(ray.start, ray.end)
     expectMsgPF() {
       case RayCastCollidesResponse(r) => assert(r)
       case _ => BadMatchFail()
@@ -71,7 +71,7 @@ class WorldTest extends BaseTestInvolvingActors("WorldTestSystem") {
     val boxCenter = new Vector2(0, 0)
     worldActor ! CreateBox(boxCenter, new Vector2(10, 10))
     val ray = new Ray[Vector2](boxCenter.cpy().sub(0, 10), boxCenter)
-    worldActor ! RayCastCollisionQuery(ray)
+    worldActor ! RayCastCollisionQuery(ray.start, ray.end)
 
     val expectedCollisionPoint = new Vector2(0.0f, -5.0f)
     val expectedCollisionNormal = new Vector2(0.0f, -1.0f)
@@ -91,7 +91,7 @@ class WorldTest extends BaseTestInvolvingActors("WorldTestSystem") {
     val boxCenter = new Vector2(0, 0)
     worldActor ! CreateBox(boxCenter, new Vector2(10, 10))
     val ray = new Ray[Vector2](boxCenter.cpy().sub(0, 10), boxCenter.cpy().add(11, 0))
-    worldActor ! RayCastCollidesQuery(ray)
+    worldActor ! RayCastCollidesQuery(ray.start, ray.end)
     expectMsgPF() {
       case RayCastCollidesResponse(r) => assert(!r)
       case _ => BadMatchFail()

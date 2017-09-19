@@ -8,6 +8,9 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import ActorRefOrSelection.{ActorRefOrSelectionHolder, _}
+import akka.actor.{Props, UntypedAbstractActor}
+import com.unibo.s3.main_system.communication.SystemManager
+import com.unibo.s3.main_system.game.AkkaSettings
 
 /**
   * A raycast collision detector, that works interacting with [[WorldActor]],
@@ -25,14 +28,14 @@ class Box2dRayCastCollisionDetectorProxy(worldActor: ActorRefOrSelectionHolder) 
   }
 
   override def findCollision(outputCollision: Collision[Vector2], inputRay: Ray[Vector2]): Boolean = {
-    val future = worldActor ? RayCastCollisionQuery(inputRay)
+    val future = worldActor ? RayCastCollisionQuery(inputRay.start, inputRay.end)
     val result = waitWorldResponse(future).asInstanceOf[RayCastCollisionResponse]
     outputCollision.set(result.coll)
     result.collided
   }
 
   override def collides(ray: Ray[Vector2]): Boolean = {
-    val future = worldActor ? RayCastCollidesQuery(ray)
+    val future = worldActor ? RayCastCollidesQuery(ray.start, ray.end)
     waitWorldResponse(future).asInstanceOf[RayCastCollidesResponse].collides
   }
 }
