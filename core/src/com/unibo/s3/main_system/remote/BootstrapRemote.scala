@@ -37,8 +37,8 @@ class BootstrapRemote() {
     SystemManager.createActor(
       CommunicatorActor.props(), GeneralActors.COMMUNICATOR_ACTOR)
 
-    SystemManager.createActor(
-      WorldActor.props(world), GeneralActors.WORLD_ACTOR)
+    /*SystemManager.createActor(
+      WorldActor.props(world), GeneralActors.WORLD_ACTOR)*/
 
     SystemManager.createActor(
       QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)
@@ -49,8 +49,8 @@ class BootstrapRemote() {
     SystemManager.createActor(
       MapActor.props(), GeneralActors.MAP_ACTOR)
 
-    SystemManager.createActor(
-      GraphActor.props(), GeneralActors.GRAPH_ACTOR)
+    /*SystemManager.createActor(
+      GraphActor.props(), GeneralActors.GRAPH_ACTOR)*/
     log("-- Actors created --")
   }
 

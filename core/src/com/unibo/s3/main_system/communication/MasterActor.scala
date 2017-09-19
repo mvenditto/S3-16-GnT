@@ -9,6 +9,7 @@ import com.unibo.s3.main_system.characters.Thief.Thief
 import com.unibo.s3.main_system.characters.{BaseCharacter, EntitiesSystemImpl}
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory
 import com.unibo.s3.main_system.communication.Messages._
+import com.unibo.s3.main_system.game.AkkaSettings
 
 class MasterActor extends UntypedAbstractActor with Stash {
 
@@ -78,8 +79,11 @@ class MasterActor extends UntypedAbstractActor with Stash {
 
   private def actAndCreate: Receive = {
     case msg: ActMsg =>
+      /*SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
+        GeneralActors.WORLD_ACTOR.name).tell(msg, getSelf())*/
       SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR).tell(msg, getSelf())
-      SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR).tell(RebuildQuadTreeMsg(), getSelf())
+      SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
+        GeneralActors.QUAD_TREE_ACTOR.name).tell(RebuildQuadTreeMsg(), getSelf())
       charactersList.foreach(cop => cop.tell(msg, getSelf()))
     //manca il ladro o i ladri
 
@@ -117,10 +121,12 @@ class MasterActor extends UntypedAbstractActor with Stash {
 
       charactersList :+= characterRef
 
-      SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR)
+      SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
+        GeneralActors.QUAD_TREE_ACTOR.name)
         .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
-      SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR)
-        .tell(AskForGraphMsg, characterRef)
+      /*SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
+        GeneralActors.GRAPH_ACTOR.name).tell(AskForGraphMsg, characterRef)*/
+      SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR).tell(AskForGraphMsg, characterRef)
     }
 
     createCharacter(msg)

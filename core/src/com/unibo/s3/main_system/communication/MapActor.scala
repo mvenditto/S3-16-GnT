@@ -3,6 +3,7 @@ package com.unibo.s3.main_system.communication
 import scala.collection.JavaConversions.asScalaBuffer
 import akka.actor.{Props, Stash, UntypedAbstractActor}
 import com.unibo.s3.main_system.communication.Messages.{GenerateMapMsg, MapElementMsg, MapSettingsMsg}
+import com.unibo.s3.main_system.game.AkkaSettings
 import com.unibo.s3.main_system.map.{AbstractMapGenerator, MapGenerator, MazeMapGenerator, RoomMapGenerator}
 
 
@@ -69,8 +70,12 @@ class MapActor extends UntypedAbstractActor with Stash {
       //valori da decidere una volta decise le dimensioni possibili per la mappa
       this.mapGenerator.generateMap(this.mapWidth, this.mapHeight)
       this.mapGenerator.getMap.foreach(line => {
-        SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR).tell(MapElementMsg(line), getSelf())
-        SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR).tell(MapElementMsg(line), getSelf())
+        val ref = SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
+          GeneralActors.GRAPH_ACTOR.name)
+        println("Grafo = " + ref)
+        ref.tell(MapElementMsg(line), getSelf())
+        SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
+          GeneralActors.WORLD_ACTOR.name).tell(MapElementMsg(line), getSelf())
         SystemManager.getLocalActor(GeneralActors.SPAWN_ACTOR).tell(MapElementMsg(line), getSelf())
       })
     // val file = Gdx.files.local(FILEPATH)

@@ -42,4 +42,5 @@ object Messages {
 
   //message for CommunciatorActor
   case class SendIPMsg(IP: String)
+  case class AskIPMsg()
 }

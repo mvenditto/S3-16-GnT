@@ -77,8 +77,8 @@ class QuadTreeActor extends UntypedAbstractActor {
 
         nearbyRequestCache += (reqId -> neighborsInFov)
 
-        SystemManager.getLocalActor(
-          GeneralActors.WORLD_ACTOR) ! filterOnlyOnSightLine
+        SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
+          GeneralActors.WORLD_ACTOR.name) ! filterOnlyOnSightLine
 
       } else {
         sender ! SendNeighboursMsg(List())

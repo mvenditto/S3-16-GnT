@@ -7,6 +7,7 @@ import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory;
+import com.unibo.s3.main_system.communication.GeneralActors;
 import com.unibo.s3.main_system.communication.SystemManager;
 import com.unibo.s3.main_system.game.GameSettings;
 import com.unibo.s3.main_system.game.Wall;
@@ -51,12 +52,12 @@ public class GraphGenerator {
 
     public static UndirectedGraph<Vector2, DefaultEdge> createGraph(int width, int height, String mapFilename) {
         int dimWall = Wall.WALL_THICKNESS();
+        log("genero il grafo di dimensione: " + width + ", " + height);
 
-        ActorRef worldActor = SystemManager.getLocalActor("worldActor");
+        ActorRef worldActor = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR());
         RaycastCollisionDetector<Vector2> collisionDetector = new Box2dProxyDetectorsFactory(worldActor).newRaycastCollisionDetector();
         HashMap<Vector2, Vector2> walls = new HashMap<>();
         Integer[][] grid = new Integer[width+(dimWall*2)][height+(dimWall*2)];
-        log("genero il grafo di dimensione: " + width + ", " + height);
         Cronometer cron = new Cronometer();
 
         cron.start();

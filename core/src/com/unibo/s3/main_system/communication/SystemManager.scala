@@ -19,7 +19,7 @@ object SystemManager {
     if(portNumber.isDefined && ip.isDefined)
       this.system = ActorSystem.create(systemName, ConfigFactory.parseString(
         "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," +
-          "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" +
+          "\"loglevel\":\"OFF\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" +
           ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
           ",\"netty\":{\"tcp\":{\"hostname\":\""+ ip.get +"\",\"port\":"+portNumber.get+"}}}}}"))
     else {
