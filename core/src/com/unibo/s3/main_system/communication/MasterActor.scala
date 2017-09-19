@@ -114,7 +114,7 @@ class MasterActor extends UntypedAbstractActor with Stash {
     def characterSettings(newCharacter: BaseCharacter, characterRef: ActorRef): Unit = {
       if (collisionDetector == null) {
         val worldActorRef = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
-        collisionDetector = new Box2dProxyDetectorsFactory(worldActorRef).newRaycastCollisionDetector()
+        collisionDetector = Box2dProxyDetectorsFactory.of(worldActorRef).newRaycastCollisionDetector()
       }
 
       newCharacter.setCollisionDetector(collisionDetector)

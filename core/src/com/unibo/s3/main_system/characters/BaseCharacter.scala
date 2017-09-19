@@ -52,7 +52,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   private var index : NeighborIndex[Vector2,DefaultEdge] = _
   private var currentDestination : Option[Vector2] = None
 
-  private val sightLineLength : Float = 15
+  private val sightLineLength : Float = 15f
 
   /*fov stuff*/
   private val fovAngle = 120f //degrees
@@ -307,6 +307,14 @@ object Thief {
     def hasTarget: Boolean = target.isDefined
 
     def getTarget: Option[BaseCharacter] = target
+
+    def priorityRunTo(v: Vector2): Unit = {
+      target = None
+      setComplexSteeringBehavior()
+        .avoidCollisionsWithWorld()
+        .seek(v)
+        .buildPriority(true)
+    }
 
     def chooseTarget(possibleTargets: Iterable[BaseCharacter]): Unit = {
       if (possibleTargets.isEmpty) {

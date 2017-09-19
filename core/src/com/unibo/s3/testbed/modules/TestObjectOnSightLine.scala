@@ -14,6 +14,7 @@ import com.unibo.s3.main_system.util.ScaleUtils
 import com.unibo.s3.main_system.world.BodyData
 import com.unibo.s3.main_system.world.actors.{AskObjectOnSightLineMsg, CreateBox, ObjectOnSightLineMsg}
 import com.unibo.s3.testbed.model.{BaseTestbedModule, Testbed}
+import com.unibo.s3.main_system.world.actors.ActorRefOrSelection._
 
 class TestObjectOnSightLine extends BaseTestbedModule {
 

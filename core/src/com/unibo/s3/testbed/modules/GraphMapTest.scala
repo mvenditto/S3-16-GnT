@@ -12,9 +12,10 @@ import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.kotcrab.vis.ui.widget.{VisSelectBox, VisTextButton, VisWindow}
-import com.unibo.s3.main_system.communication.Messages.{ActMsg, GenerateGraphMsg, GenerateMapMsg, MapSettingsMsg}
+import com.unibo.s3.main_system.communication.Messages.{ActMsg, GameSettingsMsg, GenerateGraphMsg, GenerateMapMsg}
 import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
+import com.unibo.s3.main_system.game.GameSettings
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering.{GeometryRendererImpl, GraphRenderingConfig}
 import com.unibo.s3.main_system.util.GdxImplicits._
@@ -121,8 +122,9 @@ class GraphMapTest extends BaseTestbedModule {
     mapActor = SystemManager.getLocalActor(GeneralActors.MAP_ACTOR)
     graphActor = SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR)
 
-    mapActor ! MapSettingsMsg(60, 60)
-    graphActor ! MapSettingsMsg(60, 60)
+    val size = new Vector2(60,60)
+    mapActor ! GameSettingsMsg(GameSettings(mapSize=size))
+    graphActor ! GameSettingsMsg(GameSettings(mapSize=size))
 
   }
 

@@ -129,19 +129,19 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
       GameActor.props(), GeneralActors.GAME_ACTOR)
     spawnActor = getRemoteActor(GeneralActors.SPAWN_ACTOR.name)
 
-    graphActor ! MapSettingsMsg(w, h)
+    graphActor ! GameSettingsMsg(config)
 
-    quadTreeActor ! MapSettingsMsg(w, h)
+    quadTreeActor ! GameSettingsMsg(config)
 
     /*List(graphActor, quadTreeActor).foreach(a =>
       a ! MapSettingsMsg(w, h))*/
 
-    mapActor ! MapSettingsMsg(w, h)
+    mapActor ! GameSettingsMsg(config)
 
     mapActor ! GenerateMapMsg()
     graphActor tell(AskForGraphMsg, gameActor)
 
-    spawnActor ! MapSettingsMsg(30, 30)
+    spawnActor ! GameSettingsMsg(config)
   }
 
   override def update(dt: Float): Unit = {

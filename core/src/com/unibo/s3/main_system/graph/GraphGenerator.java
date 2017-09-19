@@ -52,12 +52,13 @@ public class GraphGenerator {
 
     public static UndirectedGraph<Vector2, DefaultEdge> createGraph(int width, int height, String mapFilename) {
         int dimWall = Wall.WALL_THICKNESS();
-        log("genero il grafo di dimensione: " + width + ", " + height);
 
-        ActorRef worldActor = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR());
-        RaycastCollisionDetector<Vector2> collisionDetector = new Box2dProxyDetectorsFactory(worldActor).newRaycastCollisionDetector();
+        ActorRef worldActor = SystemManager.getLocalActor("worldActor");
+        RaycastCollisionDetector<Vector2> collisionDetector =
+                Box2dProxyDetectorsFactory.of(worldActor).newRaycastCollisionDetector();
         HashMap<Vector2, Vector2> walls = new HashMap<>();
         Integer[][] grid = new Integer[width+(dimWall*2)][height+(dimWall*2)];
+        log("genero il grafo di dimensione: " + width + ", " + height);
         Cronometer cron = new Cronometer();
 
         cron.start();

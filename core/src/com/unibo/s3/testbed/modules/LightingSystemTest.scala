@@ -2,13 +2,11 @@ package com.unibo.s3.testbed.modules
 
 import box2dLight.{ConeLight, PointLight, RayHandler}
 import com.badlogic.gdx.Input.Keys
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.{Color, GL20, OrthographicCamera}
 import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.{Gdx, InputMultiplexer}
-import com.kotcrab.vis.ui.widget.color.ColorPicker
 import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.main_system.characters.steer.MovableEntity
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory
@@ -16,6 +14,8 @@ import com.unibo.s3.main_system.util.ScaleUtils
 import com.unibo.s3.testbed.model.Testbed
 import com.unibo.s3.testbed.ui.LogMessage
 
+
+import com.unibo.s3.main_system.world.actors.ActorRefOrSelection._
 import scala.collection.JavaConversions._
 
 class LightingSystemTest extends EntitySystemModule {

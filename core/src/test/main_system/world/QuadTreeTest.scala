@@ -8,6 +8,7 @@ import com.unibo.s3.main_system.characters.Guard.Guard
 import com.unibo.s3.main_system.communication.GeneralActors._
 import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.communication.{AskNeighboursWithinFovMsg, QuadTreeActor, SystemManager}
+import com.unibo.s3.main_system.game.GameSettings
 import com.unibo.s3.main_system.world.actors.WorldActor
 import com.unibo.s3.main_system.world.spatial.Bounds
 import main_system.GdxDependencies
@@ -39,7 +40,7 @@ class QuadTreeTest extends BaseTestInvolvingActors("QuadTreeTestSystem") {
   override def deployActors(): Unit = {
     quadTreeActor = system.actorOf(
       QuadTreeActor.props())
-    quadTreeActor ! MapSettingsMsg(bounds.w.toInt, bounds.h.toInt)
+    quadTreeActor ! GameSettingsMsg(GameSettings(mapSize = new Vector2(bounds.w, bounds.h)))
 
     List(GAME_ACTOR, LIGHTING_SYSTEM_ACTOR)
       .foreach(a =>SystemManager.createActor(Props(new DummyActor), a))
