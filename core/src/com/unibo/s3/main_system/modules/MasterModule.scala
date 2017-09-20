@@ -1,6 +1,6 @@
 package com.unibo.s3.main_system.modules
 
-import akka.actor.{ActorRef, Props, UntypedAbstractActor}
+import akka.actor.{ActorRef, ActorSelection, Props, UntypedAbstractActor}
 import com.badlogic.gdx.graphics.Color._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
@@ -15,7 +15,7 @@ import com.unibo.s3.main_system.communication.CharacterActors._
 import com.unibo.s3.main_system.communication.GeneralActors.{apply => _, _}
 import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
-import com.unibo.s3.main_system.game.GameSettings
+import com.unibo.s3.main_system.game.{AkkaSettings, GameSettings}
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering._
 import com.unibo.s3.main_system.util.ImplicitConversions._
@@ -77,11 +77,11 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
 
   private[this] var masterActor: ActorRef = _
   private[this] var worldActor: ActorRef = _
-  private[this] var mapActor: ActorRef = _
-  private[this] var graphActor: ActorRef = _
+  private[this] var mapActor: ActorSelection = _
+  private[this] var graphActor: ActorSelection = _
   private[this] var quadTreeActor: ActorRef = _
   private[this] var gameActor: ActorRef = _
-  private[this] var spawnActor: ActorRef = _
+  private[this] var spawnActor: ActorSelection = _
 
   private[this] val renderer = GeometryRendererImpl()
   private[this] val spriteRenderer = SpriteRenderer()
@@ -91,6 +91,9 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
 
   private def getActor(actor: GeneralActors.Value): ActorRef =
     SystemManager.getLocalActor(actor)
+
+  private def getRemoteActor(actor: String): ActorSelection =
+    SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/", actor)
 
   private def cacheMap() = {
     worldMap = GntUtils.parseMapToRectangles(
@@ -118,16 +121,20 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
     val h = mapSize.y.toInt
 
     masterActor = getActor(GeneralActors.MASTER_ACTOR)
-    mapActor = getActor(GeneralActors.MAP_ACTOR)
+    mapActor = getRemoteActor(GeneralActors.MAP_ACTOR.name)
     worldActor = getActor(GeneralActors.WORLD_ACTOR)
     quadTreeActor = getActor(GeneralActors.QUAD_TREE_ACTOR)
-    graphActor = getActor(GeneralActors.GRAPH_ACTOR)
+    graphActor = getRemoteActor(GeneralActors.GRAPH_ACTOR.name)
     gameActor = SystemManager.createActor(
       GameActor.props(), GeneralActors.GAME_ACTOR)
-    spawnActor = getActor(GeneralActors.SPAWN_ACTOR)
+    spawnActor = getRemoteActor(GeneralActors.SPAWN_ACTOR.name)
 
-    List(graphActor, quadTreeActor).foreach(a =>
-      a ! GameSettingsMsg(config))
+    graphActor ! GameSettingsMsg(config)
+
+    quadTreeActor ! GameSettingsMsg(config)
+
+    /*List(graphActor, quadTreeActor).foreach(a =>
+      a ! MapSettingsMsg(w, h))*/
 
     mapActor ! GameSettingsMsg(config)
 

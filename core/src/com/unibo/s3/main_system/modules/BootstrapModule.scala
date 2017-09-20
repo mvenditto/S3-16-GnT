@@ -1,5 +1,7 @@
 package com.unibo.s3.main_system.modules
 
+import java.net.InetAddress
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.World
@@ -8,8 +10,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.Main
-import com.unibo.s3.main_system.communication.Messages.GameSettingsMsg
+import com.unibo.s3.main_system.communication.Messages.{AskIPMsg, GameSettingsMsg}
 import com.unibo.s3.main_system.communication._
+import com.unibo.s3.main_system.game.AkkaSettings
 import com.unibo.s3.main_system.world.actors.WorldActor
 
 
@@ -81,32 +84,45 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
 
   private def initActorSystem(): Unit = {
     setProgress(0)
-    SystemManager.createSystem(ActorSystemName, ip = None, portNumber = None)
+    var IP: String = InetAddress.getLocalHost.getHostAddress
+    val portNumber = AkkaSettings.GUISystemPort
+    SystemManager.createSystem(ActorSystemName, ip = Option(IP), portNumber = Option(portNumber))
 
     val world = new World(new Vector2(0, 0), true)
     setProgress(20)
 
     SystemManager.createActor(
-      MasterActor.props(), GeneralActors.MASTER_ACTOR)
-    setProgress(30)
-
-    SystemManager.createActor(
-      WorldActor.props(world), GeneralActors.WORLD_ACTOR)
+      CommunicatorActor.props(), GeneralActors.COMMUNICATOR_ACTOR)
+    val ref = SystemManager.getLocalActor(GeneralActors.COMMUNICATOR_ACTOR)
+    if(ref == null) println(ref.toString())
+    ref ! AskIPMsg()
     setProgress(40)
 
     SystemManager.createActor(
-      QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)
-
-    SystemManager.createActor(SpawnActor.props(), GeneralActors.SPAWN_ACTOR)
+      MasterActor.props(), GeneralActors.MASTER_ACTOR)
     setProgress(60)
 
     SystemManager.createActor(
-      MapActor.props(), GeneralActors.MAP_ACTOR)
+      QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)
     setProgress(80)
 
     SystemManager.createActor(
-      GraphActor.props(), GeneralActors.GRAPH_ACTOR)
+      WorldActor.props(world), GeneralActors.WORLD_ACTOR)
     setProgress(100)
+
+    /*SystemManager.createActor(
+      QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)*/
+
+    /*SystemManager.createActor(SpawnActor.props(), GeneralActors.SPAWN_ACTOR)
+    setProgress(60)*/
+
+    /*SystemManager.createActor(
+      MapActor.props(), GeneralActors.MAP_ACTOR)
+    setProgress(80)*/
+
+    /*SystemManager.createActor(
+      GraphActor.props(), GeneralActors.GRAPH_ACTOR)
+    setProgress(100)*/
 
     loadingFinished = true
   }
@@ -160,7 +176,7 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
 }
 
 object BootstrapModule {
-  private val ActorSystemName = "System"
+  private val ActorSystemName = AkkaSettings.GUISystem
   private val LoadingDialogTitle = "System Initialization"
 
   def apply(listener: BootstrapEvent => Unit): BootstrapModule =

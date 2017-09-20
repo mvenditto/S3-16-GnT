@@ -4,7 +4,7 @@ import akka.actor.{Props, Stash, UntypedAbstractActor}
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.Thief.Thief
 import com.unibo.s3.main_system.communication.Messages._
-import com.unibo.s3.main_system.game.Wall
+import com.unibo.s3.main_system.game.{AkkaSettings, Wall}
 import com.unibo.s3.main_system.world.Exit
 import com.unibo.s3.main_system.world.actors.{AskObjectOnSightLineMsg, ObjectOnSightLineMsg}
 
@@ -33,6 +33,7 @@ class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor wi
     case msg: ActMsg =>
       this.thief.act(msg.dt)
       if (canAct) this.thief.chooseBehaviour()
+      //val wa = SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/", GeneralActors.WORLD_ACTOR.name)
       val wa = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
       wa ! AskObjectOnSightLineMsg(
         thief.getPosition, thief.getLinearVelocity, thief.getSightLineLength)

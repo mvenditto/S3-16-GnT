@@ -7,6 +7,7 @@ import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.characters.Guard.Guard
 import com.unibo.s3.main_system.characters.Thief.Thief
 import com.unibo.s3.main_system.communication.Messages.{AskNeighboursMsg, InitialSavingCharacterMsg, RebuildQuadTreeMsg, SendNeighboursMsg, _}
+import com.unibo.s3.main_system.game.AkkaSettings
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.world.actors.{FilterReachableByRay, SendFilterReachableByRay}
 import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
@@ -42,10 +43,14 @@ class QuadTreeActor extends UntypedAbstractActor {
 
     case InitialSavingCharacterMsg(newCharacter, characterRef) =>
       agentsTable += (newCharacter -> characterRef)
-      SystemManager.getLocalActor(
-        GeneralActors.GAME_ACTOR) ! SendAllCharactersMsg(agentsTable.keys)
-      SystemManager.getLocalActor(
-        GeneralActors.LIGHTING_SYSTEM_ACTOR) ! SendAllCharactersMsg(agentsTable.keys)
+      val ref = SystemManager.getLocalActor(GeneralActors.GAME_ACTOR)
+      /*SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
+        GeneralActors.GAME_ACTOR.name)*/
+      ref ! SendAllCharactersMsg(agentsTable.keys)
+      val refLig = SystemManager.getLocalActor(GeneralActors.LIGHTING_SYSTEM_ACTOR)
+      /*SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
+        GeneralActors.LIGHTING_SYSTEM_ACTOR.name)*/
+      refLig ! SendAllCharactersMsg(agentsTable.keys)
 
     case RebuildQuadTreeMsg() =>
       root = QuadTreeNode(bounds)
@@ -76,8 +81,10 @@ class QuadTreeActor extends UntypedAbstractActor {
 
         nearbyRequestCache += (reqId -> neighborsInFov)
 
-        SystemManager.getLocalActor(
-          GeneralActors.WORLD_ACTOR) ! filterOnlyOnSightLine
+        val refWorld = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
+        /*val refWorld = SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
+          GeneralActors.WORLD_ACTOR.name)*/
+        refWorld ! filterOnlyOnSightLine
 
       } else {
         sender ! SendNeighboursMsg(List())
