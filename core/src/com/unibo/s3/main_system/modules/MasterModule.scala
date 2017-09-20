@@ -78,8 +78,8 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
   private[this] var masterActor: ActorRef = _
   private[this] var worldActor: ActorRef = _
   private[this] var mapActor: ActorSelection = _
-  private[this] var graphActor: ActorRef = _
-  private[this] var quadTreeActor: ActorSelection = _
+  private[this] var graphActor: ActorSelection = _
+  private[this] var quadTreeActor: ActorRef = _
   private[this] var gameActor: ActorRef = _
   private[this] var spawnActor: ActorSelection = _
 
@@ -123,8 +123,8 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
     masterActor = getActor(GeneralActors.MASTER_ACTOR)
     mapActor = getRemoteActor(GeneralActors.MAP_ACTOR.name)
     worldActor = getActor(GeneralActors.WORLD_ACTOR)
-    quadTreeActor = getRemoteActor(GeneralActors.QUAD_TREE_ACTOR.name)
-    graphActor = getActor(GeneralActors.GRAPH_ACTOR)
+    quadTreeActor = getActor(GeneralActors.QUAD_TREE_ACTOR)
+    graphActor = getRemoteActor(GeneralActors.GRAPH_ACTOR.name)
     gameActor = SystemManager.createActor(
       GameActor.props(), GeneralActors.GAME_ACTOR)
     spawnActor = getRemoteActor(GeneralActors.SPAWN_ACTOR.name)

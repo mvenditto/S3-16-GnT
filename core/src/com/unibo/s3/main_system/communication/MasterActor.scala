@@ -72,9 +72,11 @@ class MasterActor extends UntypedAbstractActor with Stash {
   override def onReceive(message: Any): Unit = {}
 
   private def firstCreation: Receive  = {
-    case msg: CreateCharacterMsg =>
+    case msg: CreateCharacterMsg => 
       this.createCharacter(msg)
       context.become(this.actAndCreate)
+
+    //case msg: Any => println("messaggio sconosicuto " + msg)
   }
 
   private def actAndCreate: Receive = {
@@ -82,13 +84,13 @@ class MasterActor extends UntypedAbstractActor with Stash {
       /*SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
         GeneralActors.WORLD_ACTOR.name).tell(msg, getSelf())*/
       SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR).tell(msg, getSelf())
-      SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
-        GeneralActors.QUAD_TREE_ACTOR.name).tell(RebuildQuadTreeMsg(), getSelf())
+      SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR).tell(RebuildQuadTreeMsg(), getSelf())
+      /*SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
+        GeneralActors.QUAD_TREE_ACTOR.name).tell(RebuildQuadTreeMsg(), getSelf())*/
       charactersList.foreach(cop => cop.tell(msg, getSelf()))
     //manca il ladro o i ladri
 
-    case msg: CreateCharacterMsg =>
-      this.createCharacter(msg)
+    case msg: CreateCharacterMsg => this.createCharacter(msg)
   }
 
   private def createCharacter(msg: CreateCharacterMsg): Unit = {
@@ -114,6 +116,7 @@ class MasterActor extends UntypedAbstractActor with Stash {
     def characterSettings(newCharacter: BaseCharacter, characterRef: ActorRef): Unit = {
       if (collisionDetector == null) {
         val worldActorRef = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
+        //val worldActorRef = SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/", GeneralActors.WORLD_ACTOR.name)
         collisionDetector = Box2dProxyDetectorsFactory.of(worldActorRef).newRaycastCollisionDetector()
       }
 
@@ -121,12 +124,13 @@ class MasterActor extends UntypedAbstractActor with Stash {
 
       charactersList :+= characterRef
 
-      SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
-        GeneralActors.QUAD_TREE_ACTOR.name)
-        .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
+      val ref = SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR)
       /*SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
-        GeneralActors.GRAPH_ACTOR.name).tell(AskForGraphMsg, characterRef)*/
-      SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR).tell(AskForGraphMsg, characterRef)
+        GeneralActors.QUAD_TREE_ACTOR.name)*/
+      //ref ! CiaoMsg(newCharacter)
+      ref ! InitialSavingCharacterMsg(newCharacter, characterRef)
+      SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
+        GeneralActors.GRAPH_ACTOR.name).tell(AskForGraphMsg, characterRef)
     }
 
     createCharacter(msg)

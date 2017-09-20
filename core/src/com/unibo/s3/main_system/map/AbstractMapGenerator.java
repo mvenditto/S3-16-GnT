@@ -168,12 +168,12 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
             }
         }else if(startY == 0){
             if (generatedMap[coordinate][endY] == 0) {
-                System.out.println();
+                //System.out.println();
                 return true;
             }
         } else {
             if (generatedMap[coordinate][startY - 1] == 0 || generatedMap[coordinate][endY] == 0) {
-                System.out.println();
+                //System.out.println();
                 return true;
             }
         }

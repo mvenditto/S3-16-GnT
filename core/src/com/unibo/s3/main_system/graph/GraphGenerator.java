@@ -1,6 +1,7 @@
 package com.unibo.s3.main_system.graph;
 
 import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
@@ -8,7 +9,9 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory;
 import com.unibo.s3.main_system.communication.GeneralActors;
+import com.unibo.s3.main_system.communication.Messages.CiaoMsg;
 import com.unibo.s3.main_system.communication.SystemManager;
+import com.unibo.s3.main_system.game.AkkaSettings;
 import com.unibo.s3.main_system.game.GameSettings;
 import com.unibo.s3.main_system.game.Wall;
 import com.unibo.s3.main_system.map.AbstractMapGenerator;
@@ -53,12 +56,13 @@ public class GraphGenerator {
     public static UndirectedGraph<Vector2, DefaultEdge> createGraph(int width, int height, String mapFilename) {
         int dimWall = Wall.WALL_THICKNESS();
 
-        ActorRef worldActor = SystemManager.getLocalActor("worldActor");
+        ActorSelection worldActor = SystemManager.getRemoteActor(AkkaSettings.GUISystem(), "/user/", "worldActor");
+        //ActorRef worldActor = SystemManager.getLocalActor("worldActor");
         RaycastCollisionDetector<Vector2> collisionDetector =
                 Box2dProxyDetectorsFactory.of(worldActor).newRaycastCollisionDetector();
         HashMap<Vector2, Vector2> walls = new HashMap<>();
         Integer[][] grid = new Integer[width+(dimWall*2)][height+(dimWall*2)];
-        log("genero il grafo di dimensione: " + width + ", " + height);
+        //log("genero il grafo di dimensione: " + width + ", " + height);
         Cronometer cron = new Cronometer();
 
         cron.start();
@@ -67,7 +71,7 @@ public class GraphGenerator {
         //concurrentReadMap(mapFilename, walls, grid);
         cron.stop();
 
-        log("A leggere la mappa ci ha messo: " + cron.getTime());
+        //log("A leggere la mappa ci ha messo: " + cron.getTime());
 
         //printGrid(grid);
 
@@ -75,7 +79,7 @@ public class GraphGenerator {
         UndirectedGraph<Vector2, DefaultEdge> graph = create(grid, walls, collisionDetector, dimWall);
 
 
-        log("Grafo creato: " + graph.toString());
+        //log("Grafo creato: " + graph.toString());
         return graph;
     }
 
@@ -155,7 +159,7 @@ public class GraphGenerator {
                             //log(node.toString() + " non arriva a " + toCompare.toString());
                             if(checkEdgeRayCast(collisionDetector, node, toCompare)) {
                                 DefaultEdge edge = graph.addEdge(node, toCompare);
-                                log("Secondi archi: aggiunto " + edge.toString());
+                                //log("Secondi archi: aggiunto " + edge.toString());
                             }
                         }
 
@@ -163,7 +167,7 @@ public class GraphGenerator {
                 }
             }
         });
-        log("Finiti secondi archi");
+        //log("Finiti secondi archi");
     }
 
 
@@ -217,7 +221,7 @@ public class GraphGenerator {
             });
             nodes.remove(vertex);
         });
-        log("Finiti primi archi");
+        //log("Finiti primi archi");
     }
 
     private static boolean checkNodeProximity(Vector2 first, Vector2 second) {
@@ -342,7 +346,7 @@ public class GraphGenerator {
                 }
             }
         }
-        log("Finiti primi nodi");
+        //log("Finiti primi nodi");
     }
 
     /**
@@ -398,7 +402,7 @@ public class GraphGenerator {
 
             }
         });
-        log("Finiti i nodi dei muri");
+        //log("Finiti i nodi dei muri");
     }
 
     private static boolean checkForAddingNode(int x, int y, Integer[][] grid, UndirectedGraph<Vector2, DefaultEdge> graph) {

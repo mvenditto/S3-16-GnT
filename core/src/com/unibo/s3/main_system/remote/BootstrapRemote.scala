@@ -27,9 +27,10 @@ class BootstrapRemote() {
   private def initActorSystem(): Unit = {
     log("-- Computation node configuration and startup --");
     val myIp = InetAddress.getLocalHost.getHostAddress
-    SystemManager.createSystem(AkkaSettings.RemoteSystem, ip = Option(myIp), portNumber = Option(AkkaSettings.ComputeSystemPort))
+    val portNumber = AkkaSettings.ComputeSystemPort
+    SystemManager.createSystem(AkkaSettings.RemoteSystem, ip = Option(myIp), portNumber = Option(portNumber))
     log("-- Actor system creted --");
-    log("-- IP: " + myIp)
+    log("-- IP: " + myIp + ":" + portNumber)
 
     val world = new World(new Vector2(0, 0), true)
 
@@ -42,8 +43,8 @@ class BootstrapRemote() {
     /*SystemManager.createActor(
       WorldActor.props(world), GeneralActors.WORLD_ACTOR)*/
 
-    SystemManager.createActor(
-      QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)
+    /*SystemManager.createActor(
+      QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)*/
 
     SystemManager.createActor(
       SpawnActor.props(), GeneralActors.SPAWN_ACTOR)
@@ -51,8 +52,8 @@ class BootstrapRemote() {
     SystemManager.createActor(
       MapActor.props(), GeneralActors.MAP_ACTOR)
 
-    /*SystemManager.createActor(
-      GraphActor.props(), GeneralActors.GRAPH_ACTOR)*/
+    SystemManager.createActor(
+      GraphActor.props(), GeneralActors.GRAPH_ACTOR)
     log("-- Actors created --")
   }
 

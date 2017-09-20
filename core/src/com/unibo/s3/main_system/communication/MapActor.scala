@@ -51,7 +51,7 @@ class MapActor extends UntypedAbstractActor with Stash {
     case GameSettingsMsg(gs) =>
       val w = gs.mapSize.x.toInt
       val h = gs.mapSize.y.toInt
-      println("ricevute: " + w + " " + h)
+      //println("ricevute: " + w + " " + h)
       this.mapWidth = w
       this.mapHeight = h
       context.become(generateMap)
@@ -72,12 +72,11 @@ class MapActor extends UntypedAbstractActor with Stash {
       //valori da decidere una volta decise le dimensioni possibili per la mappa
       this.mapGenerator.generateMap(this.mapWidth, this.mapHeight)
       this.mapGenerator.getMap.foreach(line => {
-        val ref = SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
-          GeneralActors.GRAPH_ACTOR.name)
-        println("Grafo = " + ref)
-        ref.tell(MapElementMsg(line), getSelf())
-        SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
-          GeneralActors.WORLD_ACTOR.name).tell(MapElementMsg(line), getSelf())
+        SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR).tell(MapElementMsg(line), getSelf())
+        //val refWorld = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
+        val refWorld = SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
+          GeneralActors.WORLD_ACTOR.name)
+          refWorld.tell(MapElementMsg(line), getSelf())
         SystemManager.getLocalActor(GeneralActors.SPAWN_ACTOR).tell(MapElementMsg(line), getSelf())
       })
     // val file = Gdx.files.local(FILEPATH)

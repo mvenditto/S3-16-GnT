@@ -43,10 +43,14 @@ class QuadTreeActor extends UntypedAbstractActor {
 
     case InitialSavingCharacterMsg(newCharacter, characterRef) =>
       agentsTable += (newCharacter -> characterRef)
-      SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
-        GeneralActors.GAME_ACTOR.name) ! SendAllCharactersMsg(agentsTable.keys)
-      SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
-        GeneralActors.LIGHTING_SYSTEM_ACTOR.name) ! SendAllCharactersMsg(agentsTable.keys)
+      val ref = SystemManager.getLocalActor(GeneralActors.GAME_ACTOR)
+      /*SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
+        GeneralActors.GAME_ACTOR.name)*/
+      ref ! SendAllCharactersMsg(agentsTable.keys)
+      val refLig = SystemManager.getLocalActor(GeneralActors.LIGHTING_SYSTEM_ACTOR)
+      /*SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
+        GeneralActors.LIGHTING_SYSTEM_ACTOR.name)*/
+      refLig ! SendAllCharactersMsg(agentsTable.keys)
 
     case RebuildQuadTreeMsg() =>
       root = QuadTreeNode(bounds)
@@ -77,8 +81,10 @@ class QuadTreeActor extends UntypedAbstractActor {
 
         nearbyRequestCache += (reqId -> neighborsInFov)
 
-        SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
-          GeneralActors.WORLD_ACTOR.name) ! filterOnlyOnSightLine
+        val refWorld = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
+        /*val refWorld = SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
+          GeneralActors.WORLD_ACTOR.name)*/
+        refWorld ! filterOnlyOnSightLine
 
       } else {
         sender ! SendNeighboursMsg(List())

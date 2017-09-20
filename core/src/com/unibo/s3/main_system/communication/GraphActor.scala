@@ -61,7 +61,6 @@ class GraphActor extends  UntypedAbstractActor with Stash {
 
   private def generateGraph(): Receive = {
     case msg: MapElementMsg =>
-      println("[GRAPH ACTOR] Riga ricevuta")
       val verifyClose = msg.line.split(":")
       def writeFunction(verifyClose: Array[String]): Unit = verifyClose match {
         case _ if verifyClose.forall(value => value == "0.0") =>
@@ -72,9 +71,7 @@ class GraphActor extends  UntypedAbstractActor with Stash {
       writeFunction(verifyClose)
 
     case _: GenerateGraphMsg =>
-      println("Ricevuto messaggio di generare grafo")
       this.graph = Option(GraphGenerator.createGraph(this.width, this.height, FILEPATH))
-      println("Grafo genera")
       context.become(askGraph())
       unstashAll()
 

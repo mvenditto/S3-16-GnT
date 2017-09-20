@@ -85,9 +85,8 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
   private def initActorSystem(): Unit = {
     setProgress(0)
     var IP: String = InetAddress.getLocalHost.getHostAddress
-    //if(!SystemManager.getIP.get.equals("127.0.0.1")) IP = InetAddress.getLocalHost.getHostAddress
-    SystemManager.createSystem(ActorSystemName, ip = Option(IP), portNumber = Option(AkkaSettings.GUISystemPort))
-    System.out.println("Creato actor system in ascolto su ip " + IP)
+    val portNumber = AkkaSettings.GUISystemPort
+    SystemManager.createSystem(ActorSystemName, ip = Option(IP), portNumber = Option(portNumber))
 
     val world = new World(new Vector2(0, 0), true)
     setProgress(20)
@@ -104,8 +103,12 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
     setProgress(60)
 
     SystemManager.createActor(
-      WorldActor.props(world), GeneralActors.WORLD_ACTOR)
+      QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)
     setProgress(80)
+
+    SystemManager.createActor(
+      WorldActor.props(world), GeneralActors.WORLD_ACTOR)
+    setProgress(100)
 
     /*SystemManager.createActor(
       QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)*/
@@ -117,9 +120,9 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
       MapActor.props(), GeneralActors.MAP_ACTOR)
     setProgress(80)*/
 
-    SystemManager.createActor(
+    /*SystemManager.createActor(
       GraphActor.props(), GeneralActors.GRAPH_ACTOR)
-    setProgress(100)
+    setProgress(100)*/
 
     loadingFinished = true
   }

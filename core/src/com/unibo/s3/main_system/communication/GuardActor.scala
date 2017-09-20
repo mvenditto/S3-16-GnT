@@ -4,6 +4,7 @@ import akka.actor.{Props, Stash, UntypedAbstractActor}
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.Guard.Guard
 import com.unibo.s3.main_system.communication.Messages._
+import com.unibo.s3.main_system.game.AkkaSettings
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
@@ -71,7 +72,9 @@ class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor wi
   private def normalBehave(): Receive = {
     case ActMsg(dt) =>
       guard.act(dt)
-      SystemManager.getLocalActor("quadTreeActor").tell(AskNeighboursWithinFovMsg(this.guard), getSelf())
+      SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR).tell(AskNeighboursWithinFovMsg(this.guard), getSelf())
+      /*SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
+        GeneralActors.QUAD_TREE_ACTOR.name).tell(AskNeighboursWithinFovMsg(this.guard), getSelf())*/
       //println(log() + "Act received")
       //println(log() + "Current node/destination: " + character.getCurrentNode.getOrElse("Not definied") + "," + character.getCurrentDestination)
 

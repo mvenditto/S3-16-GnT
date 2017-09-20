@@ -2,7 +2,7 @@ package com.unibo.s3.main_system.communication
 
 import akka.actor.{Props, Stash, UntypedAbstractActor}
 import com.unibo.s3.main_system.communication.Messages._
-import com.unibo.s3.main_system.game.{GameSettings, Wall}
+import com.unibo.s3.main_system.game.{AkkaSettings, GameSettings, Wall}
 import com.unibo.s3.main_system.spawn.{GuardStrategy, SpawnPointGenerator, ThiefStrategy}
 import com.unibo.s3.main_system.util.GntUtils
 
@@ -87,7 +87,11 @@ class SpawnActor extends UntypedAbstractActor with Stash {
         this.spawnGenerator.setSpawnStrategy(guardStrategy)
       else
         this.spawnGenerator.setSpawnStrategy(ThiefStrategy())
-      sender ! CreateCharacterMsg(this.spawnGenerator.generateSpawnPoints(this.map, 1).get(0), msg.characterType)
+
+      val ref = SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
+        GeneralActors.MASTER_ACTOR.name)
+      //ref ! CiaoMsg
+      ref ! CreateCharacterMsg(this.spawnGenerator.generateSpawnPoints(this.map, 1).get(0), msg.characterType)
   }
 }
 
