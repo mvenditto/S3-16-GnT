@@ -8,7 +8,7 @@ import com.kotcrab.vis.ui.VisUI
 import com.unibo.s3.main_system.AbstractMainApplication
 import com.unibo.s3.main_system.communication.Messages.ToggleViewDebug
 import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
-import com.unibo.s3.main_system.game.GameSettings
+import com.unibo.s3.main_system.game.{GameSettings, MapType, Maze, Rooms}
 import com.unibo.s3.main_system.modules._
 import com.unibo.s3.main_system.util.ScaleUtils._
 
@@ -48,8 +48,14 @@ class Main extends AbstractMainApplication {
 
     var settings: Option[GameSettings] = None
     val cm = new MenuModule({
-      case Start(guardsNum, thiefsNum, simulation, mapDimension, mazeTypeMap) =>
-        settings = Option(GameSettings(mapSize = mapDimension))
+      case Start(guardsNum, thievesNum, simulation, mapDimension, mazeTypeMap) =>
+        var mapType: MapType = null
+        mazeTypeMap match {
+          case true => mapType = Maze
+          case _ => mapType = Rooms
+        }
+        settings = Option(GameSettings(guardsNumber = guardsNum,
+          thievesNumber = thievesNum, mapSize = mapDimension, mapType = mapType))
         bootstrapModule.enable(true)
       case Pause(pause) => paused = pause
       case ViewDebug(debug) =>

@@ -40,7 +40,7 @@ object Messages {
   case class InitialSavingCharacterMsg(newCharacter: BaseCharacter, characterRef: ActorRef)
 
   //message for SpawnActor
-  case class GenerateNewCharacterPositionMsg(characterType: CharacterActors)
+  case class GenerateNewCharacterPositionMsg(num: Int, characterType: CharacterActors)
 
   //message for CommunciatorActor
   case class SendIPMsg(IP: String)

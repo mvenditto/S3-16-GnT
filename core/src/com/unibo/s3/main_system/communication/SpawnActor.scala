@@ -1,6 +1,9 @@
 package com.unibo.s3.main_system.communication
 
+import java.util
+
 import akka.actor.{Props, Stash, UntypedAbstractActor}
+import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.game.{AkkaSettings, GameSettings, Wall}
 import com.unibo.s3.main_system.spawn.{GuardStrategy, SpawnPointGenerator, ThiefStrategy}
@@ -53,6 +56,8 @@ class SpawnActor extends UntypedAbstractActor with Stash {
     case GameSettingsMsg(g) =>
       val wt = g.mapSize.cpy().scl(1.0f / Wall.WALL_THICKNESS)
       this.map = Array.ofDim[Int](wt.x.toInt, wt.y.toInt)
+      self ! GenerateNewCharacterPositionMsg(g.guardsNumber, CharacterActors.GUARD)
+      self ! GenerateNewCharacterPositionMsg(g.thievesNumber, CharacterActors.THIEF)
       context.become(setMatrix())
       unstashAll()
     case _ => stash()
@@ -91,7 +96,13 @@ class SpawnActor extends UntypedAbstractActor with Stash {
       val ref = SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
         GeneralActors.MASTER_ACTOR.name)
       //ref ! CiaoMsg
-      ref ! CreateCharacterMsg(this.spawnGenerator.generateSpawnPoints(this.map, 1).get(0), msg.characterType)
+      val list: util.List[Vector2] = this.spawnGenerator.generateSpawnPoints(this.map, msg.num)
+      //println("Generati " + list.size() + " punti di spawn")
+      val it = list.iterator()
+      while(it.hasNext)
+        ref ! CreateCharacterMsg(it.next(), msg.characterType)
+        //ref ! CreateCharacterMsg(pos, msg.characterType))
+
   }
 }
 

@@ -184,17 +184,17 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
   }
 
   override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
-    if (button != 1){
+    if (button != 1 && viewDebug){
       spawnActor.tell(
-        GenerateNewCharacterPositionMsg(GUARD), masterActor)
+        GenerateNewCharacterPositionMsg(1, GUARD), masterActor)
     }
     false
   }
 
   override def keyUp(keycode: Int): Boolean = {
-    if(keycode == Input.Keys.T) {
+    if(keycode == Input.Keys.T && viewDebug) {
       spawnActor.tell(
-        GenerateNewCharacterPositionMsg(THIEF), masterActor)
+        GenerateNewCharacterPositionMsg(1, THIEF), masterActor)
     }
     false
   }

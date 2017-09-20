@@ -16,7 +16,7 @@ import com.unibo.s3.testbed.ui.{AdaptiveSizeActor, Anchorable, TopLeft}
 import com.unibo.s3.testbed.ui.KeyHelpTable
 
 sealed trait MenuEvent
-case class Start(guardsNum: Int, thiefsNum: Int, simulation: Boolean, mapDimension: Vector2, mazeTypeMap: Boolean) extends MenuEvent
+case class Start(guardsNum: Int, thievesNum: Int, simulation: Boolean, mapDimension: Vector2, mazeTypeMap: Boolean) extends MenuEvent
 case class Pause(pause: Boolean) extends MenuEvent
 case class ViewDebug(debug: Boolean) extends MenuEvent
 
