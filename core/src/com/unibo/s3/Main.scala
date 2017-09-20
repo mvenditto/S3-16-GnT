@@ -51,7 +51,7 @@ class Main extends AbstractMainApplication {
       case Start(guardsNum, thiefsNum, simulation, mapDimension, mazeTypeMap) =>
         settings = Option(GameSettings(mapSize = mapDimension))
         bootstrapModule.enable(true)
-      case Pause(pause) =>
+      case Pause(pause) => paused = pause
       case ViewDebug(debug) =>
         val gameRef = SystemManager.getLocalActor(GeneralActors.GAME_ACTOR)
         gameRef ! ToggleViewDebug(debug)
