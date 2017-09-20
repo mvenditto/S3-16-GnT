@@ -32,6 +32,7 @@ object Messages {
   //messages for GameActor
   case class ThiefCaughtMsg(thief: BaseCharacter, guard: BaseCharacter)
   case class ThiefReachedExitMsg(thief: BaseCharacter)
+  case class ToggleViewDebug(viewDebug: Boolean)
 
   //message for MasterActor
   case class RebuildQuadTreeMsg()
@@ -39,7 +40,7 @@ object Messages {
   case class InitialSavingCharacterMsg(newCharacter: BaseCharacter, characterRef: ActorRef)
 
   //message for SpawnActor
-  case class GenerateNewCharacterPositionMsg(characterType: CharacterActors)
+  case class GenerateNewCharacterPositionMsg(num: Int, characterType: CharacterActors)
 
   //message for CommunciatorActor
   case class SendIPMsg(IP: String)

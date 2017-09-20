@@ -2,8 +2,8 @@ package com.unibo.s3.main_system.communication
 
 import scala.collection.JavaConversions.asScalaBuffer
 import akka.actor.{Props, Stash, UntypedAbstractActor}
-import com.unibo.s3.main_system.communication.Messages.{GenerateMapMsg, MapElementMsg, GameSettingsMsg}
-import com.unibo.s3.main_system.game.AkkaSettings
+import com.unibo.s3.main_system.communication.Messages.{GameSettingsMsg, GenerateMapMsg, MapElementMsg}
+import com.unibo.s3.main_system.game.{AkkaSettings, Maze, Rooms}
 import com.unibo.s3.main_system.map.{AbstractMapGenerator, MapGenerator, MazeMapGenerator, RoomMapGenerator}
 
 
@@ -54,6 +54,10 @@ class MapActor extends UntypedAbstractActor with Stash {
       //println("ricevute: " + w + " " + h)
       this.mapWidth = w
       this.mapHeight = h
+      gs.mapType match {
+        case Maze => this.mapType = true
+        case Rooms => this.mapType = false
+      }
       context.become(generateMap)
       unstashAll()
 
