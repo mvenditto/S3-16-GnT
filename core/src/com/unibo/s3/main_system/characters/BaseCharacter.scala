@@ -15,6 +15,9 @@ import org.jgrapht.graph.DefaultEdge
 import scala.util.Random
 import com.unibo.s3.main_system.util.GdxImplicits._
 
+import scala.collection.JavaConverters._
+import scala.collection.mutable.ArrayBuffer
+
 trait Character{
 
   /**initial graph setting*/
@@ -46,7 +49,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
 
   private var currentNode : Option[Vector2] = Option[Vector2](new Vector2())
   private var previousNode : Option[Vector2] = Option[Vector2](new Vector2()) /**Nodo precedente**/
-  private var neighbours = List[ActorRef]()
+  private var neighbours = ArrayBuffer[ActorRef]()
 
   private var visited = List[Vector2]()
   private var index : NeighborIndex[Vector2,DefaultEdge] = _
@@ -81,7 +84,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   }
 
   def addNeighbour(neighbour: ActorRef): Unit = {
-    this.neighbours :+= neighbour
+    this.neighbours += neighbour
     this.nNeighbours += 1
   }
 
@@ -107,7 +110,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
     this.setComplexSteeringBehavior.avoidCollisionsWithWorld.arriveTo(new CustomLocation(destination)).buildPriority(true)
   }
 
-  private def refreshNeighbours() : Unit = this.neighbours = List()
+  private def refreshNeighbours() : Unit = this.neighbours.clear()
 
   private def computeInitialNearestNode = {
     var nearest = None: Option[Vector2]
@@ -133,20 +136,16 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   }
 
   private def selectPriorityDestination : Option[Vector2] = {
-    import scala.collection.JavaConversions._
 
-    var list = index.neighborListOf(currentNode.get).toList
+    var list = index.neighborListOf(currentNode.get).asScala
     var out : Option[Vector2] = None
     list = list.filter(node => !node.equals(previousNode.get))
     if(list.isEmpty){
       out = previousNode
     }else{
-      out = Option[Vector2](scala.util.Random.shuffle(list.filter(node => !node.equals(previousNode.get))).get(0))
+      val randIdx = MathUtils.random(0, list.size - 1)
+      out = Some(list.filter(node => !node.equals(previousNode.get))(randIdx))
     }
-    // println(log + "previous/current " + previousNode + " " + currentNode)
-    // println(log + "OUT pre : " + list)
-    // println(log + "OUT post : " + list.filter(node => !node.equals(previousNode.get)))
-
     out
   }
 
@@ -156,7 +155,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
 
   def getCurrentNode: Option[Vector2] = currentNode
 
-  def getNeighbours: List[ActorRef] = neighbours
+  def getNeighbours: List[ActorRef] = neighbours.toList
 
   def chooseBehaviour(): Unit = {
     this.currentNode = computeNearestVertex

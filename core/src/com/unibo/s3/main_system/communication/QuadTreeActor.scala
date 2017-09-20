@@ -11,6 +11,8 @@ import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.world.actors.{FilterReachableByRay, SendFilterReachableByRay}
 import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
 
+import scala.collection.mutable
+
 case class AskNeighboursWithinFovMsg(character: BaseCharacter)
 case class SendThievesInProximityMsg(thieves: Iterable[BaseCharacter])
 case class SendGuardsInProximityMsg(thieves: Iterable[BaseCharacter])
@@ -19,8 +21,8 @@ class QuadTreeActor extends UntypedAbstractActor {
 
   type RequestId = (Long, Int)
 
-  private[this] var agentsTable = Map[BaseCharacter, ActorRef]()
-  private[this] var nearbyRequestCache = Map[RequestId, Iterable[BaseCharacter]]()
+  private[this] var agentsTable = mutable.AnyRefMap[BaseCharacter, ActorRef]()
+  private[this] var nearbyRequestCache = mutable.AnyRefMap[RequestId, Iterable[BaseCharacter]]()
   private[this] var bounds = Bounds(0, 0, 100, 100)
   private[this] var root = QuadTreeNode[BaseCharacter](Bounds(0, 0, 60, 60))
   private[this] val queryRadius = 5f
@@ -49,7 +51,7 @@ class QuadTreeActor extends UntypedAbstractActor {
 
     case RebuildQuadTreeMsg() =>
       root = QuadTreeNode(bounds)
-      agentsTable.keys.foreach(c => root.insert(c))
+      agentsTable.foreachKey(c => root.insert(c))
 
     case AskNeighboursMsg(character, radius) =>
       val neighbours = queryForNeighbors(character, radius)
