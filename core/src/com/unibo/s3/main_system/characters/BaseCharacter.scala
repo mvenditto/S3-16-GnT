@@ -223,7 +223,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
 }
 
 object Guard {
-  def apply(vector2: Vector2, id: Int): Guard = new Guard(vector2, id)
+  def apply(vector2: Vector2, id: Int): Guard = Guard(vector2, id)
 
   case class Guard(vector2: Vector2, id : Int) extends BaseCharacter(vector2, id){
 
@@ -279,7 +279,7 @@ object Guard {
 }
 
 object Thief {
-  def apply(vector2: Vector2, id: Int): Thief = new Thief(vector2, id)
+  def apply(vector2: Vector2, id: Int): Thief = Thief(vector2, id)
 
   case class Thief(vector2: Vector2, id : Int) extends BaseCharacter(vector2, id){
 
