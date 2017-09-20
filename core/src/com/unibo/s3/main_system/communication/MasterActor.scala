@@ -72,7 +72,7 @@ class MasterActor extends UntypedAbstractActor with Stash {
   override def onReceive(message: Any): Unit = {}
 
   private def firstCreation: Receive  = {
-    case msg: CreateCharacterMsg => 
+    case msg: CreateCharacterMsg =>
       this.createCharacter(msg)
       context.become(this.actAndCreate)
 
