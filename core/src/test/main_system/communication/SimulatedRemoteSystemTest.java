@@ -68,7 +68,7 @@ public class SimulatedRemoteSystemTest {
                 ActorSystem remoteSystem = ActorSystem.create("RemoteSystem", customConf);
                 remoteSystem.actorOf(Props.create(TestActor.class), "remoteActor");
 
-                SystemManager.setIPForRemoting(Inet4Address.getLocalHost().getHostAddress());
+                SystemManager.setIPForRemoting(Inet4Address.getLocalHost().getHostAddress(), AkkaSettings.ComputeSystemPort());
                 ActorSelection remoteActor = SystemManager.getRemoteActor
                         ("RemoteSystem","/user/", "remoteActor");
 
