@@ -52,7 +52,6 @@ class Main extends AbstractMainApplication {
         settings = Option(GameSettings(mapSize = mapDimension))
         bootstrapModule.enable(true)
       case Pause(pause) =>
-      case Stop() =>
       case ViewDebug(debug) =>
         val gameRef = SystemManager.getLocalActor(GeneralActors.GAME_ACTOR)
         gameRef ! ToggleViewDebug(debug)

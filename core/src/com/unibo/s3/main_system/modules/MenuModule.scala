@@ -18,7 +18,6 @@ import com.unibo.s3.testbed.ui.KeyHelpTable
 sealed trait MenuEvent
 case class Start(guardsNum: Int, thiefsNum: Int, simulation: Boolean, mapDimension: Vector2, mazeTypeMap: Boolean) extends MenuEvent
 case class Pause(pause: Boolean) extends MenuEvent
-case class Stop() extends MenuEvent
 case class ViewDebug(debug: Boolean) extends MenuEvent
 
 class MenuModule(listener: MenuEvent => Unit) extends BasicModuleWithGui{
@@ -175,13 +174,6 @@ class MenuModule(listener: MenuEvent => Unit) extends BasicModuleWithGui{
       }
     })
 
-    val buttonStop = new VisTextButton("STOP")
-    windowMenu.add(buttonStop).padTop(10).row()
-    buttonStop.addListener(new ClickListener() {
-      override def clicked(event: InputEvent, x: Float, y: Float): Unit =
-        listener(Stop())
-    })
-
     val debugView = new VisCheckBox(" View debug")
     windowMenu.add(debugView).padTop(10).padLeft(10).padRight(10).row()
     debugView.addListener(new ChangeListener {
@@ -207,13 +199,16 @@ class MenuModule(listener: MenuEvent => Unit) extends BasicModuleWithGui{
         toastManager.setAlignment(Align.center)
 
         val keys = new KeyHelpTable(true)
-        keys.addKeyBinding("p", "pause.")
+        keys.addKeyBinding("p", "pause")
         keys.addKeyBinding("q", "zoom in")
         keys.addKeyBinding("r", "zoom out")
         keys.addKeyBinding("arrow-left", "move camera left")
         keys.addKeyBinding("arrow-right", "move camera right")
         keys.addKeyBinding("arrow-up", "move camera up")
         keys.addKeyBinding("arrow-down", "move camera down")
+        keys.addKeyBinding("mouse-wheel-move", "brightness control")
+        keys.addKeyBinding("mouse-left", "spawn guard (only debug view)")
+        keys.addKeyBinding("t", "spawn thief (only debug view)")
         keys.align(Align.center)
 
         val t = new Toast("dark", keys)
@@ -232,6 +227,7 @@ class MenuModule(listener: MenuEvent => Unit) extends BasicModuleWithGui{
 
     menuWindowPane = new AdaptiveSizeActor(windowMenu) with Anchorable
     menuWindowPane.setSize(10, 20) //10 % 20 % of stage size
+    menuWindowPane.setPadding(10,0)
     menuWindowPane.setAnchor(TopLeft)
   }
 
