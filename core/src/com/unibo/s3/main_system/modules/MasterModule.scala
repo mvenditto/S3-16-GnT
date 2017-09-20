@@ -26,6 +26,7 @@ import com.unibo.s3.main_system.world.{BodyData, Exit}
 class MasterModule extends BasicModuleWithGui with GameOverlay {
   import MasterModule._
 
+  private[this] var viewDebug = false
   private[this] var graph: Option[GraphAdapter[Vector2]] = None
   private[this] var characters: Option[Iterable[BaseCharacter]] = None
   private[this] val thiefCaughtMsg = "Thief got caught!"
@@ -53,6 +54,9 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
 
       case SendAllCharactersMsg(_characters) =>
         characters = Option(_characters)
+
+      case ToggleViewDebug(d) =>
+        viewDebug = d
 
       case SendGraphMsg(g) =>
         graph = Option(g)
@@ -163,15 +167,14 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
   override def render(shapeRenderer: ShapeRenderer): Unit = {
     super.render(shapeRenderer)
 
-    graph.foreach(g =>
-      renderer.renderGraph(shapeRenderer, g, DefaultGraphRenderingConfig))
+    if(viewDebug) graph.foreach(g => renderer.renderGraph(shapeRenderer, g, DefaultGraphRenderingConfig))
 
     renderer.renderMap(shapeRenderer, worldMap)
 
     characters.foreach(characters =>
       characters.foreach(c => {
         spriteRenderer.render(c, owner.getCamera)
-        renderer.renderCharacterDebugInfo(shapeRenderer, c)
+        if(viewDebug) renderer.renderCharacterDebugInfo(shapeRenderer, c)
       }))
   }
 

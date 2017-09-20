@@ -32,6 +32,7 @@ object Messages {
   //messages for GameActor
   case class ThiefCaughtMsg(thief: BaseCharacter, guard: BaseCharacter)
   case class ThiefReachedExitMsg(thief: BaseCharacter)
+  case class ToggleViewDebug(viewDebug: Boolean)
 
   //message for MasterActor
   case class RebuildQuadTreeMsg()

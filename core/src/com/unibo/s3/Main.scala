@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.kotcrab.vis.ui.VisUI
 import com.unibo.s3.main_system.AbstractMainApplication
+import com.unibo.s3.main_system.communication.Messages.ToggleViewDebug
+import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
 import com.unibo.s3.main_system.game.GameSettings
 import com.unibo.s3.main_system.modules._
 import com.unibo.s3.main_system.util.ScaleUtils._
@@ -50,11 +52,10 @@ class Main extends AbstractMainApplication {
         settings = Option(GameSettings(mapSize = mapDimension))
         bootstrapModule.enable(true)
       case Pause(pause) =>
-        println("Sistem pause: " + pause)
       case Stop() =>
-        println("Stop system!!")
       case ViewDebug(debug) =>
-        println("View debug activated: " + debug)
+        val gameRef = SystemManager.getLocalActor(GeneralActors.GAME_ACTOR)
+        gameRef ! ToggleViewDebug(debug)
     })
     cm.enable(true)
 
