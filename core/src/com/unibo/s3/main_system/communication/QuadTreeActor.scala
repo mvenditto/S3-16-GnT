@@ -17,6 +17,8 @@ import scala.collection.mutable
 case class AskNeighboursWithinFovMsg(character: BaseCharacter)
 case class SendThievesInProximityMsg(thieves: Iterable[BaseCharacter])
 case class SendGuardsInProximityMsg(thieves: Iterable[BaseCharacter])
+case class AskNearbyGuardsMsg(c: BaseCharacter, r: Option[Float] = None)
+case class SendNearbyGuardsMsg(n: Iterable[ActorRef])
 
 class QuadTreeActor extends UntypedAbstractActor {
 
@@ -46,17 +48,19 @@ class QuadTreeActor extends UntypedAbstractActor {
     case InitialSavingCharacterMsg(newCharacter, characterRef) =>
       agentsTable += (newCharacter -> characterRef)
       val ref = SystemManager.getLocalActor(GeneralActors.GAME_ACTOR)
-      /*SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
-        GeneralActors.GAME_ACTOR.name)*/
       ref ! SendAllCharactersMsg(agentsTable.keys)
       val refLig = SystemManager.getLocalActor(GeneralActors.LIGHTING_SYSTEM_ACTOR)
-      /*SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
-        GeneralActors.LIGHTING_SYSTEM_ACTOR.name)*/
       refLig ! SendAllCharactersMsg(agentsTable.keys)
 
     case RebuildQuadTreeMsg() =>
       root = QuadTreeNode(bounds)
       agentsTable.foreachKey(c => root.insert(c))
+
+    case AskNearbyGuardsMsg(character, radius) =>
+      val neighbours = queryForNeighbors(character, radius)
+      sender ! SendNearbyGuardsMsg(neighbours.collect {
+        case n: Guard if !agentsTable(n).equals(sender) => agentsTable(n)
+      })
 
     case AskNeighboursMsg(character, radius) =>
       val neighbours = queryForNeighbors(character, radius)
@@ -84,8 +88,6 @@ class QuadTreeActor extends UntypedAbstractActor {
         nearbyRequestCache += (reqId -> neighborsInFov)
 
         val refWorld = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
-        /*val refWorld = SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
-          GeneralActors.WORLD_ACTOR.name)*/
         refWorld ! filterOnlyOnSightLine
 
       } else {
@@ -93,7 +95,6 @@ class QuadTreeActor extends UntypedAbstractActor {
       }
 
     case SendFilterReachableByRay(filter, reqId) =>
-
       val onlyVisible = nearbyRequestCache(reqId)
         .zip(filter)
         .collect{case (x, true) => x}

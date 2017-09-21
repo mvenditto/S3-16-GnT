@@ -13,6 +13,7 @@ import org.jgrapht.alg.NeighborIndex
 import org.jgrapht.graph.DefaultEdge
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
@@ -21,17 +22,11 @@ trait Character {
   /**initial graph setting*/
   def setGraph(g: UndirectedGraph[Vector2, DefaultEdge]): Unit
 
-  /**adding a character to neighbours*/
-  def addNeighbour(neighbour: ActorRef): Unit
-
-  /**verify il a character is already neighbour (maybe not public)*/
-  def isNeighbour(possibleNeighbour : ActorRef) : Boolean
-
   /**getting character infos (maybe guard exclusive)*/
-  def getInformation: List[Vector2]
+  def getInformation: Iterable[Vector2]
 
   /**graph update (maybe guard exclusive)*/
-  def updateGraph(colleagueList: List[Vector2]): Unit
+  def updateGraph(colleagueList: Iterable[Vector2]): Unit
 
   /**getting sight line lenght (maybe thief exclusive)*/
   def getSightLineLength : Float
@@ -43,13 +38,11 @@ trait Character {
 abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector2) with Character {
   private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _
 
-  private var nNeighbours = 0
-
   private var currentNode : Option[Vector2] = Option[Vector2](new Vector2())
   private var previousNode : Option[Vector2] = Option[Vector2](new Vector2()) /**Nodo precedente**/
-  private var neighbours = ArrayBuffer[ActorRef]()
 
-  private var visited = List[Vector2]()
+  private var visited = mutable.ArrayBuffer[Vector2]()
+  private var visitedBuffer = mutable.ArrayBuffer[Vector2]()
   private var index : NeighborIndex[Vector2,DefaultEdge] = _
   private var currentDestination : Option[Vector2] = None
 
@@ -76,22 +69,19 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
     setNewDestination(currentDestination.get)
   }
 
-  def addNeighbour(neighbour: ActorRef): Unit = {
-    this.neighbours += neighbour
-    this.nNeighbours += 1
+  def getInformation: Iterable[Vector2] = this.visited
+
+  def updateGraph(colleagueList: Iterable[Vector2]): Unit =
+    visitedBuffer ++ colleagueList
+
+  private def mergeCollegueGraph(): Unit = {
+    visitedBuffer.foreach(v => if (!visited.contains(v)) visited += v)
+    visitedBuffer.clear()
   }
 
-  def isNeighbour(possibleNeighbour : ActorRef) : Boolean = neighbours.contains(possibleNeighbour)
-
-  def getInformation: List[Vector2] = this.visited
-
-  def updateGraph(colleagueList: List[Vector2]): Unit = {
-    this.nNeighbours -= 1
-    //update lista
-    for (v <- colleagueList) {
-      if (!visited.contains(v)) visited:+=v
-    }
-    if (nNeighbours == 0) chooseBehaviour()
+  override def act(dt: Float): Unit = {
+    super.act(dt)
+    mergeCollegueGraph()
   }
 
   def getSightLineLength : Float = this.sightLineLength
@@ -101,8 +91,6 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   private def setNewDestination(destination: Vector2) = {
     this.setComplexSteeringBehavior().avoidCollisionsWithWorld.arriveTo(new CustomLocation(destination)).buildPriority(true)
   }
-
-  private def refreshNeighbours() : Unit = this.neighbours.clear()
 
   private def computeInitialNearestNode = {
     var nearest = None: Option[Vector2]
@@ -118,12 +106,15 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
     discoverNewVertex(nearest)
     nearest
   }
-
   def selectRandomDestination(): Option[Vector2] = {
     if (index != null && currentNode.isDefined) {
-      val neighbors = index.neighborListOf(currentNode.get)
-      val n = neighbors.size()
-      if (n == 1) neighbors.get(0)
+      val _neighbors = index.neighborListOf(currentNode.get).asScala
+      val notVisited = _neighbors.filter(n => !visited.contains(n))
+
+      val neighbors = if(notVisited.nonEmpty) notVisited else _neighbors
+
+      val n = neighbors.size
+      if (n == 1) neighbors.head
       if (n > 1) randomGenerator.nextInt(n)
     }
     currentNode
@@ -148,8 +139,6 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   }
 
   def getCurrentNode: Option[Vector2] = currentNode
-
-  def getNeighbours: List[ActorRef] = neighbours.toList
 
   def chooseBehaviour(): Unit = {
     this.currentNode = computeNearestVertex

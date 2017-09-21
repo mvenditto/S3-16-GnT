@@ -30,14 +30,16 @@ class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor wi
   private def normalBehave(): Receive = {
     case ActMsg(dt) =>
       guard.act(dt)
-      SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR).tell(AskNeighboursWithinFovMsg(this.guard), getSelf())
-      /*SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
-        GeneralActors.QUAD_TREE_ACTOR.name).tell(AskNeighboursWithinFovMsg(this.guard), getSelf())*/
+      val qt = SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR)
+      qt ! AskNeighboursWithinFovMsg(this.guard)
+      qt ! AskNearbyGuardsMsg(guard)
       Behaviors.patrolIfHasNoTarget(guard)
 
-    case msg: SendNeighboursMsg =>
-      msg.neighbours.foreach(
-        neighbour => if(!neighbour.equals(getSelf())) guard.addNeighbour(neighbour))
+    case SendGuardInfoMsg(visitedNodes) =>
+      guard.updateGraph(visitedNodes)
+
+    case SendNearbyGuardsMsg(neighbors) =>
+      neighbors.foreach(n => n ! SendGuardInfoMsg(guard.getInformation))
 
     case SendThievesInProximityMsg(thieves) =>
       Behaviors.guardPursueThieves(guard, thieves)
