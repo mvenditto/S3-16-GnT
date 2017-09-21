@@ -21,17 +21,17 @@ object TestActor {
 }
 
 object RemoteLauncher extends App {
-  SystemManager.createSystem("RemoteSystem", Option[String](InetAddress.getLocalHost.getHostAddress),
+  SystemManager.createSystem("ComputeSystem", Option[String](InetAddress.getLocalHost.getHostAddress),
     Option[Int](AkkaSettings.ComputeSystemPort))
   SystemManager.createActor(TestActor.props(), "remoteActor")
   println("remote ready, ip: " + InetAddress.getLocalHost.getHostAddress)
 }
 
 object LocalLauncher extends App {
-  SystemManager.createSystem("RemoteSystem", Option[String](InetAddress.getLocalHost.getHostAddress),
+  SystemManager.createSystem("ComputeSystem", Option[String](InetAddress.getLocalHost.getHostAddress),
     Option[Int](AkkaSettings.GUISystemPort))
   SystemManager.setIPForRemoting(InetAddress.getLocalHost.getHostAddress, AkkaSettings.ComputeSystemPort)
-  val remoteActor = SystemManager.getRemoteActor("RemoteSystem", "/user/", "remoteActor")
+  val remoteActor = SystemManager.getRemoteActor("ComputeSystem", "/user/", "remoteActor")
   val localActor = SystemManager.createActor(TestActor.props(), "localActor")
   remoteActor.tell(GenerateMapMsg(), localActor)
 }

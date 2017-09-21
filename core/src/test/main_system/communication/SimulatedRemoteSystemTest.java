@@ -15,7 +15,7 @@ import scala.Option;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 
-public class SimulatedRemoteSystemTest {
+public class SimulatedComputeSystemTest {
     private static class TestActor extends AbstractActor {
         ActorRef target = null;
         @Override
@@ -52,7 +52,7 @@ public class SimulatedRemoteSystemTest {
     }
 
     @Test
-    public void simulatedRemoteSystemTest() {
+    public void simulatedComputeSystemTest() {
         new TestKit(testSystem) {{
             try {
                 SystemManager.createSystem("LocalSystem", Option.apply(Inet4Address.getLocalHost().getHostAddress()),
@@ -65,12 +65,12 @@ public class SimulatedRemoteSystemTest {
                         ",\"netty\":{\"tcp\":{\"hostname\":\""+ Inet4Address.getLocalHost().getHostAddress() +"\",\"port\":"+
                         AkkaSettings.ComputeSystemPort()+"}}}}}";
                 Config customConf = ConfigFactory.parseString(confText);
-                ActorSystem remoteSystem = ActorSystem.create("RemoteSystem", customConf);
-                remoteSystem.actorOf(Props.create(TestActor.class), "remoteActor");
+                ActorSystem ComputeSystem = ActorSystem.create("ComputeSystem", customConf);
+                ComputeSystem.actorOf(Props.create(TestActor.class), "remoteActor");
 
                 SystemManager.setIPForRemoting(Inet4Address.getLocalHost().getHostAddress(), AkkaSettings.ComputeSystemPort());
                 ActorSelection remoteActor = SystemManager.getRemoteActor
-                        ("RemoteSystem","/user/", "remoteActor");
+                        ("ComputeSystem","/user/", "remoteActor");
 
                 TestKit probe = new TestKit(testSystem);
 
