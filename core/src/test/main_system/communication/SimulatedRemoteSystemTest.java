@@ -15,7 +15,7 @@ import scala.Option;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 
-public class SimulatedComputeSystemTest {
+public class SimulatedRemoteSystemTest {
     private static class TestActor extends AbstractActor {
         ActorRef target = null;
         @Override
