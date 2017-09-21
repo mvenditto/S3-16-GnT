@@ -108,7 +108,7 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
     SystemManager.getLocalActor(actor)
 
   private def getRemoteActor(actor: String): ActorSelection =
-    SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/", actor)
+    SystemManager.getRemoteActor(AkkaSettings.ComputeSystem, "/user/", actor)
 
   private def cacheMap(bodies: Iterable[Body]) = {
     worldMap = GntUtils.parseBodiesToMap(bodies).toList

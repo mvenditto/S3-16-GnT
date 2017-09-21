@@ -90,7 +90,7 @@ class LightingSystemModule extends BasicModuleWithGui {
         Props(new LightingActor), GeneralActors.LIGHTING_SYSTEM_ACTOR)
 
     SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
-      //.getRemoteActor(AkkaSettings.RemoteSystem, "/user/", GeneralActors.WORLD_ACTOR.name)
+      //.getRemoteActor(AkkaSettings.ComputeSystem, "/user/", GeneralActors.WORLD_ACTOR.name)
       .tell(RegisterAsWorldChangeObserver, lightingActor)
 
     val c = loadConfigFromPreferences(owner.getPrefs)

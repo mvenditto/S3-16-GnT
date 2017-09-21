@@ -28,7 +28,7 @@ class BootstrapRemote() {
     log("-- Computation node configuration and startup --");
     val myIp = InetAddress.getLocalHost.getHostAddress
     val portNumber = AkkaSettings.ComputeSystemPort
-    SystemManager.createSystem(AkkaSettings.RemoteSystem, ip = Option(myIp), portNumber = Option(portNumber))
+    SystemManager.createSystem(AkkaSettings.ComputeSystem, ip = Option(myIp), portNumber = Option(portNumber))
     log("-- Actor system creted --");
     log("-- IP: " + myIp + ":" + portNumber)
 

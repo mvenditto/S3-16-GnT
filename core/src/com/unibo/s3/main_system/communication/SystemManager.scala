@@ -1,10 +1,8 @@
 package com.unibo.s3.main_system.communication
 
-import java.net.InetAddress
 
 import akka.actor.{ActorRef, ActorSelection, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
-import com.unibo.s3.main_system.game.AkkaSettings
 
 object SystemManager {
   private[this] type GeneralActors = GeneralActors.Value
