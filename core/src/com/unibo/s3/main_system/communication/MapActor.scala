@@ -2,7 +2,8 @@ package com.unibo.s3.main_system.communication
 
 import scala.collection.JavaConversions.asScalaBuffer
 import akka.actor.{Props, Stash, UntypedAbstractActor}
-import com.unibo.s3.main_system.communication.Messages.{GenerateMapMsg, MapElementMsg, GameSettingsMsg}
+import com.unibo.s3.main_system.communication.Messages.{GameSettingsMsg, GenerateMapMsg, MapElementMsg}
+import com.unibo.s3.main_system.game.{AkkaSettings, Maze, Rooms}
 import com.unibo.s3.main_system.map.{AbstractMapGenerator, MapGenerator, MazeMapGenerator, RoomMapGenerator}
 
 
@@ -50,9 +51,13 @@ class MapActor extends UntypedAbstractActor with Stash {
     case GameSettingsMsg(gs) =>
       val w = gs.mapSize.x.toInt
       val h = gs.mapSize.y.toInt
-      println("ricevute: " + w + " " + h)
+      //println("ricevute: " + w + " " + h)
       this.mapWidth = w
       this.mapHeight = h
+      gs.mapType match {
+        case Maze => this.mapType = true
+        case Rooms => this.mapType = false
+      }
       context.become(generateMap)
       unstashAll()
 
@@ -72,7 +77,10 @@ class MapActor extends UntypedAbstractActor with Stash {
       this.mapGenerator.generateMap(this.mapWidth, this.mapHeight)
       this.mapGenerator.getMap.foreach(line => {
         SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR).tell(MapElementMsg(line), getSelf())
-        SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR).tell(MapElementMsg(line), getSelf())
+        //val refWorld = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
+        val refWorld = SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
+          GeneralActors.WORLD_ACTOR.name)
+          refWorld.tell(MapElementMsg(line), getSelf())
         SystemManager.getLocalActor(GeneralActors.SPAWN_ACTOR).tell(MapElementMsg(line), getSelf())
       })
     // val file = Gdx.files.local(FILEPATH)

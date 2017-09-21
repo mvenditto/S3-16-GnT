@@ -30,7 +30,7 @@ object RemoteLauncher extends App {
 object LocalLauncher extends App {
   SystemManager.createSystem("RemoteSystem", Option[String](InetAddress.getLocalHost.getHostAddress),
     Option[Int](AkkaSettings.GUISystemPort))
-  SystemManager.setIPForRemoting(InetAddress.getLocalHost.getHostAddress)
+  SystemManager.setIPForRemoting(InetAddress.getLocalHost.getHostAddress, AkkaSettings.GUISystemPort)
   val remoteActor = SystemManager.getRemoteActor("RemoteSystem", "/user/", "remoteActor")
   val localActor = SystemManager.createActor(TestActor.props(), "localActor")
   remoteActor.tell(GenerateMapMsg(), localActor)

@@ -11,8 +11,8 @@ public class MapGenerator {
     private GenerationStrategy strategy;
 
     public void generateMap(int width, int height) {
-        System.out.println("generator: " + width + " " + height);
-        System.out.println("generator: " + BASE_UNIT);
+        //System.out.println("generator: " + width + " " + height);
+        //System.out.println("generator: " + BASE_UNIT);
         strategy.initialSetup(width/BASE_UNIT, height/BASE_UNIT);
         strategy.generate(8, width/BASE_UNIT, height/BASE_UNIT, 0, 0); }/**todo eliminare primo parametro**/
 

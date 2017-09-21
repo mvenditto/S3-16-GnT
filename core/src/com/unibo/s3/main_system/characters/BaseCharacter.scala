@@ -40,10 +40,7 @@ trait Character {
 
 }
 
-abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector2) with Character{
-
-  private var color : Color = _
-
+abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector2) with Character {
   private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _
 
   private var nNeighbours = 0
@@ -70,10 +67,6 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   private val randomGenerator = Random
 
   def getId: Int = id
-
-  override def setColor(color: Color): Unit = { this.color = color }
-
-  override def getColor: Color = color
 
   def setGraph(g: UndirectedGraph[Vector2, DefaultEdge]): Unit = {
     this.graph = g

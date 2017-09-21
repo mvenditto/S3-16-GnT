@@ -10,6 +10,7 @@ import com.unibo.s3.Main
 import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.communication.Messages.SendAllCharactersMsg
 import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
+import com.unibo.s3.main_system.game.AkkaSettings
 import com.unibo.s3.main_system.util.Box2dImplicits._
 import com.unibo.s3.main_system.util.GntMathUtils.keepInRange
 import com.unibo.s3.main_system.util.ScaleUtils
@@ -88,8 +89,8 @@ class LightingSystemModule extends BasicModuleWithGui {
       SystemManager.createActor(
         Props(new LightingActor), GeneralActors.LIGHTING_SYSTEM_ACTOR)
 
-    SystemManager
-      .getLocalActor(GeneralActors.WORLD_ACTOR)
+    SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
+      //.getRemoteActor(AkkaSettings.RemoteSystem, "/user/", GeneralActors.WORLD_ACTOR.name)
       .tell(RegisterAsWorldChangeObserver, lightingActor)
 
     val c = loadConfigFromPreferences(owner.getPrefs)

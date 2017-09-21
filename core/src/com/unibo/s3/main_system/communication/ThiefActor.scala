@@ -6,7 +6,7 @@ import com.unibo.s3.main_system.characters.steer.behaviors.BehaviorUtils._
 import com.unibo.s3.main_system.characters.steer.behaviors.{BehaviorUtils, Behaviors, Pursuer}
 import com.unibo.s3.main_system.characters.{BaseCharacter, Guard, Thief}
 import com.unibo.s3.main_system.communication.Messages._
-import com.unibo.s3.main_system.game.Wall
+import com.unibo.s3.main_system.game.{AkkaSettings, Wall}
 import com.unibo.s3.main_system.world.Exit
 import com.unibo.s3.main_system.world.actors.{AskObjectOnSightLineMsg, ObjectOnSightLineMsg}
 

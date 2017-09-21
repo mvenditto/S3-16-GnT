@@ -2,6 +2,7 @@ package com.unibo.s3.main_system.modules
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import com.badlogic.gdx.Input.Keys
+import akka.actor.{ActorRef, ActorSelection, Props, UntypedAbstractActor}
 import com.badlogic.gdx.graphics.Color._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
@@ -16,7 +17,7 @@ import com.unibo.s3.main_system.communication.CharacterActors._
 import com.unibo.s3.main_system.communication.GeneralActors.{apply => _, _}
 import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
-import com.unibo.s3.main_system.game.GameSettings
+import com.unibo.s3.main_system.game.{AkkaSettings, GameSettings}
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering._
 import com.unibo.s3.main_system.util.ImplicitConversions._
@@ -27,6 +28,7 @@ import com.unibo.s3.main_system.world.{BodyData, Exit}
 class MasterModule extends BasicModuleWithGui with GameOverlay {
   import MasterModule._
 
+  private[this] var viewDebug = false
   private[this] var graph: Option[GraphAdapter[Vector2]] = None
   private[this] var characters: Option[Iterable[BaseCharacter]] = None
   private[this] val thiefCaughtMsg = "Thief got caught!"
@@ -56,6 +58,9 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
 
       case SendAllCharactersMsg(_characters) =>
         characters = Option(_characters)
+
+      case ToggleViewDebug(d) =>
+        viewDebug = d
 
       case SendGraphMsg(g) =>
         graph = Option(g)
@@ -103,6 +108,9 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
 
   private def getActor(actor: GeneralActors.Value): ActorRef =
     SystemManager.getLocalActor(actor)
+
+  private def getRemoteActor(actor: String): ActorSelection =
+    SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/", actor)
 
   private def cacheMap(bodies: Iterable[Body]) = {
     worldMap = GntUtils.parseBodiesToMap(bodies).toList
@@ -153,17 +161,21 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
     val h = mapSize.y.toInt
 
     masterActor = getActor(GeneralActors.MASTER_ACTOR)
-    mapActor = getActor(GeneralActors.MAP_ACTOR)
+    mapActor = getRemoteActor(GeneralActors.MAP_ACTOR.name)
     worldActor = getActor(GeneralActors.WORLD_ACTOR)
     quadTreeActor = getActor(GeneralActors.QUAD_TREE_ACTOR)
-    graphActor = getActor(GeneralActors.GRAPH_ACTOR)
+    graphActor = getRemoteActor(GeneralActors.GRAPH_ACTOR.name)
     gameActor = SystemManager.createActor(
       GameActor.props(), GeneralActors.GAME_ACTOR)
-    spawnActor = getActor(GeneralActors.SPAWN_ACTOR)
     lightingActor = getActor(GeneralActors.LIGHTING_SYSTEM_ACTOR)
+    spawnActor = getRemoteActor(GeneralActors.SPAWN_ACTOR.name)
 
-    List(graphActor, quadTreeActor).foreach(a =>
-      a ! GameSettingsMsg(config))
+    graphActor ! GameSettingsMsg(config)
+
+    quadTreeActor ! GameSettingsMsg(config)
+
+    /*List(graphActor, quadTreeActor).foreach(a =>
+      a ! MapSettingsMsg(w, h))*/
 
     mapActor ! GameSettingsMsg(config)
 
@@ -191,6 +203,8 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
 
   override def render(shapeRenderer: ShapeRenderer): Unit = {
     super.render(shapeRenderer)
+
+    if(viewDebug) graph.foreach(g => renderer.renderGraph(shapeRenderer, g, DefaultGraphRenderingConfig))
     if (loadingFinished) {
       graph.foreach(g =>
         renderer.renderGraph(shapeRenderer, g, DefaultGraphRenderingConfig))
@@ -205,6 +219,11 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
 
       spriteRenderer.renderExits(exitLocations, owner.getCamera)
     }
+    characters.foreach(characters =>
+      characters.foreach(c => {
+        spriteRenderer.render(c, owner.getCamera)
+        if(viewDebug) renderer.renderCharacterDebugInfo(shapeRenderer, c)
+      }))
   }
 
   override def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit = {
@@ -213,17 +232,17 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
   }
 
   override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
-    if (button != 1){
+    if (button != 1 && viewDebug){
       spawnActor.tell(
-        GenerateNewCharacterPositionMsg(GUARD), masterActor)
+        GenerateNewCharacterPositionMsg(1, GUARD), masterActor)
     }
     false
   }
 
   override def keyUp(keycode: Int): Boolean = {
-    if(keycode == Input.Keys.T) {
+    if(keycode == Input.Keys.T && viewDebug) {
       spawnActor.tell(
-        GenerateNewCharacterPositionMsg(THIEF), masterActor)
+        GenerateNewCharacterPositionMsg(1, THIEF), masterActor)
     }
     false
   }
