@@ -90,7 +90,8 @@ class GeometryRendererImpl extends GeometryRenderer[Vector2]{
         shapeRenderer.setAutoShapeType(true)
 
         val renderNodeInfo = bc match {
-          case t:Thief if t.gotCaughtByGuard || t.hasReachedExit => false
+          case t:Thief if t.gotCaughtByGuard || t.hasReachedExit =>
+            false
           case _ => true
         }
 

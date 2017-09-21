@@ -1,7 +1,5 @@
 package com.unibo.s3.main_system.modules
 
-import akka.actor.{ActorRef, Props, UntypedAbstractActor}
-import com.badlogic.gdx.Input.Keys
 import akka.actor.{ActorRef, ActorSelection, Props, UntypedAbstractActor}
 import com.badlogic.gdx.graphics.Color._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -9,7 +7,7 @@ import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
 import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.{Gdx, Input, InputMultiplexer}
+import com.badlogic.gdx.{Input, InputMultiplexer}
 import com.kotcrab.vis.ui.widget.{BusyBar, VisLabel, VisWindow}
 import com.unibo.s3.Main
 import com.unibo.s3.main_system.characters.{BaseCharacter, Thief}
@@ -28,7 +26,7 @@ import com.unibo.s3.main_system.world.{BodyData, Exit}
 class MasterModule extends BasicModuleWithGui with GameOverlay {
   import MasterModule._
 
-  private[this] var viewDebug = false
+  private[this] var debugRendering = false
   private[this] var graph: Option[GraphAdapter[Vector2]] = None
   private[this] var characters: Option[Iterable[BaseCharacter]] = None
   private[this] val thiefCaughtMsg = "Thief got caught!"
@@ -60,7 +58,7 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
         characters = Option(_characters)
 
       case ToggleViewDebug(d) =>
-        viewDebug = d
+        debugRendering = d
 
       case SendGraphMsg(g) =>
         graph = Option(g)
@@ -68,7 +66,7 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
           Actions.sequence(Actions.fadeOut(1.5f), Actions.run(new Runnable {
             override def run(): Unit = {
                 busyBarWindow.remove()
-                loadingFinished=true
+                loadingFinished = true
                 lightingActor ! ToggleLightingSystem(loadingFinished)
               }
           })))
@@ -90,11 +88,11 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
 
   private[this] var masterActor: ActorRef = _
   private[this] var worldActor: ActorRef = _
-  private[this] var mapActor: ActorRef = _
-  private[this] var graphActor: ActorRef = _
+  private[this] var mapActor: ActorSelection = _
+  private[this] var graphActor: ActorSelection = _
   private[this] var quadTreeActor: ActorRef = _
   private[this] var gameActor: ActorRef = _
-  private[this] var spawnActor: ActorRef = _
+  private[this] var spawnActor: ActorSelection = _
   private[this] var lightingActor: ActorRef = _
 
   private[this] val renderer = new GeometryRendererImpl() with GraphCache
@@ -121,9 +119,6 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
       val thieves =  c.collect {case t: Thief => t}
       val evadedThieves = thieves.count(t => t.hasReachedExit)
       val caughtThieves = thieves.count(t => t.gotCaughtByGuard)
-
-      println(evadedThieves, caughtThieves, thieves.size)
-
 
       if (!gameOver && evadedThieves + caughtThieves == thieves.size) {
         endGameDialog.setModal(true)
@@ -171,17 +166,10 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
     spawnActor = getRemoteActor(GeneralActors.SPAWN_ACTOR.name)
 
     graphActor ! GameSettingsMsg(config)
-
     quadTreeActor ! GameSettingsMsg(config)
-
-    /*List(graphActor, quadTreeActor).foreach(a =>
-      a ! MapSettingsMsg(w, h))*/
-
     mapActor ! GameSettingsMsg(config)
-
     mapActor ! GenerateMapMsg()
     graphActor tell(AskForGraphMsg, gameActor)
-
     spawnActor ! GameSettingsMsg(config)
   }
 
@@ -204,26 +192,20 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
   override def render(shapeRenderer: ShapeRenderer): Unit = {
     super.render(shapeRenderer)
 
-    if(viewDebug) graph.foreach(g => renderer.renderGraph(shapeRenderer, g, DefaultGraphRenderingConfig))
     if (loadingFinished) {
-      graph.foreach(g =>
-        renderer.renderGraph(shapeRenderer, g, DefaultGraphRenderingConfig))
+      if (debugRendering)
+        graph.foreach(g =>renderer.renderGraph(shapeRenderer, g, DefaultGraphRenderingConfig))
 
       renderer.renderMap(shapeRenderer, worldMap)
 
       characters.foreach(characters =>
         characters.foreach(c => {
           spriteRenderer.render(c, owner.getCamera)
-          renderer.renderCharacterDebugInfo(shapeRenderer, c)
+          if (debugRendering) renderer.renderCharacterDebugInfo(shapeRenderer, c)
         }))
 
       spriteRenderer.renderExits(exitLocations, owner.getCamera)
     }
-    characters.foreach(characters =>
-      characters.foreach(c => {
-        spriteRenderer.render(c, owner.getCamera)
-        if(viewDebug) renderer.renderCharacterDebugInfo(shapeRenderer, c)
-      }))
   }
 
   override def attachInputProcessors(inputMultiplexer: InputMultiplexer): Unit = {
@@ -232,7 +214,7 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
   }
 
   override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
-    if (button != 1 && viewDebug){
+    if (button != 1 && debugRendering){
       spawnActor.tell(
         GenerateNewCharacterPositionMsg(1, GUARD), masterActor)
     }
@@ -240,7 +222,7 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
   }
 
   override def keyUp(keycode: Int): Boolean = {
-    if(keycode == Input.Keys.T && viewDebug) {
+    if(keycode == Input.Keys.T && debugRendering) {
       spawnActor.tell(
         GenerateNewCharacterPositionMsg(1, THIEF), masterActor)
     }

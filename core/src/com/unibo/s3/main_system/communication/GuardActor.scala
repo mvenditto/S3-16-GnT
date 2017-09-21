@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.Guard
 import com.unibo.s3.main_system.characters.steer.behaviors.Behaviors
 import com.unibo.s3.main_system.communication.Messages._
-import com.unibo.s3.main_system.game.AkkaSettings
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
 

@@ -6,7 +6,7 @@ import com.badlogic.gdx.physics.box2d.Body
 import Box2dImplicits._
 
 /**
-  * An utility class containing map parsing method.
+  * An utility class containing map parsing methods.
   *
   * @author mvenditto
   */
