@@ -19,6 +19,7 @@ import scala.collection.mutable
 
 case class CreatePointLightAt(p: Vector2, c: Color)
 case class AskIsPointAtShadow(p: Vector2)
+case class ToggleLightingSystem(f: Boolean)
 
 case class LightingSystemConfig(
   enableLightingSystem: Boolean,
@@ -44,6 +45,7 @@ class LightingSystemModule extends BasicModuleWithGui {
   private[this] var charactersUpdate = Set[BaseCharacter]()
   private[this] var worldShadowCopy: World = _
   private[this] var ambientLightIntensity = 0.2f
+  private[this] var renderLights = false
 
   private class LightingActor extends UntypedAbstractActor {
     override def onReceive(msg: Any): Unit = msg match {
@@ -61,6 +63,9 @@ class LightingSystemModule extends BasicModuleWithGui {
 
       case SendAllCharactersMsg(characters) =>
         characters.foreach(c => newCharacters += c)
+
+      case ToggleLightingSystem(f) =>
+        renderLights = f
 
       case CreatePointLightAt(p, c) =>
         val pl = new PointLight(
@@ -164,8 +169,6 @@ class LightingSystemModule extends BasicModuleWithGui {
 
   override def resize(newWidth: Int, newHeight: Int): Unit = {
     super.resize(newWidth, newHeight)
-    /*rayHandler.useCustomViewport(cam.position.x.toInt, cam.position.y.toInt,
-      cam.viewportWidth.toInt, cam.viewportHeight.toInt)*/
   }
 
   override def customRender(): Unit = {
@@ -174,8 +177,7 @@ class LightingSystemModule extends BasicModuleWithGui {
       cam.combined.cpy().scl(ScaleUtils.getPixelsPerMeter.toFloat),
       cam.position.x, cam.position.y,
       cam.viewportWidth * z, cam.viewportHeight * z)
-    rayHandler.updateAndRender()
-    //rayHandler.useDefaultViewport()
+    if (renderLights) rayHandler.updateAndRender()
   }
 
   override def cleanup(): Unit = {

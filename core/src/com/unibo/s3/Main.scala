@@ -65,9 +65,9 @@ class Main(ipCalc: String) extends AbstractMainApplication {
         println(err)
 
       case UserAck() if settings.isDefined =>
+        lighting.setup()
         master.initGame(settings.get)
         master.enable(true)
-        lighting.setup()
         lighting.enable(true)
         removeModule(bootstrapModule)
     })

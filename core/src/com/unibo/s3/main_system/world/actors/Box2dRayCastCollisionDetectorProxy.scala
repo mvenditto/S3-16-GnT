@@ -3,14 +3,11 @@ package com.unibo.s3.main_system.world.actors
 import akka.util.Timeout
 import com.badlogic.gdx.ai.utils.{Collision, Ray, RaycastCollisionDetector}
 import com.badlogic.gdx.math.Vector2
+import com.unibo.s3.main_system.world.actors.ActorRefOrSelection.{ActorRefOrSelectionHolder, _}
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
-import ActorRefOrSelection.{ActorRefOrSelectionHolder, _}
-import akka.actor.{Props, UntypedAbstractActor}
-import com.unibo.s3.main_system.communication.SystemManager
-import com.unibo.s3.main_system.game.AkkaSettings
 
 /**
   * A raycast collision detector, that works interacting with [[WorldActor]],

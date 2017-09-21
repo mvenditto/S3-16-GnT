@@ -2,11 +2,11 @@ package com.unibo.s3.main_system.communication
 
 import akka.actor.{Props, Stash, UntypedAbstractActor}
 import com.badlogic.gdx.math.Vector2
-import com.unibo.s3.main_system.characters.Guard.Guard
+import com.unibo.s3.main_system.characters.Guard
+import com.unibo.s3.main_system.characters.steer.behaviors.Behaviors
 import com.unibo.s3.main_system.communication.Messages._
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
-import com.unibo.s3.main_system.characters.steer.behaviors.Behaviors
 
 class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor with Stash {
 
@@ -34,12 +34,13 @@ class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor wi
       Behaviors.patrolIfHasNoTarget(guard)
 
     case msg: SendNeighboursMsg =>
-      msg.neighbours.foreach(neighbour => if(!neighbour.equals(getSelf())) guard.addNeighbour(neighbour))
+      msg.neighbours.foreach(
+        neighbour => if(!neighbour.equals(getSelf())) guard.addNeighbour(neighbour))
 
     case SendThievesInProximityMsg(thieves) =>
-      guard.chooseTarget(thieves)
+      Behaviors.guardPursueThieves(guard, thieves)
 
-    case _ => //println("(guardActor) message unknown:" + message)
+    case _ =>
   }
 
   def log() : String = "[CHARACTER " + guard.getId + "]: "

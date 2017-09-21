@@ -4,8 +4,8 @@ import com.badlogic.gdx.ai.steer.Proximity.ProximityCallback
 import com.badlogic.gdx.ai.steer.Steerable
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.BaseCharacter
-import com.unibo.s3.main_system.characters.Guard.Guard
-import com.unibo.s3.main_system.characters.Thief.Thief
+import com.unibo.s3.main_system.characters.Guard
+import com.unibo.s3.main_system.characters.Thief
 import com.unibo.s3.main_system.communication.Messages.{AskNeighboursMsg, InitialSavingCharacterMsg, RebuildQuadTreeMsg, SendNeighboursMsg, _}
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.world.actors.{FilterReachableByRay, SendFilterReachableByRay}
@@ -105,11 +105,9 @@ class QuadTreeActor extends UntypedAbstractActor {
           case _ => false
         })
 
-      if(thievesInProximity.nonEmpty) {
-        requester ! SendThievesInProximityMsg(thievesInProximity)
-        thievesInProximity.foreach(t =>
-          agentsTable(t) ! SendGuardsInProximityMsg(List(reqCharacter)))
-      }
+      requester ! SendThievesInProximityMsg(thievesInProximity)
+      thievesInProximity.foreach(t =>
+        agentsTable(t) ! SendGuardsInProximityMsg(List(reqCharacter)))
 
       nearbyRequestCache -= reqId
 

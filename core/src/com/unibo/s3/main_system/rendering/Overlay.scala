@@ -14,8 +14,8 @@ import com.kotcrab.vis.ui.widget.{VisLabel, VisTable}
 import com.kotcrab.vis.ui.widget.toast.Toast
 import com.unibo.s3.Main
 import com.unibo.s3.main_system.characters.BaseCharacter
-import com.unibo.s3.main_system.characters.Guard.Guard
-import com.unibo.s3.main_system.characters.Thief.Thief
+import com.unibo.s3.main_system.characters.Guard
+import com.unibo.s3.main_system.characters.Thief
 import com.unibo.s3.main_system.communication.Messages.{ThiefCaughtMsg, ThiefReachedExitMsg}
 import com.unibo.s3.main_system.modules.BasicModuleWithGui
 import com.unibo.s3.main_system.util.{GraphicsUtils, ScaleUtils}
@@ -143,7 +143,7 @@ trait GameOverlay extends Overlay {
     })
   }
 
-  protected def showPopupFadingTest(pos: Vector2, msg: String, duration: Float, col: Color): Unit = {
+  protected def showPopupFadingText(pos: Vector2, msg: String, duration: Float, col: Color): Unit = {
     val vs = new LabelStyle()
     vs.font = fadeTextFont
     vs.fontColor = col
