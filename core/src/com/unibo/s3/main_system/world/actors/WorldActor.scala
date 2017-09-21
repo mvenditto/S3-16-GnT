@@ -15,13 +15,6 @@ import com.unibo.s3.main_system.util.GntUtils
 import com.unibo.s3.main_system.world.{BodyData, Exit, Hideout}
 import net.dermetfan.gdx.physics.box2d.WorldObserver
 
-case class CollisionHolder(point: Vector2, normal: Vector2)
-
-object CollisionHolder{
-  def of(c: Collision[Vector2]): CollisionHolder =
-    CollisionHolder(c.point, c.normal)
-}
-
 case class RayCastCollidesQuery(rayStart: Vector2, rayEnd: Vector2)
 case class RayCastCollidesResponse(collides: Boolean)
 case class RayCastCollisionQuery(rayStart: Vector2, rayEnd: Vector2)

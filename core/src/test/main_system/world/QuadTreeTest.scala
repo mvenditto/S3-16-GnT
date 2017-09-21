@@ -4,7 +4,7 @@ import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.physics.box2d.World
 import com.unibo.s3.main_system.characters.BaseCharacter
-import com.unibo.s3.main_system.characters.Guard.Guard
+import com.unibo.s3.main_system.characters.Guard
 import com.unibo.s3.main_system.communication.GeneralActors._
 import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.communication.{AskNeighboursWithinFovMsg, QuadTreeActor, SystemManager}

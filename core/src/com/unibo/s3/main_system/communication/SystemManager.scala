@@ -20,7 +20,7 @@ object SystemManager {
     if(portNumber.isDefined && ip.isDefined)
       this.system = ActorSystem.create(systemName, ConfigFactory.parseString(
         "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," +
-          "\"loglevel\":\"ERROR\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" +
+          "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" +
           ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
           ",\"netty\":{\"tcp\":{\"hostname\":\""+ ip.get +"\",\"port\":"+portNumber.get+"}}}}}"))
     else {
@@ -62,9 +62,6 @@ object SystemManager {
   }
 
   def getRemoteActor(systemName: String, path: String, actorName: String): ActorSelection = {
-    /*var portNumber: Int = 0
-    if(systemName.equals(AkkaSettings.GUISystem)) portNumber = AkkaSettings.GUISystemPort
-    else portNumber = AkkaSettings.ComputeSystemPort*/
     val tmp = new StringBuilder(60)
     tmp.append("akka.tcp://")
     tmp.append(systemName)

@@ -7,8 +7,8 @@ import com.badlogic.gdx.graphics.{Camera, Color, Texture}
 import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.utils.Disposable
 import com.unibo.s3.main_system.characters.BaseCharacter
-import com.unibo.s3.main_system.characters.Guard.Guard
-import com.unibo.s3.main_system.characters.Thief.Thief
+import com.unibo.s3.main_system.characters.Guard
+import com.unibo.s3.main_system.characters.Thief
 import com.unibo.s3.main_system.characters.steer.MovableEntity
 import com.unibo.s3.main_system.game.Wall
 import com.unibo.s3.main_system.util.ScaleUtils

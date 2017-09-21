@@ -4,24 +4,28 @@ import com.badlogic.gdx.ai.steer.Proximity.ProximityCallback
 import com.badlogic.gdx.ai.steer.Steerable
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.BaseCharacter
-import com.unibo.s3.main_system.characters.Guard.Guard
-import com.unibo.s3.main_system.characters.Thief.Thief
+import com.unibo.s3.main_system.characters.Guard
+import com.unibo.s3.main_system.characters.Thief
 import com.unibo.s3.main_system.communication.Messages.{AskNeighboursMsg, InitialSavingCharacterMsg, RebuildQuadTreeMsg, SendNeighboursMsg, _}
 import com.unibo.s3.main_system.game.AkkaSettings
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.world.actors.{FilterReachableByRay, SendFilterReachableByRay}
 import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
 
+import scala.collection.mutable
+
 case class AskNeighboursWithinFovMsg(character: BaseCharacter)
 case class SendThievesInProximityMsg(thieves: Iterable[BaseCharacter])
 case class SendGuardsInProximityMsg(thieves: Iterable[BaseCharacter])
+case class AskNearbyGuardsMsg(c: BaseCharacter, r: Option[Float] = None)
+case class SendNearbyGuardsMsg(n: Iterable[ActorRef])
 
 class QuadTreeActor extends UntypedAbstractActor {
 
   type RequestId = (Long, Int)
 
-  private[this] var agentsTable = Map[BaseCharacter, ActorRef]()
-  private[this] var nearbyRequestCache = Map[RequestId, Iterable[BaseCharacter]]()
+  private[this] var agentsTable = mutable.AnyRefMap[BaseCharacter, ActorRef]()
+  private[this] var nearbyRequestCache = mutable.AnyRefMap[RequestId, Iterable[BaseCharacter]]()
   private[this] var bounds = Bounds(0, 0, 100, 100)
   private[this] var root = QuadTreeNode[BaseCharacter](Bounds(0, 0, 60, 60))
   private[this] val queryRadius = 5f
@@ -44,17 +48,19 @@ class QuadTreeActor extends UntypedAbstractActor {
     case InitialSavingCharacterMsg(newCharacter, characterRef) =>
       agentsTable += (newCharacter -> characterRef)
       val ref = SystemManager.getLocalActor(GeneralActors.GAME_ACTOR)
-      /*SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
-        GeneralActors.GAME_ACTOR.name)*/
       ref ! SendAllCharactersMsg(agentsTable.keys)
       val refLig = SystemManager.getLocalActor(GeneralActors.LIGHTING_SYSTEM_ACTOR)
-      /*SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
-        GeneralActors.LIGHTING_SYSTEM_ACTOR.name)*/
       refLig ! SendAllCharactersMsg(agentsTable.keys)
 
     case RebuildQuadTreeMsg() =>
       root = QuadTreeNode(bounds)
-      agentsTable.keys.foreach(c => root.insert(c))
+      agentsTable.foreachKey(c => root.insert(c))
+
+    case AskNearbyGuardsMsg(character, radius) =>
+      val neighbours = queryForNeighbors(character, radius)
+      sender ! SendNearbyGuardsMsg(neighbours.collect {
+        case n: Guard if !agentsTable(n).equals(sender) => agentsTable(n)
+      })
 
     case AskNeighboursMsg(character, radius) =>
       val neighbours = queryForNeighbors(character, radius)
@@ -82,8 +88,6 @@ class QuadTreeActor extends UntypedAbstractActor {
         nearbyRequestCache += (reqId -> neighborsInFov)
 
         val refWorld = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
-        /*val refWorld = SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
-          GeneralActors.WORLD_ACTOR.name)*/
         refWorld ! filterOnlyOnSightLine
 
       } else {
@@ -91,7 +95,6 @@ class QuadTreeActor extends UntypedAbstractActor {
       }
 
     case SendFilterReachableByRay(filter, reqId) =>
-
       val onlyVisible = nearbyRequestCache(reqId)
         .zip(filter)
         .collect{case (x, true) => x}
@@ -110,11 +113,9 @@ class QuadTreeActor extends UntypedAbstractActor {
           case _ => false
         })
 
-      if(thievesInProximity.nonEmpty) {
-        requester ! SendThievesInProximityMsg(thievesInProximity)
-        thievesInProximity.foreach(t =>
-          agentsTable(t) ! SendGuardsInProximityMsg(List(reqCharacter)))
-      }
+      requester ! SendThievesInProximityMsg(thievesInProximity)
+      thievesInProximity.foreach(t =>
+        agentsTable(t) ! SendGuardsInProximityMsg(List(reqCharacter)))
 
       nearbyRequestCache -= reqId
 

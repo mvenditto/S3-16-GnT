@@ -4,8 +4,8 @@ import akka.actor.{ActorRef, Props, Stash, UntypedAbstractActor}
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
-import com.unibo.s3.main_system.characters.Guard.Guard
-import com.unibo.s3.main_system.characters.Thief.Thief
+import com.unibo.s3.main_system.characters.Guard
+import com.unibo.s3.main_system.characters.Thief
 import com.unibo.s3.main_system.characters.{BaseCharacter, EntitiesSystemImpl}
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory
 import com.unibo.s3.main_system.communication.Messages._

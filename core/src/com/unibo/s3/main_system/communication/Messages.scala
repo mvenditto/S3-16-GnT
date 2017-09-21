@@ -27,7 +27,7 @@ object Messages {
   case class SendNeighboursMsg(neighbours: Iterable[ActorRef])
   case class AskAllCharactersMsg()
   case class SendAllCharactersMsg(characters: Iterable[BaseCharacter])
-  case class SendCopInfoMsg(visitedVertices: List[Vector2])
+  case class SendGuardInfoMsg(visitedVertices: Iterable[Vector2])
 
   //messages for GameActor
   case class ThiefCaughtMsg(thief: BaseCharacter, guard: BaseCharacter)
@@ -41,6 +41,7 @@ object Messages {
 
   //message for SpawnActor
   case class GenerateNewCharacterPositionMsg(num: Int, characterType: CharacterActors)
+  case class ResetSpawnMsg()
 
   //message for CommunciatorActor
   case class SendIPMsg(IP: String)

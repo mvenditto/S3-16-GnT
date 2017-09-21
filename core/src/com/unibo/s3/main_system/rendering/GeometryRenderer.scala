@@ -6,12 +6,6 @@ import com.badlogic.gdx.math.{Rectangle, Vector}
 import com.unibo.s3.main_system.characters.steer.MovableEntity
 import com.unibo.s3.main_system.graph.GraphAdapter
 
-/*A container for the information needed to render a waypoints graph.*/
-case class GraphRenderingConfig(
-  edgeColor: Color,
-  vertexColor: Color,
-  vertexRadius: Float)
-
 /**
   *
   * This trait describes a renderer specialized in geometry/debug
