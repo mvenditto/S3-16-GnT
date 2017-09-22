@@ -57,6 +57,7 @@ class SpriteRenderer extends Disposable {
       case x if x < idleThreshold => (guardIdle, guardFeetIdle)
       case x if x < runThreshold => (guardMove, guardFeetWalk)
       case x if x > runThreshold => (guardMove, guardFeetRun)
+      case _ => (guardIdle, guardFeetIdle)
     }
 
     val body = getAndCacheAnimation(a._1, c)

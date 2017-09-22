@@ -1,5 +1,4 @@
 package com.unibo.s3.main_system.characters.steer.behaviors
-
 import com.badlogic.gdx.ai.steer.SteeringBehavior
 import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.unibo.s3.main_system.characters.{BaseCharacter, Guard, Thief}
@@ -8,12 +7,9 @@ import com.unibo.s3.main_system.util.GdxImplicits._
 import scala.util.Random
 
 /**
-  * This trait represent a behavior and follows the Command pattern.
-  *
-  * @author mvenditto
-  *
+  * A collection of functions defining behaviors that can be adopted by
+  * characters.
   */
-
 object Behaviors {
 
   import BehaviorUtils._
@@ -194,9 +190,4 @@ object BehaviorUtils {
       case _ => n.headOption
     }
   }
-
-  implicit class AugmentedVector2(v: Vector2) {
-    def getPosition(): Vector2 = v
-  }
-
 }

@@ -7,9 +7,9 @@ import com.unibo.s3.main_system.graph.GraphAdapter
 import scala.collection.mutable
 
 /**
-  * This trait enables caching of the waypoints graph in a GeometryRenderer.
+  * This trait can mixed with a [[GeometryRenderer]] enabling caching of the waypoints graph.
   * Used when the graph doesn't changes over time and can be stored and
-  * then accessed more efficiently later.
+  * then accessed more efficiently later for rendering.
   *
   * @author mvenditto
   */

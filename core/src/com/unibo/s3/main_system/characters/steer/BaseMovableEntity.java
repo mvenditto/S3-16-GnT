@@ -22,7 +22,7 @@ import java.util.List;
  /**
  * This class implements a basic entity
  * with facility methods for setting {@link SteeringBehavior}(s) to it
- * and collision and proximity management.
+ * and collision/proximity management.
  *
  * @author mvenditto
  * */
@@ -43,7 +43,7 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
     private final static float mainRayLength = 10.0f;
     private final static float minMainRayLength = 1.1f; //1.5f
     private final static float whiskerLength = 0.8f; //1.0
-    private final static float whiskerAngle = 30; //35
+    private final static float whiskerAngle = 35f;
     private final static float rayCastingDistFromBoundary = 1.1f;
     private final static float proximityDetectionRadius = 10f;
 

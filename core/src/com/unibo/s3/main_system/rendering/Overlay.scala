@@ -20,6 +20,12 @@ import com.unibo.s3.main_system.communication.Messages.{ThiefCaughtMsg, ThiefRea
 import com.unibo.s3.main_system.modules.BasicModuleWithGui
 import com.unibo.s3.main_system.util.{GraphicsUtils, ScaleUtils}
 
+/**
+  * A trait that can be mixed with a [[BasicModuleWithGui]] to
+  * add an 'overlay' layer rendered on top of the module gui.
+  *
+  * @author mvenditto
+  */
 trait Overlay extends BasicModuleWithGui {
 
   protected var overlay: Stage = _
@@ -52,6 +58,10 @@ trait Overlay extends BasicModuleWithGui {
   }
 }
 
+/**
+  * An implementation of [[Overlay]] that provides the possibility
+  * to show various kind of notifications on the 'overlay' layer.
+  */
 trait GameOverlay extends Overlay {
 
   private var fadeTextFont: BitmapFont = _
@@ -80,14 +90,34 @@ trait GameOverlay extends Overlay {
     toastFont = GraphicsUtils.createBitmapFromTtf("fonts/OpenSans-SemiBold.ttf", toastFontSize)
   }
 
+  /**
+    * Set the duration of the notifications
+    * @param d the new duration
+    */
   def setToastFadeDuration(d: Float): Unit = toastFadeDuration = d
 
+  /**
+    * Set the duration of fading effect of 'fading text notifications'
+    * @param d the new duration
+    */
   def setFadeDuration(d: Float): Unit = fadeTextDuration = d
 
+  /**
+    * Set how much a 'fading text notification' moves up when fading out.
+    * @param y the new duration
+    */
   def setFadeTextMoveYBy(y: Float): Unit = fadeTextMoveYBy = y
 
+  /**
+    * Set the font for the 'fading text notification'
+    * @param f the new font to set
+    */
   def setFadeTextFont(f: BitmapFont): Unit = fadeTextFont = f
 
+  /**
+    * Set the font for the 'toast notifications'
+    * @param f the new font to test
+    */
   def setToastFont(f: BitmapFont): Unit = toastFont = f
 
   private def characterTag(c: BaseCharacter): String = {
@@ -99,6 +129,10 @@ trait GameOverlay extends Overlay {
     tmp + openSquareBracket + c.getId + closedSquareBracket
   }
 
+  /**
+    * Show a 'toast notification' based on the gameEvent provided.
+    * @param gameEvent the given game event
+    */
   protected def showGameEventToast(gameEvent: Any): Unit = {
     val toast: Option[Toast] = gameEvent match {
       case ThiefCaughtMsg(t, g) =>
@@ -134,16 +168,14 @@ trait GameOverlay extends Overlay {
     toast.foreach(t => notifications.show(t, toastFadeDuration))
   }
 
-  def addExits(exits: Iterable[Vector2]): Unit = {
-    val s = ScaleUtils.getPixelsPerMeter
-    exits.foreach(e => {
-      val ex = GraphicsUtils.loadIconAsImage("sprites/popup4.png")
-      ex.setPosition(e.x * s, e.y * s)
-      overlay.addActor(ex)
-    })
-  }
 
-  protected def showPopupFadingText(pos: Vector2, msg: String, duration: Float, col: Color): Unit = {
+  /**
+    * Show a notification text that fades out when moving up of a predefined amount.
+    * @param pos the position where to show the text
+    * @param msg the message to show
+    * @param col the color of the text to show
+    */
+  protected def showPopupFadingText(pos: Vector2, msg: String, col: Color): Unit = {
     val vs = new LabelStyle()
     vs.font = fadeTextFont
     vs.fontColor = col
