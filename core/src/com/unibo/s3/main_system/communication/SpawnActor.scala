@@ -8,7 +8,7 @@ import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.game.{GameSettings, Wall}
 import com.unibo.s3.main_system.spawn.{GuardSpawningStrategy, SpawnPointGenerator, ThiefSpawningStrategy}
 import com.unibo.s3.main_system.game.{AkkaSettings, Wall}
-import com.unibo.s3.main_system.spawn.{GuardStrategy, SpawnPointGenerator, ThiefStrategy}
+import com.unibo.s3.main_system.spawn.{GuardSpawningStrategy, SpawnPointGenerator, ThiefSpawningStrategy}
 import com.unibo.s3.main_system.util.GntUtils
 
 class SpawnActor extends UntypedAbstractActor with Stash {
@@ -26,6 +26,7 @@ class SpawnActor extends UntypedAbstractActor with Stash {
 
   private def mapSettings(): Receive = {
     case GameSettingsMsg(g) =>
+      println("Settings: ", g)
       val wt = g.mapSize.cpy().scl(1.0f / Wall.WALL_THICKNESS)
       this.map = Array.ofDim[Int](wt.x.toInt, wt.y.toInt)
       self ! GenerateNewCharacterPositionMsg(g.guardsNumber, CharacterActors.GUARD)
@@ -40,7 +41,7 @@ class SpawnActor extends UntypedAbstractActor with Stash {
       val lineElements = GntUtils.parseMapEntry(msg.line)
       if (lineElements._1.forall(value => value != 0.0
         && value != (this.map.length * WALL_THICKNESS + WALL_NUMBER * WALL_THICKNESS)
-        && lineElements._2.isEmpty)) {
+        && lineElements._2.isEmpty) && lineElements._1(0).toInt != 1 &&  lineElements._1(0).toInt < 83) {
         val x = lineElements._1(0).toInt
         val y = lineElements._1(1).toInt
 
@@ -63,7 +64,7 @@ class SpawnActor extends UntypedAbstractActor with Stash {
       if (msg.characterType.equals(CharacterActors.GUARD))
         this.spawnGenerator.setSpawnStrategy(guardStrategy)
       else
-        this.spawnGenerator.setSpawnStrategy(ThiefStrategy())
+        this.spawnGenerator.setSpawnStrategy(ThiefSpawningStrategy())
 
       val ref = SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
         GeneralActors.MASTER_ACTOR.name)

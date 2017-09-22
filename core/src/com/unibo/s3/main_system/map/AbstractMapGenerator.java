@@ -220,7 +220,7 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
 
     private List<Vector2> generateMultipleExits(){
         List<Vector2> exits = new ArrayList<>();
-        for(int i = 0; i < 5; i ++) {
+        for(int i = 0; i < 2; i ++) {
             exits.addAll(generateCardinalExits());
         }
         return exits;

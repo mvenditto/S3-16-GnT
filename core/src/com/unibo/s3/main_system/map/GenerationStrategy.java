@@ -6,7 +6,7 @@ public interface GenerationStrategy {
 
     void initialSetup(int width, int height);
 
-    void generate(int n, int mapWidth, int mapHeight, int startX, int startY);
+    void generate(int mapWidth, int mapHeight, int startX, int startY);
 
     List<String> getMap();
 }

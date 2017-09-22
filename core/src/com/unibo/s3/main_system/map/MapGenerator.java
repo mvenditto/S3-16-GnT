@@ -12,7 +12,7 @@ public class MapGenerator {
 
     public void generateMap(int width, int height) {
         strategy.initialSetup(width/BASE_UNIT, height/BASE_UNIT);
-        strategy.generate(8, width/BASE_UNIT, height/BASE_UNIT, 0, 0); }/**todo eliminare primo parametro**/
+        strategy.generate(width/BASE_UNIT, height/BASE_UNIT, 0, 0); }
 
     public List<String> getMap() { return strategy.getMap(); }
 

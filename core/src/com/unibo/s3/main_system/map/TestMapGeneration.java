@@ -25,7 +25,7 @@ public class TestMapGeneration {
     @Test
     public void testRoomsGeneration(){
         generator.setStrategy(new RoomMapGenerator());
-        for(int i = 0; i < 100; i++){
+        for(int i = 0; i < 10000; i++){
             try{
                 generator.generateMap(60, 60);
             }catch (Exception e){
@@ -37,7 +37,7 @@ public class TestMapGeneration {
     @Test
     public void testMazeGeneration(){
         generator.setStrategy(new MazeMapGenerator());
-        for(int i = 0; i < 100; i++){
+        for(int i = 0; i < 10000; i++){
             try{
                 generator.generateMap(60, 60);
             }catch (Exception e){

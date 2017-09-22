@@ -17,6 +17,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
+
 trait Character {
 
   /**initial graph setting*/
@@ -120,7 +121,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
     currentNode
   }
 
-  private def selectPriorityDestination : Option[Vector2] = {
+  private def selectPriorityDestination() : Option[Vector2] = {
 
     var list = index.neighborListOf(currentNode.get).asScala
     var out : Option[Vector2] = None
@@ -173,13 +174,13 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
         discoverNewVertex(nearest)
         previousNode = currentNode
         currentNode = nearest
-        currentDestination = selectPriorityDestination
+        currentDestination = selectRandomDestination()
         setNewDestination(currentDestination.get)
       case _ =>
     }
 
     if (!computeNeighbours.forall(p => p.contains(getCurrentDestination))) {
-      currentDestination = selectRandomDestination()
+      currentDestination = selectPriorityDestination()
       setNewDestination(currentDestination.get)
     }
     nearest

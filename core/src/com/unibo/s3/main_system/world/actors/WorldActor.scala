@@ -145,7 +145,7 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       val body = entry._1
       val bodyData = entry._2
 
-      val newBody = world.createBox(new Vector2(body(0), body(1)), new Vector2(body(2), body(3)))
+      val newBody = world.createBox(new Vector2(body(0) - 0.3f, body(1) - 0.3f), new Vector2(body(2), body(3)))
       bodyData.foreach(bodyData =>
           parseBodyData(bodyData, newBody).foreach(bd => newBody.setUserData(bd)))
       worldObserver.getListener.created(newBody)

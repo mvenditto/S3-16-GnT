@@ -3,11 +3,11 @@ package com.unibo.s3.main_system.map;
 public class RoomMapGenerator extends AbstractMapGenerator {
 
     @Override
-    public void generate(int n, int width, int height, int startX, int startY){
-        int lowerX = (width/2 );//+ width/6);
-        int upperX = (width/2);//) - width/6);
-        int lowerY = (height/2);// + height/6);
-        int upperY = (height/2);// - width/6);
+    public void generate(int width, int height, int startX, int startY){
+        int lowerX = (width/2 ) - 1;//+ width/6);
+        int upperX = (width/2) + 1;//) - width/6);
+        int lowerY = (height/2) - 1;// + height/6);
+        int upperY = (height/2) + 1;// - width/6);
         width--;
         height--;
         /**relative position, not absolute*/
@@ -36,14 +36,11 @@ public class RoomMapGenerator extends AbstractMapGenerator {
         buildDoor((startX + wallV), door1Coord);
         buildDoor(door2Coord, (startY + wallH));
         buildDoor((startX + wallV), door3Coord);
-
-        if (n <= 2) {
-            return;
-        }else{
-            generate(n/2, wallV, wallH, startX, startY);
-            generate(n/2, width - wallV , wallH, startX+wallV+1, startY);
-            generate(n/2, wallV, height - wallH, startX, startY+wallH+1);
-            generate(n/2, width - wallV, height - wallH,startX+wallV+1, startY+wallH+1);
+        if (height > 15){
+            generate(wallV, wallH, startX, startY);
+            generate(width - wallV , wallH, startX+wallV+1, startY);
+            generate(wallV, height - wallH, startX, startY+wallH+1);
+            generate(width - wallV, height - wallH,startX+wallV+1, startY+wallH+1);
         }
     }
 }
