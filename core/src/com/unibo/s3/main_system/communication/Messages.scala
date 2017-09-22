@@ -14,7 +14,7 @@ object Messages {
 
   //message for MapActor
   case class GameSettingsMsg(g: GameSettings)
-  case class GenerateMapMsg() //ci va un flag con la tipologia di grafo
+  case class GenerateMapMsg()
 
   //message for GraphActor
   case class MapElementMsg(line: String)

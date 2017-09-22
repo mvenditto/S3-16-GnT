@@ -206,8 +206,6 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
 
   def getCurrentDestination: Vector2 = currentDestination.getOrElse(new Vector2())
 
-  private def log() = "Agent " + id + ": "
-
   override def equals(o: scala.Any): Boolean = {
     o match {
       case other: BaseCharacter => other.getId == id
