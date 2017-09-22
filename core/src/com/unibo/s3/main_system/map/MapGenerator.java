@@ -5,6 +5,10 @@ import com.unibo.s3.main_system.game.Wall;
 
 import java.util.List;
 
+/**
+ * Map generator class with settable strategy
+ * @author Nicola Santolini
+ */
 public class MapGenerator {
 
     private static final int BASE_UNIT = Wall.WALL_THICKNESS();

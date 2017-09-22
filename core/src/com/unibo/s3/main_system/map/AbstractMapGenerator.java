@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * Abstract class of the map generator
  * @author Nicola Santolini
  */
 public abstract class AbstractMapGenerator implements GenerationStrategy{

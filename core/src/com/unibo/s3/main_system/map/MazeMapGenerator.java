@@ -1,6 +1,7 @@
 package com.unibo.s3.main_system.map;
 
 /**
+ * Generator for maze-like maps
  * @author Nicola Santolini
  */
 public class MazeMapGenerator extends AbstractMapGenerator {

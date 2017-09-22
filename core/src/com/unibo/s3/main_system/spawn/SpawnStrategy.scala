@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2
 
 /**
   * @author Nicola Santolini
+  * @author Daniele Rosetti
   */
 trait SpawnStrategy {
 

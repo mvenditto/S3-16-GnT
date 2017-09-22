@@ -19,6 +19,8 @@ import scala.util.Random
 
 /**
   * Trait for a generic character
+  * @author Nicola Santolini
+  * @author mvenditto
   */
 trait Character {
 
@@ -54,6 +56,11 @@ trait Character {
 
 }
 
+/**
+  * Abstract class for character
+  * @param vector2 Initial position
+  * @param id Character's id
+  */
 abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEntity(vector2) with Character {
   private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _
 
@@ -61,7 +68,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   private var previousNode : Option[Vector2] = Option[Vector2](new Vector2())
 
   private var visited = mutable.ArrayBuffer[Vector2]()
-  private var visitedBuffer = mutable.ArrayBuffer[Vector2]()
+  private val visitedBuffer = mutable.ArrayBuffer[Vector2]()
   private var index : NeighborIndex[Vector2,DefaultEdge] = _
   private var currentDestination : Option[Vector2] = None
 
@@ -219,8 +226,16 @@ case class Guard(vector2: Vector2, id : Int) extends BaseCharacter(vector2, id){
 
   override def getTarget: Option[Target[BaseCharacter]] = fugitive
 
+  /**
+    * Getter of target's presence
+    * @return True if there is a target
+    */
   def hasTarget: Boolean = fugitive.isDefined
 
+  /**
+    * Setter for a target
+    * @param f Fugitive target
+    */
   def setFugitiveTarget(f: Option[Fugitive]): Unit = fugitive = f
 
 }
@@ -232,16 +247,40 @@ case class Thief(vector2: Vector2, id : Int) extends BaseCharacter(vector2, id){
   private var hasReachedExit_ = false
   private var gotCaughtByGuard_ = false
 
+  /**
+    * Checks if the thief gets captured
+    * @return True if captured
+    */
   def gotCaughtByGuard: Boolean = gotCaughtByGuard_
 
+  /**
+    * Checks if an exit is reached
+    * @return True if an exit is reached
+    */
   def hasReachedExit: Boolean = hasReachedExit_
 
+  /**
+    * Setter for reached exit
+    * @param f Exit reached or not
+    */
   def setReachedExit(f: Boolean): Unit = hasReachedExit_ = f
 
+  /**
+    * Sets if the thief has been captured or not
+    * @param f Got or not
+    */
   def setGotCaughtByGuard(f: Boolean): Unit = gotCaughtByGuard_ = f
 
+  /**
+    * Getter for a setted target
+    * @return True if a target is defined
+    */
   def hasTarget: Boolean = pursuer.isDefined
 
+  /**
+    * Setter for a pursuer
+    * @param p The pursuer
+    */
   def setPursuerTarget(p: Option[Pursuer]): Unit = pursuer = p
 
   override def getTarget: Option[Target[BaseCharacter]] = pursuer

@@ -7,6 +7,7 @@ import scala.util.Random
 
 /**
   * @author Nicola Santolini
+  * @author Daniele Rosetti
   */
 class ThiefSpawningStrategy extends SpawnStrategy {
 

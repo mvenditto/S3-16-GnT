@@ -17,6 +17,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Class for map's test
  * @author Nicola Santolini
  */
 public class TestMapGeneration {

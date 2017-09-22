@@ -6,6 +6,7 @@ import scala.util.Random
 
 /**
   * @author Nicola Santolini
+  * @author Daniele Rosetti
   */
 class GuardSpawningStrategy extends SpawnStrategy {
 

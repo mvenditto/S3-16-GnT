@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * @author Nicola Santolini
+ * @author Daniele Rosetti
  */
 public class SpawnPointGenerator {
 
