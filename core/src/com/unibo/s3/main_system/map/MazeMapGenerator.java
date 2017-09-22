@@ -4,6 +4,13 @@ public class MazeMapGenerator extends AbstractMapGenerator {
 
     private static final int MAZE_HEIGHT_THRESHOLD = 10;
 
+    /**
+     *
+     * @param width
+     * @param height
+     * @param startX
+     * @param startY
+     */
     @Override
     public void generate(int width, int height, int startX, int startY){
         /**relative position, not absolute*/

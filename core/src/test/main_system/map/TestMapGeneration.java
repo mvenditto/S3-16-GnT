@@ -1,6 +1,9 @@
-package com.unibo.s3.main_system.map;
+package map;
 
 import com.badlogic.gdx.math.Vector2;
+import com.unibo.s3.main_system.map.MapGenerator;
+import com.unibo.s3.main_system.map.MazeMapGenerator;
+import com.unibo.s3.main_system.map.RoomMapGenerator;
 import com.unibo.s3.main_system.spawn.GuardSpawningStrategy;
 import com.unibo.s3.main_system.spawn.SpawnPointGenerator;
 import com.unibo.s3.main_system.spawn.ThiefSpawningStrategy;
@@ -15,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TestMapGeneration {
 
-    MapGenerator generator;
+    private MapGenerator generator;
 
     @Before
     public void init(){
@@ -43,15 +46,6 @@ public class TestMapGeneration {
             }catch (Exception e){
                 e.printStackTrace();
             }
-        }
-    }
-
-    @Test
-    public void testRangeGen(){
-        MazeMapGenerator generator = new MazeMapGenerator();
-        for(int i = 0; i < 1000; i++){
-            int gen = generator.generateInRange(0, 100);
-            assertTrue(gen >= 0 && gen <= 100);
         }
     }
 

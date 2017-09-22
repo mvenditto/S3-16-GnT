@@ -12,13 +12,8 @@ import java.util.Random;
 
 public abstract class AbstractMapGenerator implements GenerationStrategy{
 
-
     private int BASE_UNIT = Wall.WALL_THICKNESS();
     private static final float HALF_BASE_UNIT = Wall.WALL_THICKNESS()/2;
-    private static final int LEFT_WALL = 0;
-    private static final int RIGHT_WALL = 1;
-    private static final int LOWER_WALL = 2;
-    private static final int UPPER_WALL = 3;
 
     private int widthSplits;
     private int heightSplits;
@@ -57,16 +52,11 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
 
     private ArrayList<String> generatePerimeterWalls(){
         ArrayList<String> perimeter = new ArrayList<>();
-        //perimeter.add(HALF_BASE_UNIT + SEPARATOR + ((heightSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR +  (BASE_UNIT * heightSplits + BASE_UNIT * 2));
         perimeter.add(concat(Arrays.asList(HALF_BASE_UNIT,(float) ((heightSplits * BASE_UNIT)/2 + BASE_UNIT), (float) BASE_UNIT, (float)(BASE_UNIT * heightSplits + BASE_UNIT * 2))));
-        ///perimeter.add(((widthSplits * BASE_UNIT) + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + ((heightSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + (BASE_UNIT * heightSplits + BASE_UNIT * 2));
         perimeter.add(concat(Arrays.asList(((widthSplits * BASE_UNIT) + BASE_UNIT + HALF_BASE_UNIT),(float) ((heightSplits * BASE_UNIT)/2 + BASE_UNIT), (float) BASE_UNIT, (float)(BASE_UNIT * heightSplits + BASE_UNIT * 2))));
-        //perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + HALF_BASE_UNIT + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
         perimeter.add(concat(Arrays.asList((float) ((widthSplits * BASE_UNIT)/2 + BASE_UNIT), HALF_BASE_UNIT, (float) (BASE_UNIT * widthSplits + BASE_UNIT * 2), (float) BASE_UNIT)));
-        //perimeter.add(((widthSplits * BASE_UNIT)/2 + BASE_UNIT) + SEPARATOR + (heightSplits * BASE_UNIT + BASE_UNIT + HALF_BASE_UNIT) + SEPARATOR + (BASE_UNIT * widthSplits + BASE_UNIT * 2) + SEPARATOR + BASE_UNIT);
         perimeter.add(concat(Arrays.asList((float) ((widthSplits * BASE_UNIT)/2 + BASE_UNIT), (heightSplits * BASE_UNIT + BASE_UNIT + HALF_BASE_UNIT), (float) (BASE_UNIT * widthSplits + BASE_UNIT * 2), (float) BASE_UNIT)));
 
-        //for(Vector2 exit : generateCardinalExits()) {
         for(Vector2 exit : generateMultipleExits()) {
             perimeter.add(((exit.x * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + ((exit.y * BASE_UNIT) + HALF_BASE_UNIT) + SEPARATOR + BASE_UNIT + SEPARATOR + (BASE_UNIT) + SEPARATOR + "E");
         }
@@ -77,18 +67,6 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
         String s;
         s = list.get(0) + SEPARATOR + list.get(1) + SEPARATOR + list.get(2) + SEPARATOR + list.get(3);
         return s;
-    }
-
-    protected void buildWall(boolean orientation, int coord){
-        if(orientation){ //vertical wall
-            for(int i = 0; i < widthSplits; i++){
-                this.generatedMap[coord - 1][i] = 1;
-            }
-        } else{
-            for(int i = 0; i < heightSplits; i++){
-                this.generatedMap[i][coord - 1] = 1;
-            }
-        }
     }
 
     protected void buildWallWithRange(boolean orientation, int coordinate, int start, int stop){
@@ -126,48 +104,6 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
         return out;
     }
 
-    protected int generateWithExclusions(List<Integer> l, int lowerBound, int upperbound){
-        int out = -1;
-        while(out < lowerBound){
-            out = generateInRange(lowerBound, upperbound + 1);
-            if(l.contains(out)){
-                out = -1;
-            }
-        }
-        return out;
-    }
-
-    protected boolean isIntersection(int x, int y){
-        if(x > 1 && y > 1 && x < widthSplits -1 && y < heightSplits -1){
-            System.out.println("up dx down sx");
-            System.out.println(generatedMap[x][y+1] + " " + generatedMap[x+1][y] + " " + generatedMap[x][y-1] + " " + generatedMap[x-1][y]);
-            if(generatedMap[x][y+1] == 1 && generatedMap[x+1][y] == 1 && generatedMap[x][y-1] == 1 && generatedMap[x-1][y] == 1){
-                System.out.println();
-                System.out.println(x + " " + y + " IS AN INTERSECTION!");
-
-                System.out.println();
-                return  true;
-            } else {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    public boolean containsIntersections(){
-        for(int i = 1; i < widthSplits -1; i++){
-            for(int j = 1; j < heightSplits -1; j++){
-                if(generatedMap[i][j] == 0 && generatedMap[i][j+1] == 1 && generatedMap[i+1][j] == 1 && generatedMap[i][j-1] == 1 && generatedMap[i-1][j] == 1){
-                    System.out.println();
-                    System.out.println(i + " " + j + " is a bad INTERSECTION!");
-                    System.out.println();
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     protected boolean isVerticalWallDenied(int coordinate, int startY, int endY){
         if (startY == 0 && endY == heightSplits) {}
         else if(endY == heightSplits){
@@ -176,12 +112,10 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
             }
         }else if(startY == 0){
             if (generatedMap[coordinate][endY] == 0) {
-                //System.out.println();
                 return true;
             }
         } else {
             if (generatedMap[coordinate][startY - 1] == 0 || generatedMap[coordinate][endY] == 0) {
-                //System.out.println();
                 return true;
             }
         }
@@ -224,28 +158,6 @@ public abstract class AbstractMapGenerator implements GenerationStrategy{
             exits.addAll(generateCardinalExits());
         }
         return exits;
-    }
-
-    private Vector2 generateExit(){
-        int wallWithDoor = new Random().nextInt(4);
-        Vector2 exit = new Vector2();
-        switch (wallWithDoor){
-            case LEFT_WALL:
-                exit = generateLeftWallExit();
-                break;
-            case RIGHT_WALL:
-                exit = generateRightWallExit();
-                break;
-            case UPPER_WALL:
-                exit = generateUpperWallExit();
-                break;
-            case LOWER_WALL:
-                exit = generateLowerWallExit();
-                break;
-            default:
-                break;
-        }
-        return exit;
     }
 
     private Vector2 generateLeftWallExit(){
