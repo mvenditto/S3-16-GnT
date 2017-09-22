@@ -5,6 +5,11 @@ import com.unibo.s3.main_system.characters.Guard
 import com.unibo.s3.main_system.characters.steer.behaviors.Behaviors
 import com.unibo.s3.main_system.communication.Messages._
 
+/**
+  * Class used to manage a guard
+  * @author Daniele Rosetti
+  * @param guard Guard wrapped from actor
+  */
 class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor with Stash {
 
   context.become(sendGraph())
@@ -43,6 +48,10 @@ class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor wi
   }
 }
 
+/**
+  * Companion object of GuardActor
+  * @author Daniele Rosetti
+  */
 object GuardActor {
   def props(guard: Guard): Props = Props(new GuardActor(guard))
 }

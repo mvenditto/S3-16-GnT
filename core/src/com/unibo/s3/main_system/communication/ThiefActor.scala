@@ -10,6 +10,11 @@ import com.unibo.s3.main_system.game.Wall
 import com.unibo.s3.main_system.world.Exit
 import com.unibo.s3.main_system.world.actors.{AskObjectOnSightLineMsg, ObjectOnSightLineMsg}
 
+/**
+  * Class used to manage a thief
+  * @author Daniele Rosetti
+  * @param thief Thief wrapped from actor
+  */
 class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor with Stash {
   private val captureThreshold = 8f
   private val exitReachedThreshold = (Wall.WALL_THICKNESS * 2) * 4f
@@ -84,6 +89,10 @@ class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor wi
   }
 }
 
+/**
+  * Companion object of ThiefActor
+  * @author Daniele Rosetti
+  */
 object ThiefActor {
   def props(thief: Thief): Props = Props(new ThiefActor(thief))
 }

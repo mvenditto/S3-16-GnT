@@ -2,14 +2,10 @@ package com.unibo.s3.main_system.remote
 
 import java.net.InetAddress
 
-import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.World
 import com.kotcrab.vis.ui.widget._
-import com.unibo.s3.Main
-import com.unibo.s3.main_system.communication.Messages.GameSettingsMsg
 import com.unibo.s3.main_system.communication._
 import com.unibo.s3.main_system.game.{AkkaSystemNames, ComputeSystemPort}
-import com.unibo.s3.main_system.world.actors.WorldActor
+
 
 
 class BootstrapRemote() {
@@ -29,22 +25,11 @@ class BootstrapRemote() {
     val myIp = InetAddress.getLocalHost.getHostAddress
     val portNumber = ComputeSystemPort
     SystemManager.createSystem(AkkaSystemNames.ComputeSystem, ip = Option(myIp), portNumber = Option(portNumber))
-    log("-- Actor system creted --")
+    log("-- Actor system created --")
     log("-- IP: " + myIp + ":" + portNumber.portNumber)
-
-    val world = new World(new Vector2(0, 0), true)
-
-    /*SystemManager.createActor(
-      MasterActor.props(), GeneralActors.MASTER_ACTOR)*/
 
     SystemManager.createActor(
       CommunicatorActor.props(), GeneralActors.COMMUNICATOR_ACTOR)
-
-    /*SystemManager.createActor(
-      WorldActor.props(world), GeneralActors.WORLD_ACTOR)*/
-
-    /*SystemManager.createActor(
-      QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)*/
 
     SystemManager.createActor(
       SpawnActor.props(), GeneralActors.SPAWN_ACTOR)

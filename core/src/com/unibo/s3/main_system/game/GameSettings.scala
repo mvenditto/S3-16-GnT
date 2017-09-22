@@ -18,6 +18,10 @@ case class GameSettings(
    mapType: MapType = Maze
 )
 
+/**
+  * Object for wall size
+  * @author Daniele Rosetti
+  */
 object Wall {
   val WALL_THICKNESS: Int = 2
 }

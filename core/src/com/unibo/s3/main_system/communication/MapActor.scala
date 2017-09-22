@@ -7,7 +7,10 @@ import com.unibo.s3.main_system.game.{AkkaSystemNames, Maze, Rooms}
 import com.unibo.s3.main_system.map.{MapGenerator, MazeMapGenerator, RoomMapGenerator}
 
 
-
+/**
+  * Class used to wrap map creation
+  * @author Daniele Rosetti
+  */
 class MapActor extends UntypedAbstractActor with Stash {
 
   private[this] val mapGenerator: MapGenerator = new MapGenerator
@@ -54,9 +57,15 @@ class MapActor extends UntypedAbstractActor with Stash {
 
     case _: RestartMsg =>
       context.become(this.settings)
+
+    case _ =>
   }
 }
 
+/**
+  * Companion object of MapActor
+  * @author Daniele Rosetti
+  */
 object MapActor {
   def props(): Props = Props(new MapActor())
 }
