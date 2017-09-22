@@ -5,7 +5,7 @@ import java.util
 import akka.actor.{Props, Stash, UntypedAbstractActor}
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.communication.Messages._
-import com.unibo.s3.main_system.game.{AkkaSettings, Wall}
+import com.unibo.s3.main_system.game.{AkkaSystemNames, Wall}
 import com.unibo.s3.main_system.spawn.{GuardStrategy, SpawnPointGenerator, ThiefStrategy}
 import com.unibo.s3.main_system.util.GntUtils
 
@@ -63,12 +63,15 @@ class SpawnActor extends UntypedAbstractActor with Stash {
       else
         this.spawnGenerator.setSpawnStrategy(ThiefStrategy())
 
-      val ref = SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/",
+      val ref = SystemManager.getRemoteActor(AkkaSystemNames.GUISystem, "/user/",
         GeneralActors.MASTER_ACTOR.name)
       val list: util.List[Vector2] = this.spawnGenerator.generateSpawnPoints(this.map, msg.num)
       val it = list.iterator()
       while(it.hasNext)
         ref ! CreateCharacterMsg(it.next(), msg.characterType)
+
+    case _: RestartMsg =>
+      context.become(this.mapSettings())
   }
 }
 

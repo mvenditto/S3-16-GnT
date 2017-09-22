@@ -116,4 +116,10 @@ class Main extends AbstractMainApplication {
     super.resize(newWidth, newHeight)
     modules.foreach(m => m.resize(newWidth, newHeight))
   }
+
+  override def dispose(): Unit = {
+    SystemManager.restartSystem()
+    SystemManager.shutdownSystem()
+    super.dispose()
+  }
 }

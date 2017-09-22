@@ -9,7 +9,7 @@ import com.unibo.s3.main_system.characters.Thief
 import com.unibo.s3.main_system.characters.{BaseCharacter, EntitiesSystemImpl}
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory
 import com.unibo.s3.main_system.communication.Messages._
-import com.unibo.s3.main_system.game.AkkaSettings
+import com.unibo.s3.main_system.game.AkkaSystemNames
 
 class MasterActor extends UntypedAbstractActor with Stash {
 
@@ -32,11 +32,11 @@ class MasterActor extends UntypedAbstractActor with Stash {
 
   private def actAndCreate: Receive = {
     case msg: ActMsg =>
-      /*SystemManager.getRemoteActor(AkkaSettings.ComputeSystem, "/user/",
+      /*SystemManager.getRemoteActor(AkkaSystemNames.ComputeSystem, "/user/",
         GeneralActors.WORLD_ACTOR.name).tell(msg, getSelf())*/
       SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR).tell(msg, getSelf())
       SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR).tell(RebuildQuadTreeMsg(), getSelf())
-      /*SystemManager.getRemoteActor(AkkaSettings.ComputeSystem, "/user/",
+      /*SystemManager.getRemoteActor(AkkaSystemNames.ComputeSystem, "/user/",
         GeneralActors.QUAD_TREE_ACTOR.name).tell(RebuildQuadTreeMsg(), getSelf())*/
       charactersList.foreach(cop => cop.tell(msg, getSelf()))
     //manca il ladro o i ladri
@@ -67,7 +67,7 @@ class MasterActor extends UntypedAbstractActor with Stash {
     def characterSettings(newCharacter: BaseCharacter, characterRef: ActorRef): Unit = {
       if (collisionDetector == null) {
         val worldActorRef = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
-        //val worldActorRef = SystemManager.getRemoteActor(AkkaSettings.ComputeSystem, "/user/", GeneralActors.WORLD_ACTOR.name)
+        //val worldActorRef = SystemManager.getRemoteActor(AkkaSystemNames.ComputeSystem, "/user/", GeneralActors.WORLD_ACTOR.name)
         collisionDetector = Box2dProxyDetectorsFactory.of(worldActorRef).newRaycastCollisionDetector()
       }
 
@@ -76,11 +76,11 @@ class MasterActor extends UntypedAbstractActor with Stash {
       charactersList :+= characterRef
 
       val ref = SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR)
-      /*SystemManager.getRemoteActor(AkkaSettings.ComputeSystem, "/user/",
+      /*SystemManager.getRemoteActor(AkkaSystemNames.ComputeSystem, "/user/",
         GeneralActors.QUAD_TREE_ACTOR.name)*/
       //ref ! CiaoMsg(newCharacter)
       ref ! InitialSavingCharacterMsg(newCharacter, characterRef)
-      SystemManager.getRemoteActor(AkkaSettings.ComputeSystem, "/user/",
+      SystemManager.getRemoteActor(AkkaSystemNames.ComputeSystem, "/user/",
         GeneralActors.GRAPH_ACTOR.name).tell(AskForGraphMsg, characterRef)
     }
 

@@ -50,7 +50,7 @@ public class GraphGenerator {
 
     public static UndirectedGraph<Vector2, DefaultEdge> createGraphDistributed(int width, int height, String mapFilename, ActorSelection worldActorRef) {
 
-        //ActorSelection worldActor = SystemManager.getRemoteActor(AkkaSettings.GUISystem(), "/user/", "worldActor");
+        //ActorSelection worldActor = SystemManager.getRemoteActor(AkkaSystemNames.GUISystem(), "/user/", "worldActor");
         //ActorRef worldActor = SystemManager.getLocalActor("worldActor");
         RaycastCollisionDetector<Vector2> collisionDetector =
                 Box2dProxyDetectorsFactory.of(worldActorRef).newRaycastCollisionDetector();

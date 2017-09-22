@@ -7,7 +7,7 @@ import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.characters.Guard
 import com.unibo.s3.main_system.characters.Thief
 import com.unibo.s3.main_system.communication.Messages.{AskNeighboursMsg, InitialSavingCharacterMsg, RebuildQuadTreeMsg, SendNeighboursMsg, _}
-import com.unibo.s3.main_system.game.AkkaSettings
+import com.unibo.s3.main_system.game.AkkaSystemNames
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.world.actors.{FilterReachableByRay, SendFilterReachableByRay}
 import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}

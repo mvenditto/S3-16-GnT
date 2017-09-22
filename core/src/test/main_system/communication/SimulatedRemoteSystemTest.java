@@ -6,7 +6,9 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.unibo.s3.main_system.communication.Messages;
 import com.unibo.s3.main_system.communication.SystemManager;
-import com.unibo.s3.main_system.game.AkkaSettings;
+import com.unibo.s3.main_system.game.AkkaSystemNames;
+import com.unibo.s3.main_system.game.ComputeSystemPort$;
+import com.unibo.s3.main_system.game.GUISystemPort$;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -56,19 +58,19 @@ public class SimulatedRemoteSystemTest {
         new TestKit(testSystem) {{
             try {
                 SystemManager.createSystem("LocalSystem", Option.apply(Inet4Address.getLocalHost().getHostAddress()),
-                        Option.apply(AkkaSettings.GUISystemPort()));
+                        Option.apply(GUISystemPort$.MODULE$));
                 ActorRef localActor = SystemManager.createActor(Props.create(TestActor.class), "localActor");
 
                 String confText = "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," +
                         "\"loglevel\":\"INFO\",\"remote\":{\"enabled-transports\":[\"akka.remote.netty.tcp\"]" +
                         ",\"log-received-messages\":\"on\",\"log-sent-messages\":\"on\"" +
                         ",\"netty\":{\"tcp\":{\"hostname\":\""+ Inet4Address.getLocalHost().getHostAddress() +"\",\"port\":"+
-                        AkkaSettings.ComputeSystemPort()+"}}}}}";
+                        ComputeSystemPort$.MODULE$.portNumber()+"}}}}}";
                 Config customConf = ConfigFactory.parseString(confText);
                 ActorSystem ComputeSystem = ActorSystem.create("ComputeSystem", customConf);
                 ComputeSystem.actorOf(Props.create(TestActor.class), "remoteActor");
 
-                SystemManager.setIPForRemoting(Inet4Address.getLocalHost().getHostAddress(), AkkaSettings.ComputeSystemPort());
+                SystemManager.setIPForRemoting(Inet4Address.getLocalHost().getHostAddress(), ComputeSystemPort$.MODULE$);
                 ActorSelection remoteActor = SystemManager.getRemoteActor
                         ("ComputeSystem","/user/", "remoteActor");
 
