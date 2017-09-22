@@ -1,6 +1,6 @@
 package com.unibo.s3.main_system.modules
 
-import com.badlogic.gdx.{Gdx, InputMultiplexer}
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.{Actor, InputEvent}
@@ -20,6 +20,11 @@ case class Start(guardsNum: Int, thievesNum: Int, simulation: Boolean, mapDimens
 case class Pause(pause: Boolean) extends MenuEvent
 case class ViewDebug(debug: Boolean) extends MenuEvent
 
+/**
+  * Is the class which manage two user interface and comunicate user selection to {@Link Main}
+  *
+  * @author Sara
+  * */
 class MenuModule(listener: MenuEvent => Unit) extends BasicModuleWithGui{
   private var enabled = true
   private var windowSettings, windowMenu: VisWindow = _
@@ -35,20 +40,17 @@ class MenuModule(listener: MenuEvent => Unit) extends BasicModuleWithGui{
 
   override def init(owner: Main): Unit = {
     super.init(owner)
-    //this.world = new World(new Vector2(0,0), true);
     initMenuGUI()
     initSettingsGUI()
   }
 
   private def initSettingsGUI() = {
     windowSettings = new VisWindow("Settings")
-    //windowSettings.setDebug(true);
     windowSettings.setMovable(false)
     val title = windowSettings.getTitleLabel
     title.setColor(Color.GREEN)
     title.setAlignment(Align.center)
 
-    //windowSettings.row
     val guardsNumS = new VisSlider(2f, 20f, 1f, false)
     guardsNumS.setValue(this.guardsNum)
     val labGuardsNum = new VisLabel(" " + "%02d".format(guardsNum))
@@ -95,7 +97,6 @@ class MenuModule(listener: MenuEvent => Unit) extends BasicModuleWithGui{
       }
     })
 
-    //60x60, 80x60
     val tableMapDimension = new VisTable
     val numDimension = 2
     val dimensionS = new Array[String](numDimension)
@@ -115,12 +116,10 @@ class MenuModule(listener: MenuEvent => Unit) extends BasicModuleWithGui{
     mapDimensionSB.addListener(new ChangeListener() {
       override def changed(event: ChangeListener.ChangeEvent, actor: Actor): Unit = {
         val indexSelected = mapDimensionSB.getSelectedIndex
-        //System.out.println(dimensionI(indexSelected)(0) + "x" + dimensionI(indexSelected)(1))
         dimensionMap = dimensionI.get(indexSelected)
       }
     })
 
-    //labirinto: maze - stanze: rooms
     val tableMapType = new VisTable
     val groupMaps = new ButtonGroup[VisRadioButton]
     val mazeCheck = new VisRadioButton("Maze")
@@ -150,7 +149,6 @@ class MenuModule(listener: MenuEvent => Unit) extends BasicModuleWithGui{
     windowSettings.pack()
     gui.addActor(windowSettings)
     windowSettings.centerWindow
-    //windowSettings.setPosition((Gdx.graphics.getWidth()/2)-(windowSettings.getWidth()/2), (Gdx.graphics.getHeight()/2)-(windowSettings.getHeight()/2));
   }
 
   private def initMenuGUI() = {
@@ -223,7 +221,6 @@ class MenuModule(listener: MenuEvent => Unit) extends BasicModuleWithGui{
 
     gui.addActor(windowMenu)
     windowMenu.pack()
-    //windowMenu.setPosition(50, Gdx.graphics.getHeight - 200)
 
     menuWindowPane = new AdaptiveSizeActor(windowMenu) with Anchorable
     menuWindowPane.setSize(10, 20) //10 % 20 % of stage size

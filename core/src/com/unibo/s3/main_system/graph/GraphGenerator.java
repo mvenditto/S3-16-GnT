@@ -10,15 +10,16 @@ import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory;
 import com.unibo.s3.main_system.game.Wall;
 import org.jgrapht.UndirectedGraph;
-import org.jgrapht.alg.shortestpath.KShortestPaths;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
-
 import java.util.*;
 import java.util.concurrent.*;
 
-import static java.lang.Thread.sleep;
-
+/**
+ * GraphGenerator is class used for generate graph starting from a map
+ *
+ * @author Sara
+ * */
 public class GraphGenerator {
 
     private static void log(String msg) {
@@ -26,7 +27,7 @@ public class GraphGenerator {
     }
 
     private static void printGrid(Integer[][] grid) {
-        log("Griglia: ");
+        log("Grid: ");
         for(int i = 0; i < grid.length; i++) {
             for(int j = 0; j < grid[0].length; j++) {
                 if(grid[i][j] == null)
@@ -42,16 +43,31 @@ public class GraphGenerator {
         return new Vector2(x, y);
     }
 
+    /**
+     * @param width: width of map
+     * @param height: height of map
+     * @param mapFilename : filename of file where map is saved
+     * @param worldActorRef: ActorRef od world actor,
+     *                     to use when worldActor is in the same system of this class
+     *
+     * @return the genrated graph of type {@link UndirectedGraph<Vector2, DefaultEdge}
+     */
     public static UndirectedGraph<Vector2, DefaultEdge> createGraphLocal(int width, int height, String mapFilename, ActorRef worldActorRef) {
         RaycastCollisionDetector<Vector2> collisionDetector =
                 Box2dProxyDetectorsFactory.of(worldActorRef).newRaycastCollisionDetector();
         return init(width, height, mapFilename, collisionDetector);
     }
 
+    /**
+     * @param width: width of map
+     * @param height: height of map
+     * @param mapFilename : filename of file where map is saved
+     * @param worldActorRef: ActorSelection od world actor,
+     *                     to use when worldActor is in the opposite actor system compared to this class
+     *
+     * @return the genrated graph of type {@link UndirectedGraph<Vector2, DefaultEdge}
+     */
     public static UndirectedGraph<Vector2, DefaultEdge> createGraphDistributed(int width, int height, String mapFilename, ActorSelection worldActorRef) {
-
-        //ActorSelection worldActor = SystemManager.getRemoteActor(AkkaSystemNames.GUISystem(), "/user/", "worldActor");
-        //ActorRef worldActor = SystemManager.getLocalActor("worldActor");
         RaycastCollisionDetector<Vector2> collisionDetector =
                 Box2dProxyDetectorsFactory.of(worldActorRef).newRaycastCollisionDetector();
         return init(width, height, mapFilename, collisionDetector);
@@ -61,24 +77,8 @@ public class GraphGenerator {
         int dimWall = Wall.WALL_THICKNESS();
         HashMap<Vector2, Vector2> walls = new HashMap<>();
         Integer[][] grid = new Integer[width+(dimWall*2)][height+(dimWall*2)];
-        //log("genero il grafo di dimensione: " + width + ", " + height);
-        Cronometer cron = new Cronometer();
-
-        cron.start();
-
         readMap(mapFilename, walls, grid);
-        //concurrentReadMap(mapFilename, walls, grid);
-        cron.stop();
-
-        //log("A leggere la mappa ci ha messo: " + cron.getTime());
-
-        //printGrid(grid);
-
-        //UndirectedGraph<Vector2, DefaultEdge> graph = null;
         UndirectedGraph<Vector2, DefaultEdge> graph = create(grid, walls, collisionDetector, dimWall);
-
-
-        //log("Grafo creato: " + graph.toString());
         return graph;
     }
 
@@ -86,7 +86,6 @@ public class GraphGenerator {
                                                                 RaycastCollisionDetector<Vector2> collisionDetector, int dimWall) {
         UndirectedGraph<Vector2, DefaultEdge> graph = new SimpleGraph<>(DefaultEdge.class);
         addNodes(grid, graph, walls, dimWall);
-        //log("Finiti i nodi, sono " + graph.vertexSet().size());
         addEdges(graph, collisionDetector);
         return graph;
     }
@@ -94,15 +93,7 @@ public class GraphGenerator {
     private static void addEdges(UndirectedGraph<Vector2, DefaultEdge> graph,
                                  RaycastCollisionDetector<Vector2> collisionDetector) {
         addFirstsEdges(graph, collisionDetector);
-        Cronometer cron = new Cronometer();
-        cron.start();
-
-        //checkUnconnectedNodes(graph, collisionDetector);
         concurrentCheckUnconnectedNodes(graph, collisionDetector);
-        cron.stop();
-
-        //log("A controllare i nodi staccati ci ha messo: " + cron.getTime());
-
     }
 
     private static void concurrentCheckUnconnectedNodes(UndirectedGraph<Vector2, DefaultEdge> graph,
@@ -113,9 +104,6 @@ public class GraphGenerator {
         Set<Future<Void>> resultSet = new HashSet<>();
         int nTask = graph.vertexSet().size();
         int vectToThread = graph.vertexSet().size() / nTask;
-        /*if(graph.vertexSet().size() % (float) nTask > 60)
-            vectToThread++;*/
-        //log("Resto modulo = " + graph.vertexSet().size() % (float) nTask);
         HashMap<Integer, List<Vector2>> ntc = new HashMap<>();
         int count = 0;
         ntc.put(count, new ArrayList<>());
@@ -139,49 +127,12 @@ public class GraphGenerator {
                 ex.printStackTrace();
             }
         }
-
-        //log("Finito");
         executor.shutdown();
     }
 
-    private static void checkUnconnectedNodes(UndirectedGraph<Vector2, DefaultEdge> graph,
-                                              RaycastCollisionDetector<Vector2> collisionDetector) {
-        KShortestPaths<Vector2, DefaultEdge> ksp = new KShortestPaths<>(graph, 1);
-        float maxDist = 7f;
-        graph.vertexSet().forEach(node ->{
-            for(float x = node.x - maxDist; x <= node.x + maxDist; x++) {
-                for(float y = node.y - maxDist; y <= node.y + maxDist; y++) {
-                    Vector2 toCompare = createVector(x, y);
-                    //log("Sto comparando " + node.toString() + " con " + toCompare.toString());
-                    if(graph.containsVertex(toCompare)) {
-                        if (!toCompare.equals(node) && ksp.getPaths(node, toCompare).size() == 0) {
-                            //log(node.toString() + " non arriva a " + toCompare.toString());
-                            if(checkEdgeRayCast(collisionDetector, node, toCompare)) {
-                                DefaultEdge edge = graph.addEdge(node, toCompare);
-                                //log("Secondi archi: aggiunto " + edge.toString());
-                            }
-                        }
-
-                    }
-                }
-            }
-        });
-        //log("Finiti secondi archi");
-    }
-
-
-    /**
-     *
-     * @param v1 vertice 1
-     * @param v2 vertice 2
-     * @return true se almeno un raggio da v1 raggiunge v2 (non il punto v2 preciso,
-     * ma un punto sulla circonferenza di centro v2 e raggio vertexRadius)
-     */
     private static boolean checkEdgeRayCast(RaycastCollisionDetector<Vector2> collisionDetector, Vector2 v1, Vector2 v2) {
 
-        //raggio del vertice da considerare per castare il raggio
         float vertexRadius = 0.5f;
-        //numero di raggi da utilizzare
         int numRays = 16;
 
         final Vector2 tmp = new Vector2();
@@ -197,11 +148,7 @@ public class GraphGenerator {
             tmp2.x = (float)(vertexRadius * Math.cos(iRad) + v1.x);
             tmp2.y = (float)(vertexRadius * Math.sin(iRad) + v1.y);
 
-            //log("Analisi: " + tmp2.toString() + " con " + tmp.toString());
-            if (!collisionDetector.collides(new Ray<>(tmp2, tmp))) {
-                //log(tmp2.toString() + " e " + tmp.toString() + " collidono");
-                return true;
-            }
+            if (!collisionDetector.collides(new Ray<>(tmp2, tmp))) return true;
         }
 
         return false;
@@ -211,16 +158,13 @@ public class GraphGenerator {
         List<Vector2> nodes = new ArrayList<>(graph.vertexSet());
         graph.vertexSet().forEach(vertex -> {
             nodes.forEach(node -> {
-                //log("Controllo " + vertex.toString() + " - " + node.toString());
                 if(vertex != node && checkNodeProximity(vertex, node)
                         && checkEdgeRayCast(collisionDetector, vertex, node)) {
-                    DefaultEdge edge = graph.addEdge(vertex, node);
-                    //log("Primi archi: aggiunto " + edge.toString());
+                    graph.addEdge(vertex, node);
                 }
             });
             nodes.remove(vertex);
         });
-        //log("Finiti primi archi");
     }
 
     private static boolean checkNodeProximity(Vector2 first, Vector2 second) {
@@ -239,61 +183,16 @@ public class GraphGenerator {
         return false;
     }
 
-    private static void concurrentReadMap(String mapFilename,
-                                          HashMap<Vector2, Vector2> walls,
-                                          Integer[][] grid) {
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()+1);
-        Set<Future<List<Vector2>>> resultSet = new HashSet<>();
-        int nTasks = 3600;
-
-        FileHandle file = Gdx.files.local(mapFilename);
-        String text = file.readString();
-        String[] lines = text.split("\\n");
-        int linesForTask = lines.length / (nTasks+1);
-        for(int l = 0; l < lines.length; l++) {
-            List<String> tasksLines = new ArrayList<>();
-            for (int i = 0; i < linesForTask; i++) {
-                //String[] toks = lines[l].split(":");
-                tasksLines.add(lines[i]);
-                String[] toks = lines[l].split(":");
-                float x = Float.parseFloat(toks[0]);
-                float y = Float.parseFloat(toks[1]);
-                float w = Float.parseFloat(toks[2]);
-                float h = Float.parseFloat(toks[3]);
-                walls.put(createVector(x, y), createVector(w, h));
-            }
-            Future<List<Vector2>> res = executor.submit(new ConcurrentSetWall(tasksLines, grid.length, grid[0].length));
-            resultSet.add(res);
-        }
-
-        for(Future<List<Vector2>> future : resultSet) {
-            try {
-                for(Vector2 coord : future.get()) {
-                    grid[(int) coord.x][(int) coord.y] = 1;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     private static void readMap(String mapFilename, HashMap<Vector2, Vector2> walls, Integer[][] grid) {
         FileHandle file = Gdx.files.local(mapFilename);
         String text = file.readString();
-        //log("File = " + text);
         String[] lines = text.split("\\n");
-        boolean print = false;
-        for(int l = 0; l < lines.length; l++) {
-            if(print) System.out.print("Riga: ");
-            String[] toks = lines[l].split(":");
+        for(String line : lines) {
+            String[] toks = line.split(":");
             float x = Float.parseFloat(toks[0]);
-            if(print) System.out.print("x = " + x);
             float y = Float.parseFloat(toks[1]);
-            if(print) System.out.print(", y = " + y);
             float w = Float.parseFloat(toks[2]);
-            if(print) System.out.print(", width = " + w);
             float h = Float.parseFloat(toks[3]);
-            if(print) System.out.print(", height = " + h);
 
             float halfw = w / 2;
             float halfh = h / 2;
@@ -308,14 +207,11 @@ public class GraphGenerator {
             if(bl.y >= 0)
                 startY = (int) bl.y;
 
-            if(print) log("=> metto a 1:");
             for(int i = startX; i <= (int) tr.x && i < grid.length; i++) {
                 for(int j = startY; j <= tr.y && j < grid[0].length; j++ ) {
                     grid[i][j] = 1;
-                    if(print) System.out.print(i + ", " + j + " - ");
                 }
             }
-            if(print) log("");
             walls.put(createVector(x, y), createVector(w, h));
         }
     }
@@ -341,18 +237,12 @@ public class GraphGenerator {
                 if(checkGrid(row, col, grid)) {
                     Vector2 v = createVector(row, col);
                     graph.addVertex(v);
-                    //log("Primi nodi: " + v.toString());
                 }
             }
         }
-        //log("Finiti primi nodi");
     }
 
     /**
-     *
-     * @param row index of row
-     * @param col index of coloumn
-     * @param grid the grid
      * @return true if cell of grid is empty
      * */
     private static boolean checkGrid(int row, int col, Integer[][] grid) {
@@ -378,7 +268,6 @@ public class GraphGenerator {
                 if(checkForAddingNode(x, y, grid, graph)) {
                     Vector2 v = createVector(x, y);
                     graph.addVertex(v);
-                    //log("Secondi nodi: " + v.toString());
                 }
 
                 boolean modified = false;
@@ -395,13 +284,11 @@ public class GraphGenerator {
                 if (modified && checkForAddingNode(x1, y1, grid, graph)) {
                     Vector2 v = createVector(x1, y1);
                     graph.addVertex(v);
-                    //log("Secondi nodi: " + v);
                 }
 
 
             }
         });
-        //log("Finiti i nodi dei muri");
     }
 
     private static boolean checkForAddingNode(int x, int y, Integer[][] grid, UndirectedGraph<Vector2, DefaultEdge> graph) {

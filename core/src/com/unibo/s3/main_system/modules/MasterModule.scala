@@ -6,9 +6,11 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
 import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.badlogic.gdx.physics.box2d.Body
+import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.{Input, InputMultiplexer}
-import com.kotcrab.vis.ui.widget.{BusyBar, VisLabel, VisWindow}
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.{Gdx, Input, InputMultiplexer}
+import com.kotcrab.vis.ui.widget.{BusyBar, VisLabel, VisTextButton, VisWindow}
 import com.unibo.s3.Main
 import com.unibo.s3.main_system.characters.{BaseCharacter, Thief}
 import com.unibo.s3.main_system.communication.CharacterActors._
@@ -126,6 +128,12 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
         endGameDialog.add(new VisLabel(evadedThieves + " thieves evaded.")).fillX()
         endGameDialog.row()
         endGameDialog.add(new VisLabel(caughtThieves + " thieves got caught by guards.")).fillX()
+        val okBtn = new VisTextButton("OK")
+        okBtn.addListener(new ClickListener{
+          override def clicked(event: InputEvent, x: Float, y: Float): Unit = Gdx.app.exit()
+        })
+        endGameDialog.row()
+        endGameDialog.add(okBtn)
         endGameDialog.pack()
         endGameDialog.centerWindow()
         endGameDialog.fadeIn(1.5f)

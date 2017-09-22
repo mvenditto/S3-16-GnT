@@ -16,7 +16,7 @@ import scala.concurrent.{Await, TimeoutException}
 
 class CommunicatorActor extends UntypedAbstractActor{
 
-  implicit val timeout: Timeout = Timeout(1 seconds)
+  implicit val timeout: Timeout = Timeout(1.5 seconds)
 
   def showDialog(): Unit = {
     import javax.swing.JOptionPane
@@ -33,7 +33,6 @@ class CommunicatorActor extends UntypedAbstractActor{
   override def onReceive(message: Any): Unit = message match {
     case _:AskIPMsg => val ref = SystemManager.getRemoteActor(AkkaSystemNames.ComputeSystem, "/user/",
       GeneralActors.COMMUNICATOR_ACTOR.name)
-      println("ref = " + ref.toString())
       val future = ref ? SendIPMsg(InetAddress.getLocalHost.getHostAddress)
       try {
         Await.result(future, timeout.duration).asInstanceOf[ACKComputationNode]
@@ -41,7 +40,7 @@ class CommunicatorActor extends UntypedAbstractActor{
         case _: TimeoutException => showDialog()
       }
 
-    case msg:SendIPMsg => println("IP ricevuto")
+    case msg:SendIPMsg =>
       SystemManager.setIPForRemoting(msg.IP, GUISystemPort)
       sender() ! ACKComputationNode()
 
