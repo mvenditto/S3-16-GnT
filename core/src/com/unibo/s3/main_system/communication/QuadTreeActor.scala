@@ -27,8 +27,7 @@ class QuadTreeActor extends UntypedAbstractActor {
   private[this] var agentsTable = mutable.AnyRefMap[BaseCharacter, ActorRef]()
   private[this] var nearbyRequestCache = mutable.AnyRefMap[RequestId, Iterable[BaseCharacter]]()
   private[this] var bounds = Bounds(0, 0, 100, 100)
-  private[this] var root = QuadTreeNode[BaseCharacter](Bounds(0, 0, 60, 60))
-  private[this] val queryRadius = 5f
+  private[this] var root = QuadTreeNode[BaseCharacter](bounds)
 
   private def timestamp: Long = System.nanoTime()
 
@@ -122,7 +121,7 @@ class QuadTreeActor extends UntypedAbstractActor {
     case AskAllCharactersMsg =>
       sender ! SendAllCharactersMsg(agentsTable.keys)
 
-    case _ => println("(quadTreeActor) message unknown:" + message)
+    case _ =>
   }
 }
 

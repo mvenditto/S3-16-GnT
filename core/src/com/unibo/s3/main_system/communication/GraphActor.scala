@@ -10,10 +10,13 @@ import com.unibo.s3.main_system.graph.GraphGenerator
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
-
+/**
+  * Actor used to generate graph
+  * @author Daniele Rosetti
+  */
 class GraphActor extends  UntypedAbstractActor with Stash {
 
-  private val FILEPATH = "maps/map.txt" //ci va il percorso del file dove salvare la mappa(Sara)
+  private val FILEPATH = "maps/map.txt"
   private[this] var graph: Option[UndirectedGraph[Vector2, DefaultEdge]] = None
   private[this] var width, height: Int = _
 
@@ -30,6 +33,7 @@ class GraphActor extends  UntypedAbstractActor with Stash {
       this.height = g.mapSize.y.toInt
       context.become(generateGraph())
       unstashAll()
+
     case _ => stash()
   }
 
@@ -60,9 +64,15 @@ class GraphActor extends  UntypedAbstractActor with Stash {
 
     case _: RestartMsg =>
       context.become(this.mapSettings())
+
+    case  _ =>
   }
 }
 
+/**
+  * Companion object of GraphActor
+  * @author Daniele Rosetti
+  */
 object GraphActor {
   def props() : Props = Props(new GraphActor())
 }

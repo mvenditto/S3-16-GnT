@@ -5,6 +5,11 @@ import com.unibo.s3.main_system.characters.{BaseCharacter, Guard}
 import com.unibo.s3.main_system.characters.steer.behaviors.{Behaviors, Fugitive, Pursuer}
 import com.unibo.s3.main_system.communication.Messages._
 
+/**
+  * Class used to manage a guard
+  * @author Daniele Rosetti
+  * @param guard Guard wrapped from actor
+  */
 class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor with Stash {
 
   private val captureThreshold = 8f
@@ -54,10 +59,12 @@ class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor wi
 
     case _ =>
   }
-
-  def log() : String = "[CHARACTER " + guard.getId + "]: "
 }
 
+/**
+  * Companion object of GuardActor
+  * @author Daniele Rosetti
+  */
 object GuardActor {
   def props(guard: Guard): Props = Props(new GuardActor(guard))
 }
