@@ -46,6 +46,6 @@ object Messages {
   //message for CommunicatorActor
   case class SendIPMsg(IP: String)
   case class AskIPMsg()
+  case class ACKComputationNode()
   case class RestartMsg()
-  case class CiaoMsg(char: BaseCharacter)
 }
