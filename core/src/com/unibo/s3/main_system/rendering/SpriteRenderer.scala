@@ -53,11 +53,17 @@ class SpriteRenderer extends Disposable {
 
     val v = c.getLinearVelocity
 
-    val a = v.len2 match {
+    var a = v.len2 match {
       case x if x < idleThreshold => (guardIdle, guardFeetIdle)
       case x if x < runThreshold => (guardMove, guardFeetWalk)
       case x if x > runThreshold => (guardMove, guardFeetRun)
       case _ => (guardIdle, guardFeetIdle)
+    }
+
+    c match {
+      case t: Thief if t.gotCaughtByGuard || t.hasReachedExit =>
+        a = (guardIdle, guardFeetIdle)
+      case _ =>
     }
 
     val body = getAndCacheAnimation(a._1, c)
