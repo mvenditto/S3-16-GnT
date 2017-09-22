@@ -104,7 +104,7 @@ class WorldTest extends BaseTestInvolvingActors("WorldTestSystem") {
     val expected = List(true, true, false)
     val observer = Guard(new Vector2(0, -15), 0)
     worldActor ! CreateBox(new Vector2(0, 0), new Vector2(10, 10))
-    worldActor ! FilterReachableByRay(observer, points, (0, 0))
+    worldActor ! FilterReachableByRay(observer.getPosition, points, (0, 0))
 
     expectMsgPF() {
       case SendFilterReachableByRay(mask, _) => assert(mask.equals(expected))

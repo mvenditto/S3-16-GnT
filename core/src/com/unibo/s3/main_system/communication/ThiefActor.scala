@@ -16,7 +16,6 @@ import com.unibo.s3.main_system.world.actors.{AskObjectOnSightLineMsg, ObjectOnS
   * @param thief Thief wrapped from actor
   */
 class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor with Stash {
-  private val captureThreshold = 8f
   private val exitReachedThreshold = (Wall.WALL_THICKNESS * 2) * 4f
 
   context.become(setGraph())
@@ -25,9 +24,6 @@ class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor wi
 
   private def notifyThiefReachedExit(): Unit =
     SystemManager.getLocalActor(GeneralActors.GAME_ACTOR) ! ThiefReachedExitMsg(thief)
-
-  private def notifyThiefCaught(g: BaseCharacter): Unit =
-    SystemManager.getLocalActor(GeneralActors.GAME_ACTOR) ! ThiefCaughtMsg(thief, g)
 
   override def onReceive(message: Any): Unit = {}
 
@@ -54,20 +50,24 @@ class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor wi
     case SendGuardsInProximityMsg(guards) =>
       if (canAct) {
 
-        if (thief.hasTarget
-          && (guards.isEmpty || !guards.exists(g => g.equals(thief.getTarget.get)))) {
-          Behaviors.randomPatrol(thief)
-          thief.setPursuerTarget(None)
-        }
+        if (thief.hasTarget) {
 
-        val nearestGuard = BehaviorUtils.nearest[BaseCharacter](thief, guards).get
-        Behaviors.evadeFromGuard(thief, nearestGuard)
-        nearestGuard match {
-          case guard: Guard =>
-            Behaviors.onThiefCaught(thief, guard,
-              captureThreshold, notifyThiefCaught(guard))
-            thief.setPursuerTarget(Option(Pursuer(guard)))
-          case _ =>
+          val pursuerInRange =
+            thief.getTarget.forall(t => t.get.getPosition.dst2(thief.getPosition) <= 15f)
+
+          if (!pursuerInRange) {
+            thief.setPursuerTarget(None)
+            Behaviors.randomPatrol(thief)
+          }
+        }
+        //val nearestGuard = BehaviorUtils.nearest[BaseCharacter](thief, guards).get
+
+        if (guards.nonEmpty) {
+          if (thief.getTarget.isEmpty) Behaviors.evadeFromGuard(thief, guards.head)
+          else if (guards.head.getPosition.dst2(thief.getPosition)
+            < thief.getTarget.get.get.getPosition.dst2(thief.getPosition)) {
+            Behaviors.evadeFromGuard(thief, guards.head)
+          }
         }
       }
 

@@ -43,6 +43,8 @@ abstract class AbstractMainApplication extends ApplicationAdapter with InputProc
   private[this] val camVirtualWidth = 30f
   private[this] var camController: BasicCameraInputController = _
   private[this] var camKeymap: CameraInputControllerKeymap = _
+  private var fixedTimeStep = 1.0f / 60f
+  private var useFixedTimeStep = true
   protected var paused = false
 
   protected def doRender(): Unit
@@ -68,7 +70,7 @@ abstract class AbstractMainApplication extends ApplicationAdapter with InputProc
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
     /*get time elapsed since previous frame was rendered*/
-    val dt = Gdx.graphics.getDeltaTime
+    val dt = if (useFixedTimeStep) fixedTimeStep else Gdx.graphics.getDeltaTime
     if (!paused) {
       GdxAI.getTimepiece.update(dt)
       doUpdate(dt)

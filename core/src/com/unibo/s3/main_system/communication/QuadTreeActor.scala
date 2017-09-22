@@ -82,7 +82,7 @@ class QuadTreeActor extends UntypedAbstractActor {
 
         val reqId = (timestamp, c.getId)
         val filterOnlyOnSightLine =
-          FilterReachableByRay(c, neighborsInFov.map(p => p.getPosition), reqId)
+          FilterReachableByRay(c.getPosition, neighborsInFov.map(p => p.getPosition), reqId)
 
         nearbyRequestCache += (reqId -> neighborsInFov)
 

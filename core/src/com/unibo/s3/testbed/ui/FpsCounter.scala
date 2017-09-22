@@ -4,6 +4,12 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.kotcrab.vis.ui.widget.{VisLabel, VisTable, VisWindow}
 
+/**
+  * A custom 'fps counter' widget.
+  * @see [[VisTable]]
+  *
+  * @author mvenditto
+  */
 class FpsCounter(title: String = "FPS") extends VisWindow(title) {
 
   private[this] val fpsLabel = new VisLabel()

@@ -22,7 +22,7 @@ import java.util.List;
  /**
  * This class implements a basic entity
  * with facility methods for setting {@link SteeringBehavior}(s) to it
- * and collision and proximity management.
+ * and collision/proximity management.
  *
  * @author mvenditto
  * */
@@ -40,25 +40,25 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
     private RaycastObstacleAvoidance<Vector2> raycastObstacleAvoidance;
 
     /*collision detection - ray casting*/
-    private final static float mainRayLenght = 10.0f;
-    private final static float minMainRayLenght = 1.5f;
-    private final static float whiskerLenght = 1.0f; //2
-    private final static float whiskerAngle = 35;
-    private final static float rayCastingDistFromBoundary = 1.0f;
+    private final static float mainRayLength = 10.0f;
+    private final static float minMainRayLength = 1.1f; //1.5f
+    private final static float whiskerLength = 0.8f; //1.0
+    private final static float whiskerAngle = 35f;
+    private final static float rayCastingDistFromBoundary = 1.1f;
     private final static float proximityDetectionRadius = 10f;
 
     /*wander behavior*/
     private final static boolean wanderFaceEnabled = false;
     private final static Limiter wanderLimiter = new LinearAccelerationLimiter(3);
-    private final static float defaultTimeToTarget = 1;
+    private final static float defaultTimeToTarget = 0.1f; //1
     private final static float wanderOffset = 3;
     private final static float wanderOrientation = 5;
     private final static float wanderRadius = 1;
     private final static float wanderRate = MathUtils.PI2 * 4;
 
     /*arrive behavior*/
-    private final static float arriveArrivalTolerance = 0.001f;
-    private final static float arriveDecelerationRadius = 1;
+    private final static float arriveArrivalTolerance = 0.25f; //0.001f
+    private final static float arriveDecelerationRadius = 2; //1
 
     /*hide behavior*/
     private final static float hideDistFromBoundary = 2f;
@@ -124,7 +124,7 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
         super.act(dt);
         if (rayConfiguration != null) {
             ((CentralRayWithWhiskersConfiguration<Vector2>) rayConfiguration)
-                    .setRayLength(Math.max(getLinearVelocity().len(), minMainRayLenght));
+                    .setRayLength(Math.max(getLinearVelocity().len(), minMainRayLength));
         }
     }
 
@@ -137,8 +137,8 @@ public class BaseMovableEntity extends BaseSteeringEntity implements MovableEnti
     public void setCollisionDetector(RaycastCollisionDetector<Vector2> raycastCollisionDetector) {
 
         rayConfiguration = new CentralRayWithWhiskersConfiguration<>(this,
-                mainRayLenght,
-                whiskerLenght,
+                mainRayLength,
+                whiskerLength,
                 whiskerAngle * MathUtils.degreesToRadians);
 
         raycastObstacleAvoidance = new RaycastObstacleAvoidance<>(this,

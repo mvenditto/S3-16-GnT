@@ -2,6 +2,13 @@ package com.unibo.s3.testbed.model
 
 import scala.util.{Failure, Success, Try}
 
+/**
+  * An implementation of the [[DynamicModuleLoader]] trait. that manages loading of
+  * [[TestbedModule]], used in [[TestbedImpl]] class.
+  * @param modulePackage the package in which [[TestbedModule]] classes are expected to be found.
+  *
+  * @author mvenditto
+  */
 class DynamicModuleLoaderImpl(val modulePackage: String) extends DynamicModuleLoader {
 
   private def safeClassForName(className: String): Try[Class[_]] =

@@ -17,7 +17,7 @@ public class CustomLocation implements Location<Vector2> {
     }
 
     public CustomLocation(Vector2 position) {
-        this.position = position;
+        this.position = position.cpy();
         this.orientation = 0f;
     }
 

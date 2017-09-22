@@ -2,6 +2,12 @@ package com.unibo.s3.testbed.model
 
 import scala.util.parsing.json.JSON
 
+/**
+  * This object contains the method to parse the information
+  * about available [[TestbedModule]]s, as defined in 'modules.json' file.
+  *
+  * @author mvenditto
+  */
 object ModulesMetadataParser {
 
   private[this] val clazz = "class"
@@ -22,6 +28,12 @@ object ModulesMetadataParser {
       .map(unwrapToModuleMetadata)
   }
 
+  /**
+    * Parses the modulesJson (default: 'modules.json') file
+    * and outputs the [[ModuleMetadata]] for each found module.
+    * @param modulesJson
+    * @return an [[Option]] [[Iterable]] of [[ModuleMetadata]]
+    */
   def getModulesMetadata(modulesJson: String): Option[Iterable[ModuleMetadata]] = {
     val modulesMap = JSON.parseFull(modulesJson)
     modulesMap match {

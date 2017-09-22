@@ -88,7 +88,7 @@ class Box2dModule extends BaseTestbedModule with InputProcessorAdapter {
   def saveWorld(name: String): Unit = {
     val w = Gdx.files.local("maps/" + name)
     val s = StringBuilder.newBuilder
-    getAllBodies().asScalaIterable.foreach(b => {
+    getAllBodies.foreach(b => {
       val c = b.getWorldCenter
       val size = b.size2
       s append c.x
@@ -148,24 +148,23 @@ class Box2dModule extends BaseTestbedModule with InputProcessorAdapter {
     false
   }
 
-  private def getAllBodies(): com.badlogic.gdx.utils.Array[Body] = {
+  private def getAllBodies: Iterable[Body] = {
     val timeout = new Timeout(Duration.create(5, "seconds"))
     val future = Patterns.ask(worldActor, GetAllBodies(), timeout)
     try {
-      Await.result(future, timeout.duration).asInstanceOf[com.badlogic.gdx.utils.Array[Body]]
+      Await.result(future, timeout.duration).asInstanceOf[Iterable[Body]]
     } catch {
       case e: Exception =>
         e.printStackTrace()
-        new com.badlogic.gdx.utils.Array[Body]()
+        Seq.empty[Body]
     }
   }
 
   override def render(shapeRenderer: ShapeRenderer): Unit = {
     super.render(shapeRenderer)
 
-    val bodies = getAllBodies()
-    for (i <- 0 until bodies.size) {
-      renderBox(shapeRenderer, bodies.get(i), false)
+    for (b <- getAllBodies) {
+      renderBox(shapeRenderer, b, false)
     }
 
     if (bodyEditorEnabled && topLeft.isDefined && delta.isDefined) {

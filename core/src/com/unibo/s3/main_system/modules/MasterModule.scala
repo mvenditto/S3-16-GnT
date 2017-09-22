@@ -33,7 +33,6 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
   private[this] var characters: Option[Iterable[BaseCharacter]] = None
   private[this] val thiefCaughtMsg = "Thief got caught!"
   private[this] val thiefReachedExitMsg = "Thief reached exit!"
-  private[this] val defaultPopupDuration = 3f
   private[this] var gameEventsBuffer = List[Any]()
 
   class GameActor extends UntypedAbstractActor {
@@ -45,7 +44,7 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
         getActor(
           LIGHTING_SYSTEM_ACTOR) ! CreatePointLightAt(t.getPosition, Color.RED)
         val p = t.getPosition.cpy().scl(ScaleUtils.getPixelsPerMeter.toFloat)
-        showPopupFadingText(p, thiefReachedExitMsg, defaultPopupDuration, Color.RED)
+        showPopupFadingText(p, thiefReachedExitMsg, Color.RED)
         evalGameState()
 
       case ThiefCaughtMsg(t, g) =>
@@ -53,7 +52,7 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
         getActor(
           LIGHTING_SYSTEM_ACTOR) ! CreatePointLightAt(g.getPosition, Color.BLUE)
         val p = t.getPosition.cpy().scl(ScaleUtils.getPixelsPerMeter.toFloat)
-        showPopupFadingText(p, thiefCaughtMsg, defaultPopupDuration, Color.GREEN)
+        showPopupFadingText(p, thiefCaughtMsg, Color.GREEN)
         evalGameState()
 
       case SendAllCharactersMsg(_characters) =>

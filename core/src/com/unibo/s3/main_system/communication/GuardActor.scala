@@ -1,8 +1,8 @@
 package com.unibo.s3.main_system.communication
 
 import akka.actor.{Props, Stash, UntypedAbstractActor}
-import com.unibo.s3.main_system.characters.Guard
-import com.unibo.s3.main_system.characters.steer.behaviors.Behaviors
+import com.unibo.s3.main_system.characters.{BaseCharacter, Guard}
+import com.unibo.s3.main_system.characters.steer.behaviors.{Behaviors, Fugitive, Pursuer}
 import com.unibo.s3.main_system.communication.Messages._
 
 /**
@@ -11,6 +11,11 @@ import com.unibo.s3.main_system.communication.Messages._
   * @param guard Guard wrapped from actor
   */
 class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor with Stash {
+
+  private val captureThreshold = 8f
+
+  private def notifyThiefCaught(thief: BaseCharacter): Unit =
+    SystemManager.getLocalActor(GeneralActors.GAME_ACTOR) ! ThiefCaughtMsg(thief, guard)
 
   context.become(sendGraph())
 
@@ -43,6 +48,14 @@ class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor wi
 
     case SendThievesInProximityMsg(thieves) =>
       Behaviors.guardPursueThieves(guard, thieves)
+
+      guard.getTarget match {
+        case Some(Fugitive(thief)) =>
+          Behaviors.onThiefCaught(thief, guard,
+            captureThreshold, notifyThiefCaught(guard))
+          thief.setPursuerTarget(Option(Pursuer(guard)))
+        case _ =>
+      }
 
     case _ =>
   }

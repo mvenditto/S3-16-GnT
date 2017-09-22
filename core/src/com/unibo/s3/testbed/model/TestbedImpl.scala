@@ -8,6 +8,12 @@ import com.unibo.s3.main_system.AbstractMainApplication
 import com.unibo.s3.testbed.ui.LogMessage
 import com.unibo.s3.testbed.view.{TestbedListener, TestbedView}
 
+/**
+  * The Testbed is an editor/samples showcase useful
+  * for (visual)testing single functionality, subsystems or modules in an
+  * environment similar to the one on which the 'main application' runs.
+  * @author mvenditto
+  */
 case class TestbedImpl() extends AbstractMainApplication with Testbed {
 
   private[this] var currentSample: Option[TestbedModule] = None
@@ -73,7 +79,6 @@ case class TestbedImpl() extends AbstractMainApplication with Testbed {
         override def run(): Unit = {
           sample.setup((msg: String) => {
             gui.setLoadingLogText(msg)
-            gui.writeConsoleLog(LogMessage(currSampleName, msg, Color.GOLD))
           })
           gui.setProgressBarValue(85)
 
@@ -103,8 +108,6 @@ case class TestbedImpl() extends AbstractMainApplication with Testbed {
 
     Gdx.input.setInputProcessor(inputMultiplexer)
     paused = false
-    gui.writeConsoleLog(LogMessage("Testbed", "*** Welcome ***", Color.CYAN))
-    gui.writeConsoleLog(LogMessage("Testbed", "Version : 0.9fut", Color.CYAN))
 
     parseModulesFile().foreach(modules =>
       gui.buildSamplesTree(
@@ -143,7 +146,6 @@ case class TestbedImpl() extends AbstractMainApplication with Testbed {
 
   override def keyUp(keycode: Int): Boolean = {
     keycode match {
-      case Keys.V => gui.toggleConsole()
       case Keys.H => gui.toggleSamplePane()
       case _ => ()
     }
@@ -152,5 +154,5 @@ case class TestbedImpl() extends AbstractMainApplication with Testbed {
 
   override def getCamera: OrthographicCamera = cam
 
-  override def getLogger: (LogMessage) => Unit = gui.writeConsoleLog
+  override def getLogger: (LogMessage) => Unit = (lm: LogMessage) => println(lm)
 }

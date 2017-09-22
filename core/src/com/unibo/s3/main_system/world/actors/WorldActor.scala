@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dRaycastCollisionDetector
-import com.unibo.s3.main_system.characters.steer.collisions.gdx.Box2dSquareAABBProximity
+import com.unibo.s3.main_system.characters.steer.collisions.gdx.{Box2dSquareAABBProximity, Box2dSteeringEntity}
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
 import com.unibo.s3.main_system.util.Box2dImplicits._
 import com.unibo.s3.main_system.util.GntUtils
@@ -30,7 +30,7 @@ case class WorldChangeMsg(b: Body)
 case class AskWorldMask(w:Int, h:Int, cellWidth: Float)
 case class AskObjectOnSightLineMsg(p: Vector2, lv: Vector2, rayLenght: Float)
 case class ObjectOnSightLineMsg(bd: Iterable[BodyData])
-case class FilterReachableByRay(op: BaseCharacter, n: Iterable[Vector2], reqId: (Long, Int))
+case class FilterReachableByRay(op: Vector2, n: Iterable[Vector2], reqId: (Long, Int))
 case class SendFilterReachableByRay(f: Iterable[Boolean], reqId: (Long, Int))
 
 /**
@@ -123,7 +123,7 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       val ray = new Ray[Vector2](n.head, n.head)
       sender ! SendFilterReachableByRay(
         n.map(p => {
-          ray.start = op.getPosition; ray.end = p
+          ray.start = op; ray.end = p
           !rayCastCollisionDetector.collides(ray)
         }), reqId
       )
@@ -135,7 +135,17 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       proximityDetector.setDetectionRadius(radius)
       var neighbors: Seq[Steerable[Vector2]] = List()
       proximityDetector.findNeighbors(new ProximityCallback[Vector2] {
-        override def reportNeighbor(n: Steerable[Vector2]): Boolean = {neighbors :+= n; true}
+        override def reportNeighbor(n: Steerable[Vector2]): Boolean = {
+          n match {
+            case b: Box2dSteeringEntity => b.getBody.getUserData match {
+              case bd: BodyData if bd.bodyType.exists(bt => bt.equals(Hideout)) =>
+                neighbors :+= n
+                true
+              case _ => false
+            }
+            case _ => false
+          }
+        }
       })
       sender() ! ProximityQueryResponse(neighbors)
 
@@ -147,7 +157,7 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
 
       val newBody = world.createBox(new Vector2(body(0) - 0.3f, body(1) - 0.3f), new Vector2(body(2), body(3)))
       bodyData.foreach(bodyData =>
-          parseBodyData(bodyData, newBody).foreach(bd => newBody.setUserData(bd)))
+        parseBodyData(bodyData, newBody).foreach(bd => newBody.setUserData(bd)))
       worldObserver.getListener.created(newBody)
   }
 }

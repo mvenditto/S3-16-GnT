@@ -4,7 +4,11 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.kotcrab.vis.ui.widget.VisWindow
 
-
+/**
+  * A base abstract implementation of a [[TestbedModule]].
+  *
+  * @author mvenditto
+  */
 abstract class BaseTestbedModule extends TestbedModule {
 
   protected var submodules: Seq[TestbedModule] = List[TestbedModule]()
