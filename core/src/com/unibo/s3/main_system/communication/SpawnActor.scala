@@ -9,6 +9,10 @@ import com.unibo.s3.main_system.game.{AkkaSystemNames, Wall}
 import com.unibo.s3.main_system.spawn.{GuardSpawningStrategy, SpawnPointGenerator, ThiefSpawningStrategy}
 import com.unibo.s3.main_system.util.GntUtils
 
+/**
+  * Actor for generate spawn point for guards and thieves
+  * @author
+  */
 class SpawnActor extends UntypedAbstractActor with Stash {
 
   private val WALL_THICKNESS = Wall.WALL_THICKNESS
@@ -30,6 +34,7 @@ class SpawnActor extends UntypedAbstractActor with Stash {
       self ! GenerateNewCharacterPositionMsg(g.thievesNumber, CharacterActors.THIEF)
       context.become(setMatrix())
       unstashAll()
+
     case _ => stash()
   }
 
@@ -72,9 +77,15 @@ class SpawnActor extends UntypedAbstractActor with Stash {
 
     case _: RestartMsg =>
       context.become(this.mapSettings())
+
+    case _ =>
   }
 }
 
+/**
+  * Companion object of SpawnActor
+  * @author Daniele Rosetti
+  */
 object SpawnActor {
   def props(): Props = Props(new SpawnActor())
 }

@@ -1,6 +1,9 @@
 package com.unibo.s3.main_system.communication
 
-
+/**
+  * Enumeration for actor names
+  * @author Daniele Rosetti
+  */
 object GeneralActors extends Enumeration {
 
   val MASTER_ACTOR = EnumerationType("masterActor")
@@ -16,6 +19,10 @@ object GeneralActors extends Enumeration {
   protected case class EnumerationType(name: String) extends Val(name)
 }
 
+/**
+  * Enumeration for actor names of Guards and Thieves
+  * @author Daniele Rosetti
+  */
 object CharacterActors extends Enumeration {
 
   val GUARD = EnumerationType("guard")

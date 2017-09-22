@@ -11,6 +11,10 @@ import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsF
 import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.game.AkkaSystemNames
 
+/**
+  * Actor used to manage all guard and thieves
+  * @author Daniele Rosetti
+  */
 class MasterActor extends UntypedAbstractActor with Stash {
 
   private[this] var charactersList = List[ActorRef]()
@@ -37,6 +41,8 @@ class MasterActor extends UntypedAbstractActor with Stash {
       charactersList.foreach(cop => cop.tell(msg, getSelf()))
 
     case msg: CreateCharacterMsg => this.createCharacter(msg)
+
+    case _ =>
   }
 
   private def createCharacter(msg: CreateCharacterMsg): Unit = {
@@ -57,6 +63,8 @@ class MasterActor extends UntypedAbstractActor with Stash {
         val characterRef = SystemManager.createActor(
           ThiefActor.props(newCharacter), CharacterActors.THIEF, this.characterID)
         characterSettings(newCharacter, characterRef)
+
+      case _ =>
     }
 
     def characterSettings(newCharacter: BaseCharacter, characterRef: ActorRef): Unit = {
@@ -79,6 +87,10 @@ class MasterActor extends UntypedAbstractActor with Stash {
   }
 }
 
+/**
+  * Companion object of MasterActor
+  * @author Daniele Rosetti
+  */
 object MasterActor {
   def props(): Props = Props(new MasterActor())
 }

@@ -13,12 +13,16 @@ import akka.pattern.ask
 import com.badlogic.gdx.Gdx
 
 import scala.concurrent.{Await, TimeoutException}
-
+/**
+  * Actor used for handshake between systems
+  * @author Daniele Rosetti
+  * @author Sara Sintoni
+  */
 class CommunicatorActor extends UntypedAbstractActor{
 
   implicit val timeout: Timeout = Timeout(1.5 seconds)
 
-  def showDialog(): Unit = {
+  private def showDialog(): Unit = {
     import javax.swing.JOptionPane
     val optionPane = new JOptionPane("Connection with compute node is not available. " +
       "\n Run compute application and check connection.", JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION)
@@ -44,10 +48,14 @@ class CommunicatorActor extends UntypedAbstractActor{
       SystemManager.setIPForRemoting(msg.IP, GUISystemPort)
       sender() ! ACKComputationNode()
 
-    case msg: Any => println(msg)
+    case _: Any =>
   }
 }
 
+/**
+  * Companion object of CommunicatorActor
+  * @author Daniele Rosetti
+  */
 object CommunicatorActor{
   def props(): Props = Props(new CommunicatorActor())
 }
