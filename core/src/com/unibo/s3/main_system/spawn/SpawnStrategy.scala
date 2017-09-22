@@ -2,6 +2,9 @@ package com.unibo.s3.main_system.spawn
 
 import com.badlogic.gdx.math.Vector2
 
+/**
+  * @author Nicola Santolini
+  */
 trait SpawnStrategy {
 
     /**

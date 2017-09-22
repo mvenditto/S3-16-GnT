@@ -17,21 +17,39 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
-
+/**
+  * Trait for a generic character
+  */
 trait Character {
 
-  /**initial graph setting*/
+  /**
+    * Initial graph setup
+    * @param g graph for setting
+    */
   def setGraph(g: UndirectedGraph[Vector2, DefaultEdge]): Unit
 
-  /**getting character infos (maybe guard exclusive)*/
+  /**
+    * Getter of character's known vertices
+    * @return Vertices visited by the character
+    */
   def getInformation: Iterable[Vector2]
 
-  /**graph update (maybe guard exclusive)*/
+  /**
+    * Personal graph update with information from another character
+    * @param colleagueList  Vertices visited by the other character
+    */
   def updateGraph(colleagueList: Iterable[Vector2]): Unit
 
-  /**getting sight line lenght (maybe thief exclusive)*/
+  /**
+    * Getter for sight line length
+    * @return The sight line length
+    */
   def getSightLineLength : Float
 
+  /**
+    * Getter for the character's target
+    * @return The character's target
+    */
   def getTarget: Option[Target[BaseCharacter]]
 
 }
@@ -40,7 +58,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
   private[this] var graph: UndirectedGraph[Vector2, DefaultEdge] = _
 
   private var currentNode : Option[Vector2] = Option[Vector2](new Vector2())
-  private var previousNode : Option[Vector2] = Option[Vector2](new Vector2()) /**Nodo precedente**/
+  private var previousNode : Option[Vector2] = Option[Vector2](new Vector2())
 
   private var visited = mutable.ArrayBuffer[Vector2]()
   private var visitedBuffer = mutable.ArrayBuffer[Vector2]()
@@ -188,7 +206,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
 
   def getCurrentDestination: Vector2 = currentDestination.getOrElse(new Vector2())
 
-  private def log = "Agent " + id + ": "
+  private def log() = "Agent " + id + ": "
 
   override def equals(o: scala.Any): Boolean = {
     o match {

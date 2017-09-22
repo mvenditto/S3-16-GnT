@@ -2,6 +2,9 @@ package com.unibo.s3.main_system.map;
 
 import java.util.List;
 
+/**
+ * @author Nicola Santolini
+ */
 public interface GenerationStrategy {
 
     /**

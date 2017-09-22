@@ -5,10 +5,13 @@ import com.unibo.s3.main_system.game.{GameSettings, Wall}
 
 import scala.util.Random
 
+/**
+  * @author Nicola Santolini
+  */
 class ThiefSpawningStrategy extends SpawnStrategy {
 
-  private[this] var width_shift: Int = _
-  private[this] var height_shift: Int = _
+  private[this] var width_shift : Int = _
+  private[this] var height_shift : Int = _
 
   override def generateSpawnQuadrant(map: Array[Array[Int]]): Vector2 = {
     var x = 0

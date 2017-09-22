@@ -10,6 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * @author Nicola Santolini
+ */
 public abstract class AbstractMapGenerator implements GenerationStrategy{
 
     private int BASE_UNIT = Wall.WALL_THICKNESS();

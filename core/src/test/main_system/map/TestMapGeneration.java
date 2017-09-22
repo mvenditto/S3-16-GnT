@@ -16,6 +16,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * @author Nicola Santolini
+ */
 public class TestMapGeneration {
 
     private MapGenerator generator;
@@ -24,6 +27,7 @@ public class TestMapGeneration {
     public void init(){
         generator = new MapGenerator();
     }
+
 
     @Test
     public void testRoomsGeneration(){

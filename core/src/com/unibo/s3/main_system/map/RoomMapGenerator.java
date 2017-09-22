@@ -1,5 +1,8 @@
 package com.unibo.s3.main_system.map;
 
+/**
+ * @author Nicola Santolini
+ */
 public class RoomMapGenerator extends AbstractMapGenerator {
 
     private static final int ROOM_HEIGHT_THRESHOLD = 15;
