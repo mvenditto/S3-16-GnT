@@ -6,16 +6,16 @@ public class RoomMapGenerator extends AbstractMapGenerator {
 
     @Override
     public void generate(int width, int height, int startX, int startY){
-        int lowerX = (width/2 ) - 1;//+ width/6);
-        int upperX = (width/2) + 1;//) - width/6);
-        int lowerY = (height/2) - 1;// + height/6);
-        int upperY = (height/2) + 1;// - width/6);
+        int lowerX = (width/2 ) - 1;
+        int upperX = (width/2) + 1;
+        int lowerY = (height/2) - 1;
+        int upperY = (height/2) + 1;
         width--;
         height--;
-        /**relative position, not absolute*/
+        /*relative position, not absolute*/
         int wallV = generateInRange(lowerX, upperX);
         int wallH = generateInRange(lowerY, upperY);
-        /**senso antiorario partendo da sopra*/
+        /*senso antiorario partendo da sopra*/
         int door1Coord = generateInRange(startY + wallH + 1, startY + height);
         int door2Coord;
         if(getVerticalOrHorizontal()){
