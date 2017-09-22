@@ -1,13 +1,19 @@
 package com.unibo.s3.main_system.communication
 
+import java.awt.event._
+import java.beans.{PropertyChangeEvent, PropertyChangeListener, VetoableChangeListener}
 import java.net.InetAddress
+import javax.swing.JFrame
 
 import akka.actor.{Props, UntypedAbstractActor}
 import akka.util.Timeout
 import com.unibo.s3.main_system.communication.Messages.{ACKComputationNode, AskIPMsg, SendIPMsg}
 import com.unibo.s3.main_system.game.AkkaSettings
+
 import scala.concurrent.duration._
 import akka.pattern.ask
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 
 import scala.concurrent.{Await, TimeoutException}
 
@@ -18,8 +24,11 @@ class CommunicatorActor extends UntypedAbstractActor{
   def showDialog(): Unit = {
     import javax.swing.JOptionPane
     val optionPane = new JOptionPane("Connection with compute node is not available. " +
-      "\n Run compute application and check connection.", JOptionPane.ERROR_MESSAGE)
+      "\n Run compute application and check connection.", JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION)
     val dialog = optionPane.createDialog("Alert")
+    optionPane.addPropertyChangeListener(new PropertyChangeListener {
+      override def propertyChange(evt: PropertyChangeEvent): Unit = Gdx.app.exit()
+    })
     dialog.setAlwaysOnTop(true)
     dialog.setVisible(true)
   }
