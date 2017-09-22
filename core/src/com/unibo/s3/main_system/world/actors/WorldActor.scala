@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 import com.unibo.s3.main_system.characters.BaseCharacter
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dRaycastCollisionDetector
-import com.unibo.s3.main_system.characters.steer.collisions.gdx.Box2dSquareAABBProximity
+import com.unibo.s3.main_system.characters.steer.collisions.gdx.{Box2dSquareAABBProximity, Box2dSteeringEntity}
 import com.unibo.s3.main_system.communication.Messages.{ActMsg, MapElementMsg}
 import com.unibo.s3.main_system.util.Box2dImplicits._
 import com.unibo.s3.main_system.util.GntUtils
@@ -135,7 +135,17 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
       proximityDetector.setDetectionRadius(radius)
       var neighbors: Seq[Steerable[Vector2]] = List()
       proximityDetector.findNeighbors(new ProximityCallback[Vector2] {
-        override def reportNeighbor(n: Steerable[Vector2]): Boolean = {neighbors :+= n; true}
+        override def reportNeighbor(n: Steerable[Vector2]): Boolean = {
+          n match {
+            case b: Box2dSteeringEntity => b.getBody.getUserData match {
+              case bd: BodyData if bd.bodyType.exists(bt => bt.equals(Hideout)) =>
+                neighbors :+= n
+                true
+              case _ => false
+            }
+            case _ => false
+          }
+        }
       })
       sender() ! ProximityQueryResponse(neighbors)
 
@@ -147,7 +157,7 @@ class WorldActor(val world: World) extends UntypedAbstractActor {
 
       val newBody = world.createBox(new Vector2(body(0), body(1)), new Vector2(body(2), body(3)))
       bodyData.foreach(bodyData =>
-          parseBodyData(bodyData, newBody).foreach(bd => newBody.setUserData(bd)))
+        parseBodyData(bodyData, newBody).foreach(bd => newBody.setUserData(bd)))
       worldObserver.getListener.created(newBody)
   }
 }

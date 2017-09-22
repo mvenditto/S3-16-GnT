@@ -37,7 +37,7 @@ public class RoomMapGenerator extends AbstractMapGenerator {
         buildDoor(door2Coord, (startY + wallH));
         buildDoor((startX + wallV), door3Coord);
 
-        if (n <= 2) {
+        if (n <= 4) {
             return;
         }else{
             generate(n/2, wallV, wallH, startX, startY);

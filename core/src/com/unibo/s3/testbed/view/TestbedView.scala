@@ -16,6 +16,11 @@ import com.unibo.s3.main_system.util.GraphicsUtils
 import com.unibo.s3.testbed.model.ModuleMetadata
 import com.unibo.s3.testbed.ui._
 
+/**
+  * A simple trait defining a listener for Testbed events.
+  *
+  * @author mvenditto
+  */
 trait TestbedListener {
 
   def onSampleSelection(metadata: ModuleMetadata): Unit
@@ -24,6 +29,13 @@ trait TestbedListener {
 
 }
 
+/**
+  * The default graphical interface of the Testbed application.
+  *
+  * @param listener a [[TestbedListener]]
+  *
+  * @author mvenditto
+  */
 case class TestbedView(listener: TestbedListener) {
 
   type AnchorableToggleableActor =
@@ -35,26 +47,20 @@ case class TestbedView(listener: TestbedListener) {
   private var loadingLog: VisLabel = _
   private var samplePane: AnchorableToggleableActor = _
   private var eastPane: AnchorableToggleableActor = _
-  private var console: Console = _
-  private var consolePane: AdaptiveSizeActor with Toggleable = _
   private var toastManager: ToastManager = _
   private var fpsCounter: AdaptiveSizeActor with Anchorable = _
   private var currSampleShortcuts: Option[KeyHelpTable] = None
   private var tree: VisTree = _
 
-  private val consolePadding = 50f
   private val customBlue = new Color(0f, 0.7f, 1f, 1f)
   private val errorRed = new Color(1f, 0.41f, 0.38f, 1f)
 
   def resize(newWidth: Integer, newHeight: Integer): Unit = {
     stage.getViewport.update(newWidth, newHeight, true)
 
-    List(consolePane, eastPane, samplePane, fpsCounter).foreach(w =>
+    List(eastPane, samplePane, fpsCounter).foreach(w =>
       w.resize(newWidth.toFloat, newHeight.toFloat)
     )
-
-    console.setSize(stage.getWidth - consolePadding * 2, stage.getHeight / 4.5f)
-    console.rebuild()
   }
 
   def init(): Unit = {
@@ -113,16 +119,6 @@ case class TestbedView(listener: TestbedListener) {
     menuBar = new MenuBar()
     createMenu()
 
-    console = new Console()
-    val ss = new VisScrollPane(console)
-    consolePane = new AdaptiveSizeActor(ss) with Toggleable
-    consolePane.setTransitionFunc(TransitionFunctions.slideDown)
-    val tmp = Color.BLACK.cpy()
-    tmp.a = 0.5f
-    val bg = GraphicsUtils.drawableFromColor(stage.getWidth.toInt,
-      (stage.getHeight / 4.5f).toInt, tmp)
-    ss.getStyle.background = bg
-
     val _fps = new FpsCounter()
     _fps.setSize(64, 48)
     fpsCounter = new AdaptiveSizeActor(_fps) with Anchorable
@@ -139,7 +135,6 @@ case class TestbedView(listener: TestbedListener) {
     hud.addActor(_eastPane)
 
     stage.addActor(hud)
-    stage.addActor(ss)
     stage.addActor(_fps)
     stage.addActor(root)
 
@@ -147,13 +142,11 @@ case class TestbedView(listener: TestbedListener) {
     val yPerc = 100 - (100 * padY) / stage.getHeight
     List(eastPane, samplePane, fpsCounter)
       .foreach(w => w.setPadding(0, -padY.toInt))
-    consolePane.setSize(100, 20)
     samplePane.setSize(25, yPerc)
     eastPane.setSize(25, yPerc)
-    consolePane.toggle(stage.getWidth, stage.getHeight)
   }
 
-  def addSampleEntry(node: Node, sample: ModuleMetadata, valid: Boolean): Unit = {
+  private def addSampleEntry(node: Node, sample: ModuleMetadata, valid: Boolean): Unit = {
     val sampleNameLbl = new VisLabel(sample.name)
 
     if (!valid) {
@@ -171,20 +164,38 @@ case class TestbedView(listener: TestbedListener) {
     node.add(new Node(sampleNameLbl))
   }
 
+  /**
+    * Update the value of the loading bar
+    * @param value the value to set to the progress bar
+    */
   def setProgressBarValue(value: Float): Unit = loadingBar.setValue(value)
 
+  /**
+    * Logs a message to the 'loading log'
+    * @param msg the message to log.
+    */
   def setLoadingLogText(msg: String): Unit = loadingLog.setText(msg)
 
-  def writeConsoleLog(log: LogMessage): Unit = console.addLog(log)
-
+  /**
+    * Resets the loading bar
+    */
   def resetProgressBar(): Unit = {
     loadingBar.setAnimateDuration(0)
     loadingBar.setValue(0)
     loadingBar.setAnimateDuration(0.2f)
   }
 
+  /**
+    * Clear the content of the panel reserved to the
+    * active [[com.unibo.s3.testbed.model.TestbedModule]].
+    */
   def resetSamplePane(): Unit = samplePane.getActor[VisWindow].clear()
 
+  /**
+    * Display a success notification when a
+    * [[com.unibo.s3.testbed.model.TestbedModule]] is loaded.
+    * @param name the name of the loaded module.
+    */
   def displayModuleLoadedToast(name: String): Unit = {
     val toast = new Toast("dark", new VisTable(true))
     toast.getContentTable.add(new VisLabel("Loaded module: "))
@@ -195,6 +206,10 @@ case class TestbedView(listener: TestbedListener) {
     centerToast(toast)
   }
 
+  /**
+    * Update the current module 'shortcuts help table'
+    * @param shortcuts the shortcuts in the format (shortcut -> action)
+    */
   def setCurrentSampleShortcuts(shortcuts: Map[String, String]): Unit = {
     currSampleShortcuts = None
     val st = new KeyHelpTable(true)
@@ -205,9 +220,17 @@ case class TestbedView(listener: TestbedListener) {
     currSampleShortcuts = Option(st)
   }
 
+  /**
+    * Attach this gui as [[com.badlogic.gdx.InputProcessor]] on the give [[InputMultiplexer]]
+    * @param inputMultiplexer an [[InputMultiplexer]]
+    */
   def attachInputProcessor(inputMultiplexer: InputMultiplexer): Unit =
     inputMultiplexer.addProcessor(stage)
 
+  /**
+    * Return the panel reserved by the Testbed to the active module.
+    * @return the active module panel
+    */
   def getSamplePane: VisWindow = samplePane.getActor[VisWindow]
 
   def render(): Unit = stage.draw()
@@ -216,12 +239,11 @@ case class TestbedView(listener: TestbedListener) {
     stage.act(dt)
   }
 
+  /**
+    * Toggle the active module panel.
+    */
   def toggleSamplePane(): Unit = {
     samplePane.toggle(stage.getWidth, stage.getHeight)
-  }
-
-  def toggleConsole(): Unit = {
-    consolePane.toggle(stage.getWidth, stage.getHeight)
   }
 
   private def createMenu() = {
@@ -276,6 +298,11 @@ case class TestbedView(listener: TestbedListener) {
     toast.getMainTable.setX((stage.getWidth / 2) - toast.getMainTable.getPrefWidth / 2 )
   }
 
+  /**
+    * Build the [[com.unibo.s3.testbed.model.TestbedModule]] [[VisTree]] with
+    * the given modules data.
+    * @param modules the pairs (module, valid)
+    */
   def buildSamplesTree(modules: Iterable[(ModuleMetadata, Boolean)]): Unit = {
     var categories = Map[String, Node]()
 
