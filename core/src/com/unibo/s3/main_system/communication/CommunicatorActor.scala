@@ -1,11 +1,13 @@
 package com.unibo.s3.main_system.communication
 
 import java.beans.{PropertyChangeEvent, PropertyChangeListener, VetoableChangeListener}
+import java.beans.{PropertyChangeEvent, PropertyChangeListener}
 import java.net.InetAddress
+
 import akka.actor.{Props, UntypedAbstractActor}
 import akka.util.Timeout
 import com.unibo.s3.main_system.communication.Messages.{ACKComputationNode, AskIPMsg, SendIPMsg}
-import com.unibo.s3.main_system.game.AkkaSettings
+import com.unibo.s3.main_system.game.{AkkaSystemNames, GUISystemPort}
 
 import scala.concurrent.duration._
 import akka.pattern.ask
@@ -15,7 +17,7 @@ import scala.concurrent.{Await, TimeoutException}
 
 class CommunicatorActor extends UntypedAbstractActor{
 
-  implicit val timeout = Timeout(1 seconds)
+  implicit val timeout: Timeout = Timeout(1 seconds)
 
   def showDialog(): Unit = {
     import javax.swing.JOptionPane
@@ -30,18 +32,20 @@ class CommunicatorActor extends UntypedAbstractActor{
   }
 
   override def onReceive(message: Any): Unit = message match {
-    case _:AskIPMsg => val ref = SystemManager.getRemoteActor(AkkaSettings.ComputeSystem, "/user/",
+    case _:AskIPMsg => val ref = SystemManager.getRemoteActor(AkkaSystemNames.ComputeSystem, "/user/",
       GeneralActors.COMMUNICATOR_ACTOR.name)
       println("ref = " + ref.toString())
       val future = ref ? SendIPMsg(InetAddress.getLocalHost.getHostAddress)
       try {
         Await.result(future, timeout.duration).asInstanceOf[ACKComputationNode]
       } catch {
-        case e: TimeoutException => showDialog()
+        case _: TimeoutException => showDialog()
       }
+
     case msg:SendIPMsg => println("IP ricevuto")
-      SystemManager.setIPForRemoting(msg.IP, AkkaSettings.GUISystemPort)
+      SystemManager.setIPForRemoting(msg.IP, GUISystemPort)
       sender() ! ACKComputationNode()
+
     case msg: Any => println(msg)
   }
 }

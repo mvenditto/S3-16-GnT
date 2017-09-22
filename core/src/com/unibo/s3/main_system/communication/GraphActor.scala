@@ -5,7 +5,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.communication.Messages._
-import com.unibo.s3.main_system.game.AkkaSettings
+import com.unibo.s3.main_system.game.AkkaSystemNames
 import com.unibo.s3.main_system.graph.GraphGenerator
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
@@ -45,7 +45,7 @@ class GraphActor extends  UntypedAbstractActor with Stash {
       writeFunction(verifyClose)
 
     case _: GenerateGraphMsg =>
-      val worldActor = SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/", GeneralActors.WORLD_ACTOR.name)
+      val worldActor = SystemManager.getRemoteActor(AkkaSystemNames.GUISystem, "/user/", GeneralActors.WORLD_ACTOR.name)
 
         this.graph = Option(GraphGenerator.createGraphDistributed(this.width, this.height, FILEPATH, worldActor))
       context.become(askGraph())
@@ -57,6 +57,9 @@ class GraphActor extends  UntypedAbstractActor with Stash {
   private def askGraph(): Receive = {
     case AskForGraphMsg =>
       sender ! SendGraphMsg(graph.get)
+
+    case _: RestartMsg =>
+      context.become(this.mapSettings())
   }
 }
 

@@ -4,7 +4,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.unibo.s3.Main;
 import com.unibo.s3.main_system.communication.SystemManager;
-import com.unibo.s3.main_system.game.AkkaSettings;
+import com.unibo.s3.main_system.game.ComputeSystemPort$;
 
 import java.awt.*;
 import java.net.InetAddress;
@@ -28,7 +28,7 @@ public class DesktopLauncher {
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
-		SystemManager.setIPForRemoting(ip, AkkaSettings.ComputeSystemPort());
+		SystemManager.setIPForRemoting(ip, ComputeSystemPort$.MODULE$);
 		new LwjglApplication(new Main(), config);
 	}
 }
