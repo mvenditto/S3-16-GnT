@@ -2,6 +2,7 @@ package com.unibo.s3.main_system.map;
 
 public class MazeMapGenerator extends AbstractMapGenerator {
 
+    private static final int MAZE_HEIGHT_THRESHOLD = 10;
 
     @Override
     public void generate(int width, int height, int startX, int startY){
@@ -32,7 +33,7 @@ public class MazeMapGenerator extends AbstractMapGenerator {
         buildDoor((startX + wallV), door3Coord);
         buildDoor(door4Coord, (startY + wallH));
 
-        if (height > 10){
+        if (height > MAZE_HEIGHT_THRESHOLD){
             generate(wallV, wallH, startX, startY);
             generate(width - wallV , wallH, startX+wallV+1, startY);
             generate(wallV, height - wallH, startX, startY+wallH+1);

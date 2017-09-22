@@ -2,6 +2,8 @@ package com.unibo.s3.main_system.map;
 
 public class RoomMapGenerator extends AbstractMapGenerator {
 
+    private static final int ROOM_HEIGHT_THRESHOLD = 15;
+
     @Override
     public void generate(int width, int height, int startX, int startY){
         int lowerX = (width/2 ) - 1;//+ width/6);
@@ -36,7 +38,7 @@ public class RoomMapGenerator extends AbstractMapGenerator {
         buildDoor((startX + wallV), door1Coord);
         buildDoor(door2Coord, (startY + wallH));
         buildDoor((startX + wallV), door3Coord);
-        if (height > 15){
+        if (height > ROOM_HEIGHT_THRESHOLD){
             generate(wallV, wallH, startX, startY);
             generate(width - wallV , wallH, startX+wallV+1, startY);
             generate(wallV, height - wallH, startX, startY+wallH+1);
