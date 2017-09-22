@@ -41,8 +41,6 @@ class GuardActor(private[this] val guard: Guard) extends UntypedAbstractActor wi
 
     case _ =>
   }
-
-  def log() : String = "[CHARACTER " + guard.getId + "]: "
 }
 
 object GuardActor {

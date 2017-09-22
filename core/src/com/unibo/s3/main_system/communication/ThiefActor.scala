@@ -81,13 +81,7 @@ class ThiefActor(private[this] val thief: Thief) extends UntypedAbstractActor wi
         Behaviors.onThiefExit(thief, nearestExit,
           exitReachedThreshold, notifyThiefReachedExit())
       }
-
-    case m => println("(thiefActor) message unknown:" + m)
   }
-
-
-
-  def log() : String = "[CHARACTER " + thief.getId + "]: "
 }
 
 object ThiefActor {

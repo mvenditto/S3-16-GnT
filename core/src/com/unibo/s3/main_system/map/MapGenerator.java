@@ -5,16 +5,18 @@ import com.unibo.s3.main_system.game.Wall;
 
 import java.util.List;
 
+/**
+ * Map generator class with settable strategy
+ * @author Nicola Santolini
+ */
 public class MapGenerator {
 
     private static final int BASE_UNIT = Wall.WALL_THICKNESS();
     private GenerationStrategy strategy;
 
     public void generateMap(int width, int height) {
-        //System.out.println("generator: " + width + " " + height);
-        //System.out.println("generator: " + BASE_UNIT);
         strategy.initialSetup(width/BASE_UNIT, height/BASE_UNIT);
-        strategy.generate(8, width/BASE_UNIT, height/BASE_UNIT, 0, 0); }/**todo eliminare primo parametro**/
+        strategy.generate(width/BASE_UNIT, height/BASE_UNIT, 0, 0); }
 
     public List<String> getMap() { return strategy.getMap(); }
 

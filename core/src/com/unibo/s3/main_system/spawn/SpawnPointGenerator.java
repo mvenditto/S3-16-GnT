@@ -6,6 +6,10 @@ import com.unibo.s3.main_system.game.Wall;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Nicola Santolini
+ * @author Daniele Rosetti
+ */
 public class SpawnPointGenerator {
 
     private static final int WALL_THICKNESS = Wall.WALL_THICKNESS();
@@ -22,7 +26,6 @@ public class SpawnPointGenerator {
                     spawnQuadrant.y * 2 + WALL_THICKNESS));
             nSpawnPoints--;
         }
-        //System.out.println("SpawnPoints " + spawnPoints);
         return spawnPoints;
     }
 
