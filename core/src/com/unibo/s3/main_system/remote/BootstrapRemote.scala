@@ -8,7 +8,7 @@ import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.Main
 import com.unibo.s3.main_system.communication.Messages.GameSettingsMsg
 import com.unibo.s3.main_system.communication._
-import com.unibo.s3.main_system.game.AkkaSettings
+import com.unibo.s3.main_system.game.{AkkaSystemNames, ComputeSystemPort}
 import com.unibo.s3.main_system.world.actors.WorldActor
 
 
@@ -20,17 +20,17 @@ class BootstrapRemote() {
   private[this] var startBtn: VisTextButton = _
   private[this] var visualLoadingFinished = false
 
-  private def log(msg: String) = {
+  private def log(msg: String): Unit = {
     println(msg)
   }
 
   private def initActorSystem(): Unit = {
-    log("-- Computation node configuration and startup --");
+    log("-- Computation node configuration and startup --")
     val myIp = InetAddress.getLocalHost.getHostAddress
-    val portNumber = AkkaSettings.ComputeSystemPort
-    SystemManager.createSystem(AkkaSettings.ComputeSystem, ip = Option(myIp), portNumber = Option(portNumber))
-    log("-- Actor system creted --");
-    log("-- IP: " + myIp + ":" + portNumber)
+    val portNumber = ComputeSystemPort
+    SystemManager.createSystem(AkkaSystemNames.ComputeSystem, ip = Option(myIp), portNumber = Option(portNumber))
+    log("-- Actor system creted --")
+    log("-- IP: " + myIp + ":" + portNumber.portNumber)
 
     val world = new World(new Vector2(0, 0), true)
 
@@ -67,7 +67,7 @@ class BootstrapRemote() {
           initActorSystem()
           loadingFinished = true
         } catch {
-          case err: Exception =>
+          case _: Exception =>
           case _ =>
         }
       }

@@ -15,7 +15,7 @@ import com.unibo.s3.main_system.communication.CharacterActors._
 import com.unibo.s3.main_system.communication.GeneralActors.{apply => _, _}
 import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
-import com.unibo.s3.main_system.game.{AkkaSettings, GameSettings}
+import com.unibo.s3.main_system.game.{AkkaSystemNames, GameSettings}
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering._
 import com.unibo.s3.main_system.util.ImplicitConversions._
@@ -108,7 +108,7 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
     SystemManager.getLocalActor(actor)
 
   private def getRemoteActor(actor: String): ActorSelection =
-    SystemManager.getRemoteActor(AkkaSettings.ComputeSystem, "/user/", actor)
+    SystemManager.getRemoteActor(AkkaSystemNames.ComputeSystem, "/user/", actor)
 
   private def cacheMap(bodies: Iterable[Body]) = {
     worldMap = GntUtils.parseBodiesToMap(bodies).toList
