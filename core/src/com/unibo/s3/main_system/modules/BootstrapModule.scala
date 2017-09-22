@@ -12,7 +12,7 @@ import com.kotcrab.vis.ui.widget._
 import com.unibo.s3.Main
 import com.unibo.s3.main_system.communication.Messages.{AskIPMsg, GameSettingsMsg}
 import com.unibo.s3.main_system.communication._
-import com.unibo.s3.main_system.game.AkkaSettings
+import com.unibo.s3.main_system.game.{AkkaSystemNames, GUISystemPort}
 import com.unibo.s3.main_system.world.actors.WorldActor
 
 
@@ -85,7 +85,7 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
   private def initActorSystem(): Unit = {
     setProgress(0)
     var IP: String = InetAddress.getLocalHost.getHostAddress
-    val portNumber = AkkaSettings.GUISystemPort
+    val portNumber = GUISystemPort
     SystemManager.createSystem(ActorSystemName, ip = Option(IP), portNumber = Option(portNumber))
 
     val world = new World(new Vector2(0, 0), true)
@@ -176,7 +176,7 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
 }
 
 object BootstrapModule {
-  private val ActorSystemName = AkkaSettings.GUISystem
+  private val ActorSystemName = AkkaSystemNames.GUISystem
   private val LoadingDialogTitle = "System Initialization"
 
   def apply(listener: BootstrapEvent => Unit): BootstrapModule =

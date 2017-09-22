@@ -56,21 +56,43 @@ task afterEclipseImport(description: "Post processing after project generation",
     printer.print(classpath)
   }
 }
-/*
-shadowJar {
-    from files(sourceSets.main.output.classesDir)
-    println(sourceSets.main.output.classesDir)
-    from files(sourceSets.main.output.resourcesDir)
-    from files(project.assetsDir);
+
+/*shadowJar {
+    baseName = "remote"
+    classifier = null
+    version = null
     manifest {
         attributes 'Implementation-Title': 'GeT',
-                'Implementation-Version': version,
-                'Main-Class': 'com.unibo.s3.desktop.TestbedLauncher'
+                'Main-Class': 'com.unibo.s3.desktop.ComputeLauncher'
     }
-shadowJar {
     transform(AppendingTransformer) {
         resource = 'reference.conf'
     }
+    dependencies {
+        exclude(dependency("com.kotcrab.vis:vis-ui:$visuiVersion"))
+        exclude(dependency("com.badlogicgames.box2dlights:box2dlights:1.4"))
+        exclude(dependency("com.typesafe.akka:akka-testkit_2.11:2.5.4"))
+        exclude(dependency("net.dermetfan.libgdx-utils:libgdx-utils-box2d:0.13.4"))
+        exclude(dependency("junit:junit:4.+"))
 
-}
+    }
 }*/
+
+shadowJar {
+    baseName = "local"
+    classifier = null
+    version = null
+    manifest {
+        attributes 'Implementation-Title': 'GeT',
+                'Main-Class': 'com.unibo.s3.desktop.DesktopLauncher'
+    }
+    transform(AppendingTransformer) {
+        resource = 'reference.conf'
+    }
+    dependencies {
+        exclude(dependency("com.typesafe.akka:akka-testkit_2.11:2.5.4"))
+        exclude(dependency("junit:junit:4.+"))
+        exclude(dependency("com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"))
+
+    }
+}

@@ -6,16 +6,18 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
 import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.badlogic.gdx.physics.box2d.Body
+import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.{Input, InputMultiplexer}
-import com.kotcrab.vis.ui.widget.{BusyBar, VisLabel, VisWindow}
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.{Gdx, Input, InputMultiplexer}
+import com.kotcrab.vis.ui.widget.{BusyBar, VisLabel, VisTextButton, VisWindow}
 import com.unibo.s3.Main
 import com.unibo.s3.main_system.characters.{BaseCharacter, Thief}
 import com.unibo.s3.main_system.communication.CharacterActors._
 import com.unibo.s3.main_system.communication.GeneralActors.{apply => _, _}
 import com.unibo.s3.main_system.communication.Messages._
 import com.unibo.s3.main_system.communication.{GeneralActors, SystemManager}
-import com.unibo.s3.main_system.game.{AkkaSettings, GameSettings}
+import com.unibo.s3.main_system.game.{AkkaSystemNames, GameSettings}
 import com.unibo.s3.main_system.graph.GraphAdapter
 import com.unibo.s3.main_system.rendering._
 import com.unibo.s3.main_system.util.ImplicitConversions._
@@ -108,7 +110,7 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
     SystemManager.getLocalActor(actor)
 
   private def getRemoteActor(actor: String): ActorSelection =
-    SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/", actor)
+    SystemManager.getRemoteActor(AkkaSystemNames.ComputeSystem, "/user/", actor)
 
   private def cacheMap(bodies: Iterable[Body]) = {
     worldMap = GntUtils.parseBodiesToMap(bodies).toList
@@ -126,6 +128,12 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
         endGameDialog.add(new VisLabel(evadedThieves + " thieves evaded.")).fillX()
         endGameDialog.row()
         endGameDialog.add(new VisLabel(caughtThieves + " thieves got caught by guards.")).fillX()
+        val okBtn = new VisTextButton("OK")
+        okBtn.addListener(new ClickListener{
+          override def clicked(event: InputEvent, x: Float, y: Float): Unit = Gdx.app.exit()
+        })
+        endGameDialog.row()
+        endGameDialog.add(okBtn)
         endGameDialog.pack()
         endGameDialog.centerWindow()
         endGameDialog.fadeIn(1.5f)
@@ -222,10 +230,7 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
   }
 
   override def keyUp(keycode: Int): Boolean = {
-    if(keycode == Input.Keys.T && debugRendering) {
-      spawnActor.tell(
-        GenerateNewCharacterPositionMsg(1, THIEF), masterActor)
-    }
+    if(keycode == Input.Keys.T && debugRendering) spawnActor.tell(GenerateNewCharacterPositionMsg(1, THIEF), masterActor)
     false
   }
 
