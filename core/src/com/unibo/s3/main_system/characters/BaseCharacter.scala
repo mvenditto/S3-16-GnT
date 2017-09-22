@@ -125,6 +125,7 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
     discoverNewVertex(nearest)
     nearest
   }
+
   def selectRandomDestination(): Option[Vector2] = {
     if (index != null && currentNode.isDefined) {
       val _neighbors = index.neighborListOf(currentNode.get).asScala
@@ -172,12 +173,10 @@ abstract class BaseCharacter(vector2: Vector2, id : Int) extends BaseMovableEnti
     }
   }
 
-
-  //computo il mio nodo di riferimento
   private def computeNearestVertex: Option[Vector2] = {
     var nearest = currentNode
     var minDistance = getPosition.dst2(new Vector2(nearest.get.x, nearest.get.y))
-    var list = computeNeighbours.get
+    val list = computeNeighbours.get
     import scala.collection.JavaConversions._
     for (v <- list) {
       val distance = v.dst2(getPosition)
