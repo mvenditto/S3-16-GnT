@@ -69,6 +69,9 @@ class SpawnActor extends UntypedAbstractActor with Stash {
       val it = list.iterator()
       while(it.hasNext)
         ref ! CreateCharacterMsg(it.next(), msg.characterType)
+
+    case _: RestartMsg =>
+      context.become(this.mapSettings())
   }
 }
 

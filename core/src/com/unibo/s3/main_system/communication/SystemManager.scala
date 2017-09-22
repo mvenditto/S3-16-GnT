@@ -3,6 +3,8 @@ package com.unibo.s3.main_system.communication
 
 import akka.actor.{ActorRef, ActorSelection, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
+import com.unibo.s3.main_system.communication.Messages.RestartMsg
+import com.unibo.s3.main_system.game.AkkaSettings
 
 object SystemManager {
   private[this] type GeneralActors = GeneralActors.Value
@@ -72,5 +74,14 @@ object SystemManager {
     this.system.actorSelection(tmp.toString())
   }
 
-  def shutdownSystem(): Unit = this.system.terminate()
+  def restartSystem(): Unit = {
+    if(this.portToConnect == AkkaSettings.ComputeSystemPort) {
+      this.getRemoteActor(AkkaSettings.ComputeSystem, "/user/", GeneralActors.MAP_ACTOR.name) ! RestartMsg()
+      this.getRemoteActor(AkkaSettings.ComputeSystem, "/user/", GeneralActors.GRAPH_ACTOR.name) ! RestartMsg()
+      this.getRemoteActor(AkkaSettings.ComputeSystem, "/user/", GeneralActors.SPAWN_ACTOR.name) ! RestartMsg()
+    }
+  }
+  def shutdownSystem(): Unit = {
+    this.system.terminate()
+  }
 }

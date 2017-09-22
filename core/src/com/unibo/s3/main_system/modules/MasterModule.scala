@@ -222,10 +222,7 @@ class MasterModule extends BasicModuleWithGui with GameOverlay {
   }
 
   override def keyUp(keycode: Int): Boolean = {
-    if(keycode == Input.Keys.T && debugRendering) {
-      spawnActor.tell(
-        GenerateNewCharacterPositionMsg(1, THIEF), masterActor)
-    }
+    if(keycode == Input.Keys.T && debugRendering) spawnActor.tell(GenerateNewCharacterPositionMsg(1, THIEF), masterActor)
     false
   }
 

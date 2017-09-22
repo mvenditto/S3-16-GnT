@@ -43,8 +43,9 @@ object Messages {
   case class GenerateNewCharacterPositionMsg(num: Int, characterType: CharacterActors)
   case class ResetSpawnMsg()
 
-  //message for CommunciatorActor
+  //message for CommunicatorActor
   case class SendIPMsg(IP: String)
   case class AskIPMsg()
+  case class RestartMsg()
   case class CiaoMsg(char: BaseCharacter)
 }

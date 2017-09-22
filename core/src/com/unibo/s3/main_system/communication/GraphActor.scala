@@ -57,6 +57,9 @@ class GraphActor extends  UntypedAbstractActor with Stash {
   private def askGraph(): Receive = {
     case AskForGraphMsg =>
       sender ! SendGraphMsg(graph.get)
+
+    case _: RestartMsg =>
+      context.become(this.mapSettings())
   }
 }
 
