@@ -1,10 +1,11 @@
 package com.unibo.s3.main_system.communication
 
-import akka.actor.{Props, Stash, UntypedAbstractActor}
+import akka.actor.{ActorSelection, Props, Stash, UntypedAbstractActor}
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.communication.Messages._
+import com.unibo.s3.main_system.game.AkkaSettings
 import com.unibo.s3.main_system.graph.GraphGenerator
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
@@ -40,7 +41,7 @@ class GraphActor extends  UntypedAbstractActor with Stash {
       else stash()
 
     case _: GenerateGraphMsg =>
-      this.graph = Option(GraphGenerator.createGraph(this.width, this.height, FILEPATH))
+      this.graph = Option(GraphGenerator.createGraphDistributed(this.width, this.height, FILEPATH))
       unstashAll()
 
     case _ => println("(graphActor) message unknown: " + message)
@@ -51,9 +52,9 @@ class GraphActor extends  UntypedAbstractActor with Stash {
   override def onReceive(message: Any): Unit = {}
 
   private def mapSettings(): Receive = {
-    case MapSettingsMsg(w, h) =>
-      this.width = w
-      this.height = h
+    case GameSettingsMsg(g) =>
+      this.width = g.mapSize.x.toInt
+      this.height = g.mapSize.y.toInt
       context.become(generateGraph())
       unstashAll()
     case _ => stash()
@@ -71,7 +72,9 @@ class GraphActor extends  UntypedAbstractActor with Stash {
       writeFunction(verifyClose)
 
     case _: GenerateGraphMsg =>
-      this.graph = Option(GraphGenerator.createGraph(this.width, this.height, FILEPATH))
+      val worldActor = SystemManager.getRemoteActor(AkkaSettings.GUISystem, "/user/", GeneralActors.WORLD_ACTOR.name);
+
+        this.graph = Option(GraphGenerator.createGraphDistributed(this.width, this.height, FILEPATH, worldActor))
       context.become(askGraph())
       unstashAll()
 

@@ -17,7 +17,7 @@ import com.unibo.s3.InputProcessorAdapter
 import com.unibo.s3.main_system.util.ScaleUtils.getPixelsPerMeter
 
 /**
-  * This is a base skeleton application. Only implemented aspects are:
+  * This is a skeleton application. Only covered aspects are:
   *{{{
   * - base game-loop logic, update/render cycle + pause.
   * - AI timepiece update

@@ -1,5 +1,6 @@
 package graph;
 
+import akka.actor.Actor;
 import akka.actor.ActorRef;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -27,12 +28,12 @@ public class GraphTest {
 
     @Test
     public void checkNewGraph() {
-        SystemManager.createSystem("TestSystem", Option.empty());
-        SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor");
+        SystemManager.createSystem("TestSystem", Option.empty(), Option.empty());
+        ActorRef worldActor = SystemManager.createActor(WorldActor.props(new World(new Vector2(0, 0), true)), "worldActor");
 
         sendMapToWord();
 
-        UndirectedGraph<Vector2, DefaultEdge> objectGraph = GraphGenerator.createGraph(15,9,mapFilename);
+        UndirectedGraph<Vector2, DefaultEdge> objectGraph = GraphGenerator.createGraphLocal(15,9,mapFilename, worldActor);
         UndirectedGraph<Vector2, DefaultEdge> expected = createExpectedGraph();
         assert(objectGraph.vertexSet().containsAll(expected.vertexSet()));
         assert(expected.vertexSet().containsAll(objectGraph.vertexSet()));

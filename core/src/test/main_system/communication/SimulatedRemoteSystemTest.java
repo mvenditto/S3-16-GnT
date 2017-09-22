@@ -55,7 +55,8 @@ public class SimulatedRemoteSystemTest {
     public void simulatedRemoteSystemTest() {
         new TestKit(testSystem) {{
             try {
-                SystemManager.createSystem("LocalSystem", Option.apply(AkkaSettings.GUISystemPort()));
+                SystemManager.createSystem("LocalSystem", Option.apply(Inet4Address.getLocalHost().getHostAddress()),
+                        Option.apply(AkkaSettings.GUISystemPort()));
                 ActorRef localActor = SystemManager.createActor(Props.create(TestActor.class), "localActor");
 
                 String confText = "{\"akka\":{\"actor\":{\"provider\":\"akka.remote.RemoteActorRefProvider\"}," +
@@ -67,7 +68,7 @@ public class SimulatedRemoteSystemTest {
                 ActorSystem remoteSystem = ActorSystem.create("RemoteSystem", customConf);
                 remoteSystem.actorOf(Props.create(TestActor.class), "remoteActor");
 
-                SystemManager.setIPForRemoting(Inet4Address.getLocalHost().getHostAddress());
+                SystemManager.setIPForRemoting(Inet4Address.getLocalHost().getHostAddress(), AkkaSettings.ComputeSystemPort());
                 ActorSelection remoteActor = SystemManager.getRemoteActor
                         ("RemoteSystem","/user/", "remoteActor");
 

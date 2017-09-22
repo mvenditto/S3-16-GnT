@@ -3,6 +3,7 @@ package com.unibo.s3.main_system.communication
 import akka.actor.ActorRef
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.BaseCharacter
+import com.unibo.s3.main_system.game.GameSettings
 import org.jgrapht.UndirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
@@ -12,7 +13,7 @@ object Messages {
   case class ActMsg(dt: Float)
 
   //message for MapActor
-  case class MapSettingsMsg(width: Int, height: Int)
+  case class GameSettingsMsg(g: GameSettings)
   case class GenerateMapMsg() //ci va un flag con la tipologia di grafo
 
   //message for GraphActor
@@ -22,15 +23,16 @@ object Messages {
   case class SendGraphMsg(graph: UndirectedGraph[Vector2, DefaultEdge])
 
   //message for CharacterActor
-  case class AskNeighboursMsg(character: BaseCharacter)
+  case class AskNeighboursMsg(character: BaseCharacter, radius: Option[Float] = None)
   case class SendNeighboursMsg(neighbours: Iterable[ActorRef])
   case class AskAllCharactersMsg()
   case class SendAllCharactersMsg(characters: Iterable[BaseCharacter])
-  case class SendCopInfoMsg(visitedVertices: List[Vector2])
+  case class SendGuardInfoMsg(visitedVertices: Iterable[Vector2])
 
   //messages for GameActor
-  case class ThiefCaughtMsg(thief: BaseCharacter)
+  case class ThiefCaughtMsg(thief: BaseCharacter, guard: BaseCharacter)
   case class ThiefReachedExitMsg(thief: BaseCharacter)
+  case class ToggleViewDebug(viewDebug: Boolean)
 
   //message for MasterActor
   case class RebuildQuadTreeMsg()
@@ -38,5 +40,11 @@ object Messages {
   case class InitialSavingCharacterMsg(newCharacter: BaseCharacter, characterRef: ActorRef)
 
   //message for SpawnActor
-  case class GenerateNewCharacterPositionMsg(characterType: CharacterActors)
+  case class GenerateNewCharacterPositionMsg(num: Int, characterType: CharacterActors)
+  case class ResetSpawnMsg()
+
+  //message for CommunciatorActor
+  case class SendIPMsg(IP: String)
+  case class AskIPMsg()
+  case class CiaoMsg(char: BaseCharacter)
 }

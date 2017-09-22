@@ -1,10 +1,8 @@
 package main_system
 
-import com.badlogic.gdx.ApplicationListener
+import com.badlogic.gdx.ai.GdxAI
 import com.badlogic.gdx.backends.headless.{HeadlessApplication, HeadlessApplicationConfiguration}
-import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.World
-import com.badlogic.gdx.utils.GdxNativesLoader
+import com.badlogic.gdx.{ApplicationListener, Gdx}
 import org.junit.runners.BlockJUnit4ClassRunner
 
 /**
@@ -23,7 +21,8 @@ class GdxDependencies(klass: Class[_])
 
   override def dispose(): Unit = {}
 
-  override def render(): Unit = {}
+  override def render(): Unit =
+    GdxAI.getTimepiece.update(Gdx.graphics.getDeltaTime)
 
   override def resume(): Unit = {}
 

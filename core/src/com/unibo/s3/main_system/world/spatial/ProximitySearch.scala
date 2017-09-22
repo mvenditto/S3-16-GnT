@@ -3,7 +3,7 @@ package com.unibo.s3.main_system.world.spatial
 import com.badlogic.gdx.ai.steer.Steerable
 import com.badlogic.gdx.math.Vector2
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 /*
 * A 2d space rectangular partition.
@@ -26,7 +26,7 @@ case class Bounds(x: Float, y: Float, w: Float, h: Float) {
   */
 class QuadTreeNode[T <: Steerable[Vector2]](bounds: Bounds){
 
-  private var entities: ListBuffer[T] = ListBuffer[T]()
+  private var entities = ArrayBuffer.empty[T]
   private val max_entities: Int = 4
 
   private var ne: QuadTreeNode[T] = _
@@ -78,7 +78,7 @@ class QuadTreeNode[T <: Steerable[Vector2]](bounds: Bounds){
     * @return an [[Iterable]] of [[T]] entities contained in queryArea.
     */
   def rangeQuery(queryArea: Bounds): Iterable[T] = {
-    var neighbors: Seq[T] = List()
+    var neighbors = ArrayBuffer[T]()
 
     if (!bounds.intersect(queryArea)) return neighbors
 

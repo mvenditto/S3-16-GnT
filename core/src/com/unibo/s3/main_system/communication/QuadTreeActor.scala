@@ -4,59 +4,71 @@ import com.badlogic.gdx.ai.steer.Proximity.ProximityCallback
 import com.badlogic.gdx.ai.steer.Steerable
 import com.badlogic.gdx.math.Vector2
 import com.unibo.s3.main_system.characters.BaseCharacter
-import com.unibo.s3.main_system.characters.Guard.Guard
-import com.unibo.s3.main_system.characters.Thief.Thief
+import com.unibo.s3.main_system.characters.Guard
+import com.unibo.s3.main_system.characters.Thief
 import com.unibo.s3.main_system.communication.Messages.{AskNeighboursMsg, InitialSavingCharacterMsg, RebuildQuadTreeMsg, SendNeighboursMsg, _}
+import com.unibo.s3.main_system.game.AkkaSettings
 import com.unibo.s3.main_system.util.GdxImplicits._
 import com.unibo.s3.main_system.world.actors.{FilterReachableByRay, SendFilterReachableByRay}
 import com.unibo.s3.main_system.world.spatial.{Bounds, QuadTreeNode}
 
-case class AskNeighboursWithFovMsg(character: BaseCharacter)
+import scala.collection.mutable
+
+case class AskNeighboursWithinFovMsg(character: BaseCharacter)
 case class SendThievesInProximityMsg(thieves: Iterable[BaseCharacter])
 case class SendGuardsInProximityMsg(thieves: Iterable[BaseCharacter])
+case class AskNearbyGuardsMsg(c: BaseCharacter, r: Option[Float] = None)
+case class SendNearbyGuardsMsg(n: Iterable[ActorRef])
 
 class QuadTreeActor extends UntypedAbstractActor {
 
   type RequestId = (Long, Int)
 
-  private[this] var agentsTable = Map[BaseCharacter, ActorRef]()
-  private[this] var nearbyRequestCache = Map[RequestId, Iterable[BaseCharacter]]()
+  private[this] var agentsTable = mutable.AnyRefMap[BaseCharacter, ActorRef]()
+  private[this] var nearbyRequestCache = mutable.AnyRefMap[RequestId, Iterable[BaseCharacter]]()
   private[this] var bounds = Bounds(0, 0, 100, 100)
   private[this] var root = QuadTreeNode[BaseCharacter](Bounds(0, 0, 60, 60))
   private[this] val queryRadius = 5f
 
   private def timestamp: Long = System.nanoTime()
 
-  private def queryForNeighbors(c: BaseCharacter): Iterable[BaseCharacter] = {
-    val pos = c.getPosition.cpy().sub(queryRadius, queryRadius)
-    val twiceQueryRadius= 2 * queryRadius
+  private def queryForNeighbors(c: BaseCharacter, r: Option[Float]): Iterable[BaseCharacter] = {
+    val radius = if(r.isDefined) r.get else c.getFieldOfView.getRadius
+    val pos = c.getPosition.cpy().sub(radius, radius)
+    val twiceQueryRadius= 2 * radius
     val neighbours = root.rangeQuery(
       Bounds(pos.x, pos.y, twiceQueryRadius, twiceQueryRadius))
     neighbours
   }
 
   override def onReceive(message: Any): Unit = message match {
-    case MapSettingsMsg(w, h) =>
-      bounds = Bounds(0, 0, w, h)
+    case GameSettingsMsg(gs) =>
+      bounds = Bounds(0, 0, gs.mapSize.x, gs.mapSize.y)
 
     case InitialSavingCharacterMsg(newCharacter, characterRef) =>
       agentsTable += (newCharacter -> characterRef)
-      SystemManager.getLocalActor(
-        GeneralActors.GAME_ACTOR) ! SendAllCharactersMsg(agentsTable.keys)
-      SystemManager.getLocalActor(
-        GeneralActors.LIGHTING_SYSTEM_ACTOR) ! SendAllCharactersMsg(agentsTable.keys)
+      val ref = SystemManager.getLocalActor(GeneralActors.GAME_ACTOR)
+      ref ! SendAllCharactersMsg(agentsTable.keys)
+      val refLig = SystemManager.getLocalActor(GeneralActors.LIGHTING_SYSTEM_ACTOR)
+      refLig ! SendAllCharactersMsg(agentsTable.keys)
 
     case RebuildQuadTreeMsg() =>
       root = QuadTreeNode(bounds)
-      agentsTable.keys.foreach(c => root.insert(c))
+      agentsTable.foreachKey(c => root.insert(c))
 
-    case AskNeighboursMsg(character) =>
-      val neighbours = queryForNeighbors(character)
+    case AskNearbyGuardsMsg(character, radius) =>
+      val neighbours = queryForNeighbors(character, radius)
+      sender ! SendNearbyGuardsMsg(neighbours.collect {
+        case n: Guard if !agentsTable(n).equals(sender) => agentsTable(n)
+      })
+
+    case AskNeighboursMsg(character, radius) =>
+      val neighbours = queryForNeighbors(character, radius)
       sender ! SendNeighboursMsg(neighbours.map(c => agentsTable(c)))
 
-    case AskNeighboursWithFovMsg(c) =>
+    case AskNeighboursWithinFovMsg(c) =>
       val fov = c.getFieldOfView
-      val neighbors = queryForNeighbors(c).map { x: Steerable[Vector2] => x }
+      val neighbors = queryForNeighbors(c, None).map { x: Steerable[Vector2] => x }
       var neighborsInFov = List[BaseCharacter]()
 
       fov.setAgents(neighbors.asGdxArray)
@@ -75,31 +87,38 @@ class QuadTreeActor extends UntypedAbstractActor {
 
         nearbyRequestCache += (reqId -> neighborsInFov)
 
-        SystemManager.getLocalActor(
-          GeneralActors.WORLD_ACTOR) ! filterOnlyOnSightLine
+        val refWorld = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
+        refWorld ! filterOnlyOnSightLine
 
       } else {
         sender ! SendNeighboursMsg(List())
       }
 
     case SendFilterReachableByRay(filter, reqId) =>
-
       val onlyVisible = nearbyRequestCache(reqId)
         .zip(filter)
         .collect{case (x, true) => x}
 
       val reqCharacter = agentsTable.keys.filter(a => a.getId == reqId._2).head
       val requester = agentsTable(reqCharacter)
-      requester ! SendNeighboursMsg(onlyVisible.filter(a => a match {
-        case _ : Guard => true; case _ => false}).map(a => agentsTable(a)))
-      val thievesInProximity = onlyVisible.filter(a => a match {case _ : Thief => true; case _ => false})
 
-      if(thievesInProximity.nonEmpty) {
-        requester ! SendThievesInProximityMsg(thievesInProximity)
-        thievesInProximity.foreach(t => agentsTable(t) ! SendGuardsInProximityMsg(List(reqCharacter)))
-      }
+      requester ! SendNeighboursMsg(
+        onlyVisible.filter(a => a match {
+          case _ : Guard => true
+          case _ => false
+        }).map(a => agentsTable(a)))
+
+      val thievesInProximity = onlyVisible.filter(a => a match {
+          case t : Thief => !t.hasReachedExit && !t.gotCaughtByGuard
+          case _ => false
+        })
+
+      requester ! SendThievesInProximityMsg(thievesInProximity)
+      thievesInProximity.foreach(t =>
+        agentsTable(t) ! SendGuardsInProximityMsg(List(reqCharacter)))
 
       nearbyRequestCache -= reqId
+
     case AskAllCharactersMsg =>
       sender ! SendAllCharactersMsg(agentsTable.keys)
 

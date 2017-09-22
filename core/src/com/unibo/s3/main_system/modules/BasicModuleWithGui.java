@@ -2,6 +2,8 @@ package com.unibo.s3.main_system.modules;
 
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.unibo.s3.InputProcessorAdapter;
@@ -12,6 +14,10 @@ public class BasicModuleWithGui implements BasicModule, InputProcessorAdapter {
     protected Stage gui;
     private boolean guiEnabled = true;
     private boolean enabled = true;
+
+    public Stage getGuiStage() {
+        return gui;
+    }
 
     @Override
     public void init(Main owner) {
@@ -63,4 +69,5 @@ public class BasicModuleWithGui implements BasicModule, InputProcessorAdapter {
     public void cleanup() {
         gui.dispose();
     }
+
 }

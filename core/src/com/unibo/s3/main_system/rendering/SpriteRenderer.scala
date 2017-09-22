@@ -7,7 +7,10 @@ import com.badlogic.gdx.graphics.{Camera, Color, Texture}
 import com.badlogic.gdx.math.{MathUtils, Vector2}
 import com.badlogic.gdx.utils.Disposable
 import com.unibo.s3.main_system.characters.BaseCharacter
+import com.unibo.s3.main_system.characters.Guard
+import com.unibo.s3.main_system.characters.Thief
 import com.unibo.s3.main_system.characters.steer.MovableEntity
+import com.unibo.s3.main_system.game.Wall
 import com.unibo.s3.main_system.util.ScaleUtils
 
 import scala.collection.mutable
@@ -20,21 +23,33 @@ import scala.collection.mutable
 class SpriteRenderer extends Disposable {
   import SpriteRenderer._
 
-  private var batch: SpriteBatch = _
+  var batch: SpriteBatch = _
   private val animationsCache = mutable.Map[String, Animation[TextureRegion]]()
   private var guardAtlas: TextureAtlas = _
+  private var thiefAtlas: TextureAtlas = _
   private var stateTime = 0f
   private var floorTexture: TextureRegion = _
   private var font: BitmapFont = _
   private var debugDraw = false
+  private var exitTexture: Texture = _
+  private var exitSprite: TextureRegion = _
 
-  private def getAndCacheAnimation(s: String): Animation[TextureRegion] = {
-    animationsCache.getOrElseUpdate(s,
-      new Animation[TextureRegion](freq, guardAtlas.findRegions(s), PlayMode.LOOP))
+  private def getAndCacheAnimation(s: String, c: BaseCharacter): Animation[TextureRegion] = {
+
+    val typee = c match {
+      case _ :Guard => ("g", guardAtlas)
+      case _ :Thief => ("t", thiefAtlas)
+    }
+
+    val atlas = typee._2
+    val tag = typee._1
+
+    animationsCache.getOrElseUpdate(tag + s,
+      new Animation[TextureRegion](freq, atlas.findRegions(s), PlayMode.LOOP))
   }
 
   private def getCurrentAnimation(
-    c: MovableEntity[Vector2]): (Animation[TextureRegion], Animation[TextureRegion]) = {
+    c: BaseCharacter): (Animation[TextureRegion], Animation[TextureRegion]) = {
 
     val v = c.getLinearVelocity
 
@@ -44,8 +59,8 @@ class SpriteRenderer extends Disposable {
       case x if x > runThreshold => (guardMove, guardFeetRun)
     }
 
-    val body = getAndCacheAnimation(a._1)
-    val feet = getAndCacheAnimation(a._2)
+    val body = getAndCacheAnimation(a._1, c)
+    val feet = getAndCacheAnimation(a._2, c)
 
     (body, feet)
   }
@@ -63,13 +78,16 @@ class SpriteRenderer extends Disposable {
     font.setColor(Color.YELLOW)
     font.getData.setScale(2f, 2f)
     guardAtlas = new TextureAtlas(guardAtlasFile)
+    thiefAtlas = new TextureAtlas(thiefAtlasFile)
+    exitTexture = new Texture(Gdx.files.internal(exitSpriteFile))
+    exitSprite = new TextureRegion(exitTexture, 0, 0, exitTexture.getWidth, exitTexture.getHeight)
   }
 
   def setDebugDraw(flag: Boolean): Unit = debugDraw = flag
 
   def update(dt: Float): Unit = stateTime += dt
 
-  def render(c: MovableEntity[Vector2], cam: Camera): Unit = {
+  def render(c: BaseCharacter, cam: Camera): Unit = {
     val a = getCurrentAnimation(c)
     val body = a._1
     val feet = a._2
@@ -101,7 +119,19 @@ class SpriteRenderer extends Disposable {
 
   }
 
-  def updateAndRender(dt: Float, c: MovableEntity[Vector2], cam: Camera): Unit = {
+
+  def renderExits(exits: Iterable[Vector2], cam: Camera): Unit = {
+    val s = ScaleUtils.getPixelsPerMeter
+    val hw = exitSprite.getRegionWidth / 2
+    val wt = Wall.WALL_THICKNESS * s
+    batch.setProjectionMatrix(cam.combined)
+    batch.begin()
+
+    exits.foreach(e => batch.draw(exitSprite, (e.x * s) - wt / 2, (e.y * s) - wt / 2, wt, wt))
+    batch.end()
+  }
+
+  def updateAndRender(dt: Float, c: BaseCharacter, cam: Camera): Unit = {
     render(c, cam)
     update(dt)
   }
@@ -129,19 +159,23 @@ class SpriteRenderer extends Disposable {
   override def dispose(): Unit = {
     batch.dispose()
     guardAtlas.dispose()
+    thiefAtlas.dispose()
     font.dispose()
+    exitTexture.dispose()
   }
 }
 
 object SpriteRenderer {
 
   private val guardAtlasFile = "sprites/guard.atlas"
+  private val thiefAtlasFile = "sprites/thief.atlas"
   private val guardIdle  = "guard-idle_flashlight"
   private val guardMove  = "guard-move_flashlight"
   private val guardFeetIdle = "guard-idle"
   private val guardFeetWalk = "guard-walk"
   private val guardFeetRun = "guard-run"
   private val defaultFloor = "sprites/floor3.png"
+  private val exitSpriteFile = "sprites/exit_icon.png"
   private val guardScale = 1.0f / 3.0f
   private val runThreshold = 1.0f
   private val idleThreshold = 0.01f

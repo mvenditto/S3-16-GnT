@@ -1,13 +1,12 @@
 package com.unibo.s3.main_system.world.actors
 
-import akka.actor.ActorRef
-import akka.pattern.ask
 import akka.util.Timeout
 import com.badlogic.gdx.ai.utils.{Collision, Ray, RaycastCollisionDetector}
 import com.badlogic.gdx.math.Vector2
+import com.unibo.s3.main_system.world.actors.ActorRefOrSelection.{ActorRefOrSelectionHolder, _}
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
 /**
@@ -15,9 +14,9 @@ import scala.language.postfixOps
   * instead of directly referencing a [[com.badlogic.gdx.physics.box2d.World]].
   * This anyway introduces latency and a collision could be missed on high load.
   * @see [[com.unibo.s3.main_system.characters.steer.collisions.Box2dRaycastCollisionDetector]]
-  * @param worldActor a reference to the WorldActor
+  * @param worldActor a [[ActorRefOrSelection]] to the WorldActor
   */
-class Box2dRayCastCollisionDetectorProxy(worldActor: ActorRef) extends RaycastCollisionDetector[Vector2]{
+class Box2dRayCastCollisionDetectorProxy(worldActor: ActorRefOrSelectionHolder) extends RaycastCollisionDetector[Vector2]{
 
   implicit val timeout = Timeout(5 seconds)
 
@@ -26,14 +25,14 @@ class Box2dRayCastCollisionDetectorProxy(worldActor: ActorRef) extends RaycastCo
   }
 
   override def findCollision(outputCollision: Collision[Vector2], inputRay: Ray[Vector2]): Boolean = {
-    val future = worldActor ? RayCastCollisionQuery(inputRay)
+    val future = worldActor ? RayCastCollisionQuery(inputRay.start, inputRay.end)
     val result = waitWorldResponse(future).asInstanceOf[RayCastCollisionResponse]
-    outputCollision.set(result.coll)
+    outputCollision.set(result.coll.point, result.coll.normal)
     result.collided
   }
 
   override def collides(ray: Ray[Vector2]): Boolean = {
-    val future = worldActor ? RayCastCollidesQuery(ray)
+    val future = worldActor ? RayCastCollidesQuery(ray.start, ray.end)
     waitWorldResponse(future).asInstanceOf[RayCastCollidesResponse].collides
   }
 }

@@ -1,26 +1,19 @@
 package com.unibo.s3.main_system.graph;
 
 import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory;
-import com.unibo.s3.main_system.communication.SystemManager;
-import com.unibo.s3.main_system.game.GameSettings;
 import com.unibo.s3.main_system.game.Wall;
-import com.unibo.s3.main_system.map.AbstractMapGenerator;
-import org.jgrapht.GraphPath;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.alg.shortestpath.KShortestPaths;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
-import scala.Int;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -49,14 +42,26 @@ public class GraphGenerator {
         return new Vector2(x, y);
     }
 
-    public static UndirectedGraph<Vector2, DefaultEdge> createGraph(int width, int height, String mapFilename) {
-        int dimWall = Wall.WALL_THICKNESS();
+    public static UndirectedGraph<Vector2, DefaultEdge> createGraphLocal(int width, int height, String mapFilename, ActorRef worldActorRef) {
+        RaycastCollisionDetector<Vector2> collisionDetector =
+                Box2dProxyDetectorsFactory.of(worldActorRef).newRaycastCollisionDetector();
+        return init(width, height, mapFilename, collisionDetector);
+    }
 
-        ActorRef worldActor = SystemManager.getLocalActor("worldActor");
-        RaycastCollisionDetector<Vector2> collisionDetector = new Box2dProxyDetectorsFactory(worldActor).newRaycastCollisionDetector();
+    public static UndirectedGraph<Vector2, DefaultEdge> createGraphDistributed(int width, int height, String mapFilename, ActorSelection worldActorRef) {
+
+        //ActorSelection worldActor = SystemManager.getRemoteActor(AkkaSettings.GUISystem(), "/user/", "worldActor");
+        //ActorRef worldActor = SystemManager.getLocalActor("worldActor");
+        RaycastCollisionDetector<Vector2> collisionDetector =
+                Box2dProxyDetectorsFactory.of(worldActorRef).newRaycastCollisionDetector();
+        return init(width, height, mapFilename, collisionDetector);
+    }
+
+    private static UndirectedGraph<Vector2, DefaultEdge> init(int width, int height, String mapFilename, RaycastCollisionDetector<Vector2> collisionDetector) {
+        int dimWall = Wall.WALL_THICKNESS();
         HashMap<Vector2, Vector2> walls = new HashMap<>();
         Integer[][] grid = new Integer[width+(dimWall*2)][height+(dimWall*2)];
-        log("genero il grafo di dimensione: " + width + ", " + height);
+        //log("genero il grafo di dimensione: " + width + ", " + height);
         Cronometer cron = new Cronometer();
 
         cron.start();
@@ -65,7 +70,7 @@ public class GraphGenerator {
         //concurrentReadMap(mapFilename, walls, grid);
         cron.stop();
 
-        log("A leggere la mappa ci ha messo: " + cron.getTime());
+        //log("A leggere la mappa ci ha messo: " + cron.getTime());
 
         //printGrid(grid);
 
@@ -73,7 +78,7 @@ public class GraphGenerator {
         UndirectedGraph<Vector2, DefaultEdge> graph = create(grid, walls, collisionDetector, dimWall);
 
 
-        log("Grafo creato: " + graph.toString());
+        //log("Grafo creato: " + graph.toString());
         return graph;
     }
 
@@ -153,7 +158,7 @@ public class GraphGenerator {
                             //log(node.toString() + " non arriva a " + toCompare.toString());
                             if(checkEdgeRayCast(collisionDetector, node, toCompare)) {
                                 DefaultEdge edge = graph.addEdge(node, toCompare);
-                                log("Secondi archi: aggiunto " + edge.toString());
+                                //log("Secondi archi: aggiunto " + edge.toString());
                             }
                         }
 
@@ -161,7 +166,7 @@ public class GraphGenerator {
                 }
             }
         });
-        log("Finiti secondi archi");
+        //log("Finiti secondi archi");
     }
 
 
@@ -215,7 +220,7 @@ public class GraphGenerator {
             });
             nodes.remove(vertex);
         });
-        log("Finiti primi archi");
+        //log("Finiti primi archi");
     }
 
     private static boolean checkNodeProximity(Vector2 first, Vector2 second) {
@@ -340,7 +345,7 @@ public class GraphGenerator {
                 }
             }
         }
-        log("Finiti primi nodi");
+        //log("Finiti primi nodi");
     }
 
     /**
@@ -396,7 +401,7 @@ public class GraphGenerator {
 
             }
         });
-        log("Finiti i nodi dei muri");
+        //log("Finiti i nodi dei muri");
     }
 
     private static boolean checkForAddingNode(int x, int y, Integer[][] grid, UndirectedGraph<Vector2, DefaultEdge> graph) {

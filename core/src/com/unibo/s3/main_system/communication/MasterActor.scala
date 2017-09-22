@@ -4,11 +4,12 @@ import akka.actor.{ActorRef, Props, Stash, UntypedAbstractActor}
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
-import com.unibo.s3.main_system.characters.Guard.Guard
-import com.unibo.s3.main_system.characters.Thief.Thief
+import com.unibo.s3.main_system.characters.Guard
+import com.unibo.s3.main_system.characters.Thief
 import com.unibo.s3.main_system.characters.{BaseCharacter, EntitiesSystemImpl}
 import com.unibo.s3.main_system.characters.steer.collisions.Box2dProxyDetectorsFactory
 import com.unibo.s3.main_system.communication.Messages._
+import com.unibo.s3.main_system.game.AkkaSettings
 
 class MasterActor extends UntypedAbstractActor with Stash {
 
@@ -74,17 +75,22 @@ class MasterActor extends UntypedAbstractActor with Stash {
     case msg: CreateCharacterMsg =>
       this.createCharacter(msg)
       context.become(this.actAndCreate)
+
+    //case msg: Any => println("messaggio sconosicuto " + msg)
   }
 
   private def actAndCreate: Receive = {
     case msg: ActMsg =>
+      /*SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
+        GeneralActors.WORLD_ACTOR.name).tell(msg, getSelf())*/
       SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR).tell(msg, getSelf())
       SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR).tell(RebuildQuadTreeMsg(), getSelf())
+      /*SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
+        GeneralActors.QUAD_TREE_ACTOR.name).tell(RebuildQuadTreeMsg(), getSelf())*/
       charactersList.foreach(cop => cop.tell(msg, getSelf()))
     //manca il ladro o i ladri
 
-    case msg: CreateCharacterMsg =>
-      this.createCharacter(msg)
+    case msg: CreateCharacterMsg => this.createCharacter(msg)
   }
 
   private def createCharacter(msg: CreateCharacterMsg): Unit = {
@@ -110,17 +116,21 @@ class MasterActor extends UntypedAbstractActor with Stash {
     def characterSettings(newCharacter: BaseCharacter, characterRef: ActorRef): Unit = {
       if (collisionDetector == null) {
         val worldActorRef = SystemManager.getLocalActor(GeneralActors.WORLD_ACTOR)
-        collisionDetector = new Box2dProxyDetectorsFactory(worldActorRef).newRaycastCollisionDetector()
+        //val worldActorRef = SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/", GeneralActors.WORLD_ACTOR.name)
+        collisionDetector = Box2dProxyDetectorsFactory.of(worldActorRef).newRaycastCollisionDetector()
       }
 
       newCharacter.setCollisionDetector(collisionDetector)
 
       charactersList :+= characterRef
 
-      SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR)
-        .tell(InitialSavingCharacterMsg(newCharacter, characterRef), getSelf())
-      SystemManager.getLocalActor(GeneralActors.GRAPH_ACTOR)
-        .tell(AskForGraphMsg, characterRef)
+      val ref = SystemManager.getLocalActor(GeneralActors.QUAD_TREE_ACTOR)
+      /*SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
+        GeneralActors.QUAD_TREE_ACTOR.name)*/
+      //ref ! CiaoMsg(newCharacter)
+      ref ! InitialSavingCharacterMsg(newCharacter, characterRef)
+      SystemManager.getRemoteActor(AkkaSettings.RemoteSystem, "/user/",
+        GeneralActors.GRAPH_ACTOR.name).tell(AskForGraphMsg, characterRef)
     }
 
     createCharacter(msg)

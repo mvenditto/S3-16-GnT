@@ -1,9 +1,7 @@
 package com.unibo.s3.testbed.ui
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.Texture.TextureFilter
 import com.kotcrab.vis.ui.widget.{VisImage, VisLabel, VisTable}
+import com.unibo.s3.main_system.util.GraphicsUtils
 
 
 class KeyHelpTable(
@@ -13,12 +11,8 @@ class KeyHelpTable(
   private[this] val iconsPath = "icons/keys/"
   private[this] val png = ".png"
 
-  private def loadKeyIcon(key: String): VisImage = {
-    val texture = new Texture(Gdx.files.internal(iconsPath + key + png), true)
-    texture.setFilter(TextureFilter.Linear,
-      TextureFilter.Linear)
-    new VisImage(texture)
-  }
+  private def loadKeyIcon(key: String): VisImage =
+    GraphicsUtils.loadIconAsImage(iconsPath + key + png)
 
   def addKeyBinding(key: String, desc: String): Unit = {
     add(loadKeyIcon(key)).size(icoSize, icoSize).expandX()
