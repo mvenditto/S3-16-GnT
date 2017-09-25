@@ -110,20 +110,6 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
       WorldActor.props(world), GeneralActors.WORLD_ACTOR)
     setProgress(100)
 
-    /*SystemManager.createActor(
-      QuadTreeActor.props(), GeneralActors.QUAD_TREE_ACTOR)*/
-
-    /*SystemManager.createActor(SpawnActor.props(), GeneralActors.SPAWN_ACTOR)
-    setProgress(60)*/
-
-    /*SystemManager.createActor(
-      MapActor.props(), GeneralActors.MAP_ACTOR)
-    setProgress(80)*/
-
-    /*SystemManager.createActor(
-      GraphActor.props(), GeneralActors.GRAPH_ACTOR)
-    setProgress(100)*/
-
     loadingFinished = true
   }
 
@@ -155,9 +141,7 @@ class BootstrapModule(listener: BootstrapEvent => Unit) extends BasicModuleWithG
   override def update(dt: Float): Unit = {
     super.update(dt)
 
-    if (loadingFinished) {
-      // after init updates ?
-    }
+    if (loadingFinished) {}
 
     if (!visualLoadingFinished && loadingBar.getVisualPercent >= 1.0f) {
       uiSetSuccess()

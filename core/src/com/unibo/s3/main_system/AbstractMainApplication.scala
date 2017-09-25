@@ -44,7 +44,7 @@ abstract class AbstractMainApplication extends ApplicationAdapter with InputProc
   private[this] var camController: BasicCameraInputController = _
   private[this] var camKeymap: CameraInputControllerKeymap = _
   private var fixedTimeStep = 1.0f / 60f
-  private var useFixedTimeStep = true
+  private var useFixedTimeStep = false
   protected var paused = false
 
   protected def doRender(): Unit

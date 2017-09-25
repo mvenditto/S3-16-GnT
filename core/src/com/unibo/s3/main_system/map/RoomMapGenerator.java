@@ -10,10 +10,10 @@ public class RoomMapGenerator extends AbstractMapGenerator {
 
     @Override
     public void generate(int width, int height, int startX, int startY){
-        int lowerX = (width/2 ) - 1;
-        int upperX = (width/2) + 1;
-        int lowerY = (height/2) - 1;
-        int upperY = (height/2) + 1;
+        int lowerX = (width/2);
+        int upperX = (width/2);
+        int lowerY = (height/2);
+        int upperY = (height/2);
         width--;
         height--;
         /*relative position, not absolute*/
